@@ -4,6 +4,7 @@ import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import io.vavr.Tuple3;
 import io.vavr.collection.Seq;
+import io.vavr.collection.Stream;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
 
@@ -32,10 +33,10 @@ public interface Builder<I, O> {
 
     default <D> Builder<I, D> withPostProcess(Transformer<O, D> t) {
         final Builder<I, O> thisBuilder = this;
-        return ((input, context) -> {
+        return (input, context) -> {
             Tuple3<O, Dynamic, Seq<I>> preOutput = thisBuilder.build(input, context);
             Tuple2<D, Dynamic> postOutput = t.transform(preOutput._1, preOutput._2);
             return Tuple.of(postOutput._1, postOutput._2, preOutput._3);
-        });
+        };
     }
 }

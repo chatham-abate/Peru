@@ -6,6 +6,12 @@ import io.vavr.Tuple2;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
 
+/**
+ * Transformer can be seen as a more atomic version of a builder.
+ * The transformer simply maps an input to an output given some context.
+ * The transformer returns the transformed input as well as a new context
+ * given input was just transformed.
+ */
 @FunctionalInterface
 public interface Transformer<I, O> {
     Tuple2<O, Dynamic> transform(I inputEle, Dynamic context) throws Throwable;

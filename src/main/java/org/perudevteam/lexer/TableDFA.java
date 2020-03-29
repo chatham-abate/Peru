@@ -4,6 +4,16 @@ import io.vavr.Function1;
 import io.vavr.collection.Array;
 import io.vavr.control.Option;
 
+/**
+ * Table Driven DFA.
+ * This class implements the State Machine Interface.
+ * Accepting states are stored in an array of options.
+ * Transition edges are stored in a matrix of options.
+ * The big catch here is that the user must provide some input class calculator function.
+ * Since the transitions are stored in an array, they can only be accessed with integer
+ * indices. Given some input, your input class function should return an integer in the range
+ * [0, |states| - 1].
+ */
 public abstract class TableDFA<I, O> implements StateMachine<I, O> {
     public static <I, O> TableDFA<I, O> tableDFA(Function1<I, ? extends Option<? extends Integer>> cl,
                     Array<? extends Option<O>> as,
