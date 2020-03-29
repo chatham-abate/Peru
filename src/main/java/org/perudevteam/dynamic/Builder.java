@@ -1,5 +1,7 @@
 package org.perudevteam.dynamic;
 
+import io.vavr.Tuple;
+import io.vavr.Tuple2;
 import io.vavr.Tuple3;
 import io.vavr.collection.Seq;
 import io.vavr.control.Option;
@@ -18,13 +20,22 @@ import io.vavr.control.Try;
  */
 @FunctionalInterface
 public interface Builder<I, O> {
-    Tuple3<O, Seq<I>, Dynamic> build(Seq<I> input, Dynamic context) throws Throwable;
+    Tuple3<O, Dynamic, Seq<I>> build(Seq<I> input, Dynamic context) throws Throwable;
 
-    default Try<Tuple3<O, Seq<I>, Dynamic>> tryBuild(Seq<I> input, Dynamic context) {
+    default Try<Tuple3<O, Dynamic, Seq<I>>> tryBuild(Seq<I> input, Dynamic context) {
         return Try.of(() -> build(input, context));
     }
 
-    default Option<Tuple3<O, Seq<I>, Dynamic>> optionBuild(Seq<I> input, Dynamic context) {
+    default Option<Tuple3<O, Dynamic, Seq<I>>> optionBuild(Seq<I> input, Dynamic context) {
         return tryBuild(input, context).toOption();
+    }
+
+    default <D> Builder<I, D> withPostProcess(Transformer<O, D> t) {
+        final Builder<I, O> thisBuilder = this;
+        return ((input, context) -> {
+            Tuple3<O, Dynamic, Seq<I>> preOutput = thisBuilder.build(input, context);
+            Tuple2<D, Dynamic> postOutput = t.transform(preOutput._1, preOutput._2);
+            return Tuple.of(postOutput._1, postOutput._2, preOutput._3);
+        });
     }
 }
