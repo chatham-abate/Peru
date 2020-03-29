@@ -1,4 +1,4 @@
-package org.perudevteam.misc;
+package org.perudevteam.dynamic;
 
 import io.vavr.CheckedFunction1;
 import io.vavr.Function1;
@@ -22,6 +22,9 @@ public interface Dynamic {
         // Null Dynamic
     };
 
+    Dynamic TRUE = new DynaBoolean(true);
+    Dynamic FALSE = new DynaBoolean(false);
+
     static Dynamic ofNull() {
         return NULL;
     }
@@ -38,8 +41,12 @@ public interface Dynamic {
         return new DynaString(v);
     }
 
-    static Dynamic ofBoolean(boolean v) {
-        return new DynaBoolean(v);
+    static Dynamic ofTrue() {
+        return TRUE;
+    }
+
+    static Dynamic ofFalse() {
+        return FALSE;
     }
 
     static Dynamic ofEnum(Enum v) {
