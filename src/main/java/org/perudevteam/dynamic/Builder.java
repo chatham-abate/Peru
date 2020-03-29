@@ -20,11 +20,11 @@ import io.vavr.control.Try;
 public interface Builder<I, O> {
     Tuple3<O, Seq<I>, Dynamic> build(Seq<I> input, Dynamic context) throws Throwable;
 
-    default Try<Tuple3<O, Seq<I>, Dynamic>> buildTry(Seq<I> input, Dynamic context) {
+    default Try<Tuple3<O, Seq<I>, Dynamic>> tryBuild(Seq<I> input, Dynamic context) {
         return Try.of(() -> build(input, context));
     }
 
-    default Option<Tuple3<O, Seq<I>, Dynamic>> buildOption(Seq<I> input, Dynamic context) {
-        return buildTry(input, context).toOption();
+    default Option<Tuple3<O, Seq<I>, Dynamic>> optionBuild(Seq<I> input, Dynamic context) {
+        return tryBuild(input, context).toOption();
     }
 }
