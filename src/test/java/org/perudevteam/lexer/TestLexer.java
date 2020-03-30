@@ -68,43 +68,12 @@ public class TestLexer {
        CLASSES, ACCEPTS, TRANS
     );
 
-    private static final CheckedFunction2<Character, Dynamic, Dynamic> READER = (input, context) -> {
-        if (input == '\n') {
-            int linesRead = context.asMap().get("CurrentLine").get().asInt();
-            return ofMap(context.asMap().put("CurrentLine", ofInt(linesRead + 1)));
-        }
-
-        return context;
-    };
-
-    private static final Function2<Character, Dynamic, Dynamic> COMBINER =
-            (input, lexeme) -> ofString(lexeme.asString() + input);
-
-    private static final Dynamic INIT_LEXEME = ofString("");
-
-    private static final Function2<Dynamic, Dynamic, Dynamic> ON_TOKEN = (token, context) -> context;
-
-    private static final Function2<Dynamic, Dynamic, Throwable> ON_ERROR = (lexeme, context) -> {
-        int lineSinceLast = context.asMap().get("LineSinceLastToken").get().asInt();
-        String lex = lexeme.asString();
-
-        return new IllegalArgumentException("[" + lineSinceLast + "] Invalid Lexeme : " + lex);
-    };
-
-    private static final Function2<Dynamic, Dynamic, Dynamic> FINISHER = (token, context) -> {
-        Dynamic currentLine = context.asMap().get("CurrentLine").get();
-        return ofMap(context.asMap().put("LineSinceLastToken", currentLine));
-    };
-
-
-    private static final Builder<Character, Dynamic> LEXER =
-            Lexer.tableLexer(DFA, READER, COMBINER, INIT_LEXEME, ON_TOKEN, ON_ERROR, FINISHER);
+    private static final Builder<Character, Dynamic> LEXER = Lexer.classicTableLexer(DFA);
 
     private static final Dynamic START_CONTEXT = ofMap(HashMap.of(
             "LineSinceLastToken", ofInt(0),
             "CurrentLine", ofInt(0)
     ));
-
 
     @Test
     void testBasicLanguage() {

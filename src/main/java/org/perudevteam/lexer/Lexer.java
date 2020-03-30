@@ -55,13 +55,15 @@ public class Lexer {
      * @param finisher This function is called to finalize the context after finishing lexing.
      *                 Should be in the form (finalToken, context) -> context'.
      */
-    public static <I> Builder<I, Dynamic> tableLexer(StateMachine<I, Function2<Dynamic, Dynamic, Dynamic>> dfa,
-                                                        CheckedFunction2<I, Dynamic, Dynamic> reader,
-                                                        Function2<I, Dynamic, Dynamic> combiner,
-                                                        Dynamic initialLex,
-                                                        Function2<Dynamic, Dynamic, Dynamic> onToken,
-                                                        Function2<Dynamic, Dynamic, Throwable> onError,
-                                                        Function2<Dynamic, Dynamic, Dynamic> finisher) {
+    public static <I> Builder<I, Dynamic> tableLexer(
+            StateMachine<? super I, ? extends Function2<? super Dynamic, ? super Dynamic, ? extends Dynamic>> dfa,
+            CheckedFunction2<? super I, ? super Dynamic, ? extends Dynamic> reader,
+            Function2<? super I, ? super Dynamic, ? extends Dynamic> combiner,
+            Dynamic initialLex,
+            Function2<? super Dynamic, ? super Dynamic, ? extends Dynamic> onToken,
+            Function2<? super Dynamic, ? super Dynamic, ? extends Throwable> onError,
+            Function2<? super Dynamic, ? super Dynamic, ? extends Dynamic> finisher) {
+
         return (input, context) -> {
             // This will save the input state whenever a token is found.
             Seq<I> lastCutOff = input;
@@ -79,9 +81,10 @@ public class Lexer {
             while (!stateOp.isEmpty()) {
                 int state = stateOp.get();
 
-                Option<Function2<Dynamic, Dynamic, Dynamic>> output = dfa.getOutcome(state);
+                Option<? extends Function2<? super Dynamic, ? super Dynamic, ? extends Dynamic>> output =
+                        dfa.getOutcome(state);
                 if (!output.isEmpty()) {
-                    Function2<Dynamic, Dynamic, Dynamic> tokenGenerator = output.get();
+                    Function2<? super Dynamic, ? super Dynamic, ? extends Dynamic> tokenGenerator = output.get();
 
                     lastToken = tokenGenerator.apply(lexeme, algoContext);
                     lastCutOff = symbolsLeft;
@@ -165,9 +168,9 @@ public class Lexer {
     };
 
     public static Builder<Character, Dynamic> classicTableLexer(
-            StateMachine<Character, Function2<Dynamic, Dynamic, Dynamic>> dfa) {
+            StateMachine<? super Character,
+                    ? extends Function2<? super Dynamic, ? super Dynamic, ? extends Dynamic>> dfa) {
         return tableLexer(dfa, CLASSIC_READER, CLASSIC_COMBINER, CLASSIC_INIT_LEXEME, CLASSIC_ON_TOKEN,
                 CLASSIC_ON_ERROR, CLASSIC_FINISHER);
     }
-
 }
