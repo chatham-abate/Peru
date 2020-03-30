@@ -1,13 +1,9 @@
 package org.perudevteam.lexer;
 
 import io.vavr.Function1;
-import io.vavr.Tuple;
-import io.vavr.Tuple2;
 import io.vavr.collection.*;
 import io.vavr.control.Option;
-import io.vavr.control.Try;
 import org.junit.jupiter.api.Test;
-import static org.perudevteam.dynamic.Dynamic.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestTableDFA {

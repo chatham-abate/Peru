@@ -69,28 +69,56 @@ public interface Dynamic {
         throw new NullPointerException("Dynamic Value contains no Integer value.");
     }
 
+    default boolean isInt() {
+        return false;
+    }
+
     default double asDouble() {
         throw new NullPointerException("Dynamic Value contains no Double value.");
+    }
+
+    default boolean isDouble() {
+        return false;
     }
 
     default String asString() {
         throw new NullPointerException("Dynamic Value contains no String value.");
     }
 
+    default boolean isString() {
+        return false;
+    }
+
     default boolean asBoolean() {
         throw new NullPointerException("Dynamic Value contains no Boolean value.");
+    }
+
+    default boolean isBoolean() {
+        return false;
     }
 
     default Enum asEnum() {
         throw new NullPointerException("Dynamic Value contains no Enum value.");
     }
 
+    default boolean isEnum() {
+        return false;
+    }
+
     default Seq<Dynamic> asSequence() {
         throw new NullPointerException("Dynamic Value contains no Sequence value.");
     }
 
+    default boolean isSequence() {
+        return false;
+    }
+
     default Map<? super String, Dynamic> asMap() {
         throw new NullPointerException("Dynamic Value contains no Map value.");
+    }
+
+    default boolean isMap() {
+        return false;
     }
 
     default Object asReference() {
@@ -128,8 +156,25 @@ public interface Dynamic {
         }
 
         @Override
+        public boolean isInt() {
+            return true;
+        }
+
+        @Override
         public Object asReference() {
             return value;
+        }
+
+        @Override
+        public String toString() {
+            return "" + value;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o.getClass() != this.getClass()) return false;
+            DynaInt other = (DynaInt)o;
+            return value == other.asInt();
         }
     }
 
@@ -145,8 +190,25 @@ public interface Dynamic {
         }
 
         @Override
+        public boolean isDouble() {
+            return true;
+        }
+
+        @Override
         public Object asReference() {
             return value;
+        }
+
+        @Override
+        public String toString() {
+            return "" + value;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o.getClass() != this.getClass()) return false;
+            DynaDouble other = (DynaDouble)o;
+            return value == other.asDouble();
         }
     }
 
@@ -162,8 +224,25 @@ public interface Dynamic {
         }
 
         @Override
+        public boolean isString() {
+            return true;
+        }
+
+        @Override
         public Object asReference() {
             return value;
+        }
+
+        @Override
+        public String toString() {
+            return value;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o.getClass() != this.getClass()) return false;
+            DynaString other = (DynaString)o;
+            return value.equals(other.asString());
         }
     }
 
@@ -179,8 +258,25 @@ public interface Dynamic {
         }
 
         @Override
+        public boolean isBoolean() {
+            return true;
+        }
+
+        @Override
         public Object asReference() {
             return value;
+        }
+
+        @Override
+        public String toString() {
+            return "" + value;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o.getClass() != this.getClass()) return false;
+            DynaBoolean other = (DynaBoolean)o;
+            return value == other.asBoolean();
         }
     }
 
@@ -196,8 +292,25 @@ public interface Dynamic {
         }
 
         @Override
+        public boolean isEnum() {
+            return true;
+        }
+
+        @Override
         public Object asReference() {
             return value;
+        }
+
+        @Override
+        public String toString() {
+            return value.name();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o.getClass() != this.getClass()) return false;
+            DynaEnum other = (DynaEnum)o;
+            return value == other.asEnum();
         }
     }
 
@@ -213,8 +326,25 @@ public interface Dynamic {
         }
 
         @Override
+        public boolean isSequence() {
+            return true;
+        }
+
+        @Override
         public Object asReference() {
             return value;
+        }
+
+        @Override
+        public String toString() {
+            return value.toString();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o.getClass() != this.getClass()) return false;
+            DynaSeq other = (DynaSeq)o;
+            return value.equals(other.asSequence());
         }
     }
 
@@ -231,8 +361,25 @@ public interface Dynamic {
         }
 
         @Override
+        public boolean isMap() {
+            return true;
+        }
+
+        @Override
         public Object asReference() {
             return value;
+        }
+
+        @Override
+        public String toString() {
+            return value.toString();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o.getClass() != this.getClass()) return false;
+            DynaMap other = (DynaMap)o;
+            return value.equals(other.asMap());
         }
     }
 
@@ -245,6 +392,13 @@ public interface Dynamic {
         @Override
         public Object asReference() {
             return value;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o.getClass() != this.getClass()) return false;
+            DynaRef other = (DynaRef)o;
+            return value.equals(other.asReference());
         }
     }
 }

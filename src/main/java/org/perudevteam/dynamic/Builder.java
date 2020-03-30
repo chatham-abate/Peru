@@ -18,6 +18,8 @@ import io.vavr.control.Try;
  * The builder would then build the first valid token it comes across.
  * It returns the token, the rest of the characters yet to be used, and the new context
  * with some new line number (Maybe a new line character had been read).
+ *
+ * The builder is in the form (seq, context) -> (product, context', seq')
  */
 @FunctionalInterface
 public interface Builder<I, O> {

@@ -13,6 +13,9 @@ import io.vavr.control.Option;
  * Since the transitions are stored in an array, they can only be accessed with integer
  * indices. Given some input, your input class function should return an integer in the range
  * [0, |states| - 1].
+ * NOTE, while not stored, this is assumed to have a starting state of 0.
+ * This point does not affect this class. However, in places where this class is used,
+ * 0 will be used as the initial state.
  */
 public abstract class TableDFA<I, O> implements StateMachine<I, O> {
     public static <I, O> TableDFA<I, O> tableDFA(Function1<I, ? extends Option<? extends Integer>> cl,
