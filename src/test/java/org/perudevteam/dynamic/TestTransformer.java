@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TestTransformer {
     @Test
-    public void testBasics() {
+    void testBasics() {
         Transformer<Integer, String> counter = ((inputEle, context) -> {
             Dynamic newContext = ofInt(context.asInt() + inputEle);
             return Tuple.of(inputEle.toString(), newContext);

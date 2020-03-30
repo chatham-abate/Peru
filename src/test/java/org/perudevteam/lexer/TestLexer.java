@@ -107,7 +107,7 @@ public class TestLexer {
 
 
     @Test
-    public void testBasicLanguage() {
+    void testBasicLanguage() {
         Seq<Character> input = List.ofAll("123 456.1".toCharArray());
 
         Try<Tuple3<Dynamic, Dynamic, Seq<Character>>> outputTry = LEXER.tryBuild(input, START_CONTEXT);
@@ -122,9 +122,9 @@ public class TestLexer {
         assertEquals(List.ofAll(" 456.1".toCharArray()), rest);
     }
 
-    static final String TEST_STRING = "123.3\n 7852.12 \n 23";
+    private static final String TEST_STRING = "123.3\n 7852.12 \n 23";
 
-    static final Seq<Dynamic> EXPECTED_TOKENS = List.of(
+    private static final Seq<Dynamic> EXPECTED_TOKENS = List.of(
             ofMap(HashMap.of(
                     "Data", ofString("123.3"),
                     "Type", ofEnum(TokenTypes.DECIMAL),
@@ -153,13 +153,12 @@ public class TestLexer {
     );
 
     @Test
-    public void testBasicLanguageVerbose() {
+    void testBasicLanguageVerbose() {
         assertTokenMatch(EXPECTED_TOKENS, LEXER, START_CONTEXT, TEST_STRING);
     }
 
-    public static void assertTokenMatch(Seq<Dynamic> expected, Builder<Character, Dynamic> lexer,
+    static void assertTokenMatch(Seq<Dynamic> expected, Builder<Character, Dynamic> lexer,
                                    Dynamic startContext, String input) {
-
         Dynamic context = startContext;
         Seq<Character> rest = List.ofAll(input.toCharArray());
 
@@ -178,4 +177,11 @@ public class TestLexer {
 
         assertEquals(expected, tokens);
     }
+
+    /*
+     * Now for Table Lexer Tests....
+     * The Table
+     */
+
+
 }

@@ -53,11 +53,11 @@ public interface Dynamic {
         return new DynaEnum(v);
     }
 
-    static Dynamic ofSequence(Seq<Dynamic> v) {
+    static Dynamic ofSequence(Seq<? extends Dynamic> v) {
         return new DynaSeq(v);
     }
 
-    static Dynamic ofMap(Map<? super String, Dynamic> v) {
+    static Dynamic ofMap(Map<? super String, ? extends Dynamic> v) {
         return new DynaMap(v);
     }
 
@@ -73,6 +73,10 @@ public interface Dynamic {
         return false;
     }
 
+    default Dynamic mapInt(Function1<? super Integer, ? extends Integer> f) {
+        throw new NullPointerException("Dynamic Value contains no Integer value.");
+    }
+
     default double asDouble() {
         throw new NullPointerException("Dynamic Value contains no Double value.");
     }
@@ -81,12 +85,21 @@ public interface Dynamic {
         return false;
     }
 
+    default Dynamic mapDouble(Function1<? super Double, ? extends Double> f) {
+        throw new NullPointerException("Dynamic Value contains no Double value.");
+    }
+
+
     default String asString() {
         throw new NullPointerException("Dynamic Value contains no String value.");
     }
 
     default boolean isString() {
         return false;
+    }
+
+    default Dynamic mapString(Function1<? super String, ? extends String> f) {
+        throw new NullPointerException("Dynamic Value contains no String value.");
     }
 
     default boolean asBoolean() {
@@ -97,12 +110,20 @@ public interface Dynamic {
         return false;
     }
 
+    default Dynamic mapBoolean(Function1<? super Boolean, ? extends Boolean> f) {
+        throw new NullPointerException("Dynamic Value contains no Boolean value.");
+    }
+
     default Enum asEnum() {
         throw new NullPointerException("Dynamic Value contains no Enum value.");
     }
 
     default boolean isEnum() {
         return false;
+    }
+
+    default Dynamic mapEnum(Function1<? super Enum, ? extends Enum>  f) {
+        throw new NullPointerException("Dynamic Value contains no Enum value.");
     }
 
     default Seq<Dynamic> asSequence() {
@@ -113,6 +134,10 @@ public interface Dynamic {
         return false;
     }
 
+    default Dynamic mapSequence(Function1<? super Seq<? extends Dynamic>, ? extends Seq<? extends Dynamic>> f) {
+        throw new NullPointerException("Dynamic Value contains no Sequence value.");
+    }
+
     default Map<? super String, Dynamic> asMap() {
         throw new NullPointerException("Dynamic Value contains no Map value.");
     }
@@ -121,7 +146,16 @@ public interface Dynamic {
         return false;
     }
 
+    default Dynamic mapMap(Function1<? super Map<? super String, ? extends Dynamic>,
+            ? extends Map<? super String, ? extends Dynamic>> f) {
+        throw new NullPointerException("Dynamic Value contains no Map value.");
+    }
+
     default Object asReference() {
+        throw new NullPointerException("Dynamic Value contains no Reference value.");
+    }
+
+    default Dynamic mapReference(Function1<Object, Object> f) {
         throw new NullPointerException("Dynamic Value contains no Reference value.");
     }
 
@@ -161,6 +195,11 @@ public interface Dynamic {
         }
 
         @Override
+        public Dynamic mapInt(Function1<? super Integer, ? extends Integer> f) {
+            return new DynaInt(f.apply(value));
+        }
+
+        @Override
         public Object asReference() {
             return value;
         }
@@ -192,6 +231,11 @@ public interface Dynamic {
         @Override
         public boolean isDouble() {
             return true;
+        }
+
+        @Override
+        public Dynamic mapDouble(Function1<? super Double, ? extends Double> f) {
+            return new DynaDouble(f.apply(value));
         }
 
         @Override
@@ -229,6 +273,11 @@ public interface Dynamic {
         }
 
         @Override
+        public Dynamic mapString(Function1<? super String, ? extends String> f) {
+            return new DynaString(f.apply(value));
+        }
+
+        @Override
         public Object asReference() {
             return value;
         }
@@ -260,6 +309,11 @@ public interface Dynamic {
         @Override
         public boolean isBoolean() {
             return true;
+        }
+
+        @Override
+        public Dynamic mapBoolean(Function1<? super Boolean, ? extends Boolean> f) {
+            return f.apply(value) ? TRUE : FALSE;
         }
 
         @Override
@@ -297,6 +351,11 @@ public interface Dynamic {
         }
 
         @Override
+        public Dynamic mapEnum(Function1<? super Enum, ? extends Enum> f) {
+            return new DynaEnum(f.apply(value));
+        }
+
+        @Override
         public Object asReference() {
             return value;
         }
@@ -328,6 +387,11 @@ public interface Dynamic {
         @Override
         public boolean isSequence() {
             return true;
+        }
+
+        @Override
+        public Dynamic mapSequence(Function1<? super Seq<? extends Dynamic>, ? extends Seq<? extends Dynamic>> f) {
+            return new DynaSeq(f.apply(value));
         }
 
         @Override
@@ -366,6 +430,12 @@ public interface Dynamic {
         }
 
         @Override
+        public Dynamic mapMap(Function1<? super Map<? super String, ? extends Dynamic>,
+                ? extends Map<? super String, ? extends Dynamic>> f) {
+            return new DynaMap(f.apply(value));
+        }
+
+        @Override
         public Object asReference() {
             return value;
         }
@@ -392,6 +462,11 @@ public interface Dynamic {
         @Override
         public Object asReference() {
             return value;
+        }
+
+        @Override
+        public Dynamic mapReference(Function1<Object, Object> f) {
+            return new DynaRef(f.apply(value));
         }
 
         @Override

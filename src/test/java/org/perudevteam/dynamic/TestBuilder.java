@@ -32,7 +32,7 @@ public class TestBuilder {
     });
 
     @Test
-    public void testBasics() {
+    void testBasics() {
         Seq<Integer> input = List.of(1, 2, 3, 2, 3);
         Dynamic context = ofInt(0);
 

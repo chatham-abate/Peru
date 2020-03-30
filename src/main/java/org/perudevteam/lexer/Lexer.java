@@ -15,7 +15,6 @@ import static org.perudevteam.dynamic.Dynamic.*;
  * completely user defined.
  */
 public class Lexer {
-
     /**
      * Build a table driven lexer.
      *
@@ -119,6 +118,56 @@ public class Lexer {
 
             return Tuple.of(lastToken, finisher.apply(lastToken, lastContext), lastCutOff);
         };
+    }
+
+    /*
+     * Below lie presets for different types of lexers.
+     *
+     * First is the Classic String Lexer...
+     * This lexer reads in characters and combines them into Strings.
+     * The lexer has the following context format.
+     *
+     * Context is a DynaMap containing two entries.
+     * CurrentLine : DynaInt
+     * LineSinceLastToken : DynaInt
+     *
+     * These entries help the lexer position the tokens it lexes with line numbers.
+     * CurrentLine will be the current line of the context.
+     * LineSinceLastToken will be the line number the last lexed token starts on.
+     */
+
+    public static final CheckedFunction2<Character, Dynamic, Dynamic> CLASSIC_READER = (input, context) -> {
+        if (input == '\n') {
+            int linesRead = context.asMap().get("CurrentLine").get().asInt();
+            return ofMap(context.asMap().put("CurrentLine", ofInt(linesRead + 1)));
+        }
+
+        return context;
+    };
+
+    public static final Function2<Character, Dynamic, Dynamic> CLASSIC_COMBINER =
+            (input, lexeme) -> ofString(lexeme.asString() + input);
+
+    public static final Dynamic CLASSIC_INIT_LEXEME = ofString("");
+
+    public static final Function2<Dynamic, Dynamic, Dynamic> CLASSIC_ON_TOKEN = (token, context) -> context;
+
+    public static final Function2<Dynamic, Dynamic, Throwable> CLASSIC_ON_ERROR = (lexeme, context) -> {
+        int lineSinceLast = context.asMap().get("LineSinceLastToken").get().asInt();
+        String lex = lexeme.asString();
+
+        return new IllegalArgumentException("[" + lineSinceLast + "] Invalid Lexeme : " + lex);
+    };
+
+    public static final Function2<Dynamic, Dynamic, Dynamic> CLASSIC_FINISHER = (token, context) -> {
+        Dynamic currentLine = context.asMap().get("CurrentLine").get();
+        return ofMap(context.asMap().put("LineSinceLastToken", currentLine));
+    };
+
+    public static Builder<Character, Dynamic> classicTableLexer(
+            StateMachine<Character, Function2<Dynamic, Dynamic, Dynamic>> dfa) {
+        return tableLexer(dfa, CLASSIC_READER, CLASSIC_COMBINER, CLASSIC_INIT_LEXEME, CLASSIC_ON_TOKEN,
+                CLASSIC_ON_ERROR, CLASSIC_FINISHER);
     }
 
 }
