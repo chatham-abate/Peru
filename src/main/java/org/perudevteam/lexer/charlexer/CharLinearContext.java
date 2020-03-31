@@ -1,12 +1,17 @@
 package org.perudevteam.lexer.charlexer;
 
 import io.vavr.Tuple;
+import io.vavr.collection.HashMap;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Map;
 import io.vavr.collection.Set;
 import org.perudevteam.lexer.LinearContext;
 
 public class CharLinearContext extends CharSimpleContext implements LinearContext<CharLinearContext> {
+
+    public static final CharLinearContext INIT_LINEAR_CONTEXT =
+            new CharLinearContext(HashMap.empty(), 0, 1, 1, 1);
+
     private int absolutePosition;
     private Map<Integer, Set<Integer>> failMap;
 

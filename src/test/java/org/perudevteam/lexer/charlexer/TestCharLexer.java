@@ -3,8 +3,10 @@ package org.perudevteam.lexer.charlexer;
 import io.vavr.Function1;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
+import io.vavr.Tuple3;
 import io.vavr.collection.List;
 import io.vavr.collection.Seq;
+import io.vavr.collection.Stream;
 import io.vavr.control.Try;
 import org.junit.jupiter.api.Test;
 import org.perudevteam.statemachine.DFStateMachine;
@@ -13,14 +15,14 @@ import org.perudevteam.statemachine.DStateMachine;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestCharLexer {
-    enum CharType1 {
+    private enum CharType1 {
         SPACE,
         NUMBER,
         DOT,
         OTHER
     }
 
-    enum TokenType1 {
+    private enum TokenType1 {
         WHITESPACE,
         INT,
         DOUBLE
@@ -70,4 +72,62 @@ public class TestCharLexer {
         assertEquals(EXPECTED1,
                 LEXER1.buildStream(INPUT1, CharSimpleContext.INIT_SIMPLE_CONTEXT).map(Try::get));
     }
+
+    private enum CharType2 {
+        A,
+        B,
+        C,
+        OTHER
+    }
+
+    private enum TokenType2 {
+        LONG,
+        SHORT
+    }
+
+    private static final DFStateMachine<CharType2, Function1<CharLinearContext, CharData>>
+            DSFM2 = DFStateMachine.<CharType2, Function1<CharLinearContext, CharData>>emptyDFSM(6)
+            .withEdge(0, 1, CharType2.A)
+            .withEdge(1, 2, CharType2.B)
+            .withEdge(2, 3, CharType2.A)
+            .withEdge(3, 4, CharType2.B)
+            .withEdge(4, 5, CharType2.C)
+            .withEdge(2, 5, CharType2.C)
+            .withEdge(4, 3, CharType2.A)
+            .withAcceptingState(2, c -> new CharData(TokenType2.SHORT, c.getStartingLine()))
+            .withAcceptingState(5, c -> new CharData(TokenType2.LONG, c.getStartingLine()));
+
+    private static final CharLinearDLexer<CharType2> LEXER2 = new CharLinearDLexer<CharType2>(DSFM2) {
+        @Override
+        protected CharType2 inputClass(Character input) {
+            if (input == 'a') {
+                return CharType2.A;
+            } else if (input == 'b') {
+                return CharType2.B;
+            } else if (input == 'c') {
+                return CharType2.C;
+            }
+
+            return CharType2.OTHER;
+        }
+    };
+
+    private static final Seq<Tuple2<String, CharData>> EXPECTED2 = List.of(
+            Tuple.of("ababc", new CharData(TokenType2.LONG, 1)),
+            Tuple.of("ab", new CharData(TokenType2.SHORT, 1)),
+            Tuple.of("ab", new CharData(TokenType2.SHORT, 1))
+    );
+
+    @Test
+    void testLinearLexer() {
+        Seq<Character> input = List.ofAll("ababcabab".toCharArray());
+
+        Stream<Try<Tuple2<String, CharData>>> tryStream =
+                LEXER2.buildStream(input, CharLinearContext.INIT_LINEAR_CONTEXT);
+
+        Stream<Tuple2<String, CharData>> stream = tryStream.map(Try::get);
+
+        assertEquals(EXPECTED2, stream);
+    }
+
 }

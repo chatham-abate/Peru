@@ -7,19 +7,16 @@ import org.perudevteam.misc.LineException;
 import org.perudevteam.statemachine.DStateMachine;
 
 public abstract class CharLinearDLexer<CL> extends LinearDLexer<Character, CL, String, CharData, CharLinearContext> {
-    public CharLinearDLexer(String initLex, DStateMachine<CL, Function1<CharLinearContext, CharData>> d) {
-        super(initLex, d);
+    public CharLinearDLexer(DStateMachine<CL, Function1<CharLinearContext, CharData>> d) {
+        super("", d);
     }
 
     @Override
     protected CharLinearContext readInput(Character input, CharLinearContext context) {
-        // Increment absolute position.
-        CharLinearContext advancedContext = context.withAbsolutePosition(context.getAbsolutePosition() + 1);
-
         // Increment Line number if necessary.
         return input == '\n'
-                ? advancedContext.withCurrentLine(advancedContext.getCurrentLine() + 1)
-                : advancedContext;
+                ? context.withCurrentLine(context.getCurrentLine() + 1)
+                : context;
     }
 
     @Override
@@ -39,6 +36,7 @@ public abstract class CharLinearDLexer<CL> extends LinearDLexer<Character, CL, S
 
     @Override
     protected CharLinearContext onSuccess(Tuple2<String, CharData> token, CharLinearContext context) {
-        return null;
+        return context.withStartingLine(context.getEndingLine())
+                .withCurrentLine(context.getEndingLine());
     }
 }

@@ -60,6 +60,7 @@ public abstract class LinearDLexer<I, CL, L, D, C extends LinearContext<C>>
             if (tail.isEmpty()) break;
 
             I symbol = tail.head();
+
             // Increment absolute position.
             algoContext = algoContext.withAbsolutePosition(algoContext.getAbsolutePosition() + 1);
 
