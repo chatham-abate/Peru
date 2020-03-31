@@ -25,5 +25,12 @@ public interface StateMachine<O> {
         return getOutputUnsafe(st);
     }
 
+    boolean isAcceptingUnsafe(int st);
+
+    default boolean isAccepting(int st) {
+        validateState(st);
+        return isAcceptingUnsafe(st);
+    }
+
     StateMachine<O> withAcceptingState(int st, O output);
 }

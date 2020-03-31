@@ -51,6 +51,11 @@ public class DFStateMachine<I, O> implements DStateMachine<I, O>, FStateMachine<
     }
 
     @Override
+    public boolean isAcceptingUnsafe(int st) {
+        return acceptingStates.containsKey(st);
+    }
+
+    @Override
     public DFStateMachine<I, O> withAcceptingState(int st, O output) {
         validateState(st);
         return new DFStateMachine<>(transitionTable, acceptingStates.put(st, output));
