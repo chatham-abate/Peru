@@ -5,7 +5,6 @@ import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import io.vavr.collection.List;
 import io.vavr.collection.Seq;
-import io.vavr.collection.Stream;
 import io.vavr.control.Try;
 import org.junit.jupiter.api.Test;
 import org.perudevteam.statemachine.DFStateMachine;
@@ -69,6 +68,6 @@ public class TestCharLexer {
     @Test
     void testSimpleLexer() {
         assertEquals(EXPECTED1,
-                LEXER1.buildStream(INPUT1, CharSimpleContext.INITIAL_CONTEXT).map(Try::get));
+                LEXER1.buildStream(INPUT1, CharSimpleContext.INIT_SIMPLE_CONTEXT).map(Try::get));
     }
 }

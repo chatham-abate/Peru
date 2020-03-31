@@ -19,6 +19,14 @@ public class CharData {
         return lineNumber;
     }
 
+    public CharData withType(Enum t) {
+        return new CharData(t, lineNumber);
+    }
+
+    public CharData withLineNumber(int ln) {
+        return new CharData(type, ln);
+    }
+
     @Override
     public String toString() {
         return "[" + type.name() + ", " + lineNumber + "]";

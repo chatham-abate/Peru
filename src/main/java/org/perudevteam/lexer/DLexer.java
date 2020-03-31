@@ -20,7 +20,7 @@ import org.perudevteam.statemachine.DStateMachine;
 public abstract class DLexer<I, CL, L, D, C> implements Builder<I, C, Tuple2<L, D>> {
     private L initialLexeme;
 
-    // (context) -> (data, context').
+    // (context) -> (data).
     private DStateMachine<CL, Function1<C, D>> dsm;
 
     public DLexer(L initLex, DStateMachine<CL, Function1<C, D>> d) {

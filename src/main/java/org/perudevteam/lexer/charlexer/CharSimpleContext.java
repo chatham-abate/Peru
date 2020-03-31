@@ -2,7 +2,7 @@ package org.perudevteam.lexer.charlexer;
 
 public class CharSimpleContext {
 
-    public static final CharSimpleContext INITIAL_CONTEXT = new CharSimpleContext(1, 1, 1);
+    public static final CharSimpleContext INIT_SIMPLE_CONTEXT = new CharSimpleContext(1, 1, 1);
 
     private int currentLine;
     private int staringLine;
