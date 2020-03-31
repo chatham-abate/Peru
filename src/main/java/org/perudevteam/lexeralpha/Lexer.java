@@ -1,6 +1,7 @@
-package org.perudevteam.lexer;
+package org.perudevteam.lexeralpha;
 
 import io.vavr.*;
+import io.vavr.collection.Map;
 import io.vavr.collection.Seq;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
@@ -55,7 +56,7 @@ public class Lexer {
      * @param finisher This function is called to finalize the context after finishing lexing.
      *                 Should be in the form (finalToken, context) -> context'.
      */
-    public static <I> Builder<I, Dynamic> tableLexer(
+    public static <I> Builder<I, Dynamic> lexer(
             StateMachine<? super I, ? extends Function2<? super Dynamic, ? super Dynamic, ? extends Dynamic>> dfa,
             CheckedFunction2<? super I, ? super Dynamic, ? extends Dynamic> reader,
             Function2<? super I, ? super Dynamic, ? extends Dynamic> combiner,
@@ -67,7 +68,6 @@ public class Lexer {
         return (input, context) -> {
             // This will save the input state whenever a token is found.
             Seq<I> lastCutOff = input;
-            Dynamic lastContext = context;
 
             Dynamic lastToken = null; // This will be plain null until a real token is found.
 
@@ -89,7 +89,6 @@ public class Lexer {
                     lastToken = tokenGenerator.apply(lexeme, algoContext);
                     lastCutOff = symbolsLeft;
                     algoContext = onToken.apply(lastToken, algoContext);
-                    lastContext = algoContext;
                 }
 
                 // We know we are on a valid state, it was either just determined to be
@@ -119,7 +118,7 @@ public class Lexer {
                 throw onError.apply(lexeme, algoContext);
             }
 
-            return Tuple.of(lastToken, finisher.apply(lastToken, lastContext), lastCutOff);
+            return Tuple.of(lastToken, finisher.apply(lastToken, algoContext), lastCutOff);
         };
     }
 
@@ -130,13 +129,15 @@ public class Lexer {
      * This lexer reads in characters and combines them into Strings.
      * The lexer has the following context format.
      *
-     * Context is a DynaMap containing two entries.
+     * Context is a DynaMap containing three entries.
+     * InitialLine : DynaInt
      * CurrentLine : DynaInt
      * LineSinceLastToken : DynaInt
      *
      * These entries help the lexer position the tokens it lexes with line numbers.
+     * InitialLine will store the line the algorithm started on.
      * CurrentLine will be the current line of the context.
-     * LineSinceLastToken will be the line number the last lexed token starts on.
+     * LineSinceLastToken will be the line number of the context the last time a valid token was found.
      */
 
     public static final CheckedFunction2<Character, Dynamic, Dynamic> CLASSIC_READER = (input, context) -> {
@@ -153,24 +154,31 @@ public class Lexer {
 
     public static final Dynamic CLASSIC_INIT_LEXEME = ofString("");
 
-    public static final Function2<Dynamic, Dynamic, Dynamic> CLASSIC_ON_TOKEN = (token, context) -> context;
+    public static final Function2<Dynamic, Dynamic, Dynamic> CLASSIC_ON_TOKEN = (token, context) -> {
+        Dynamic currentLine = context.asMap().get("CurrentLine").get();
+        return ofMap(context.asMap().put("LineSinceLastToken", currentLine));
+    };
 
     public static final Function2<Dynamic, Dynamic, Throwable> CLASSIC_ON_ERROR = (lexeme, context) -> {
-        int lineSinceLast = context.asMap().get("LineSinceLastToken").get().asInt();
+        int lineSinceLast = context.asMap().get("InitialLine").get().asInt();
         String lex = lexeme.asString();
 
         return new IllegalArgumentException("[" + lineSinceLast + "] Invalid Lexeme : " + lex);
     };
 
     public static final Function2<Dynamic, Dynamic, Dynamic> CLASSIC_FINISHER = (token, context) -> {
-        Dynamic currentLine = context.asMap().get("CurrentLine").get();
-        return ofMap(context.asMap().put("LineSinceLastToken", currentLine));
+        Map<? super String, Dynamic> contextMap = context.asMap();
+        Dynamic lineSinceLastToken = contextMap.get("LineSinceLastToken").get();
+        contextMap = contextMap.put("CurrentLine", lineSinceLastToken)
+                .put("InitialLine", lineSinceLastToken);
+
+        return ofMap(contextMap);
     };
 
     public static Builder<Character, Dynamic> classicTableLexer(
             StateMachine<? super Character,
                     ? extends Function2<? super Dynamic, ? super Dynamic, ? extends Dynamic>> dfa) {
-        return tableLexer(dfa, CLASSIC_READER, CLASSIC_COMBINER, CLASSIC_INIT_LEXEME, CLASSIC_ON_TOKEN,
+        return lexer(dfa, CLASSIC_READER, CLASSIC_COMBINER, CLASSIC_INIT_LEXEME, CLASSIC_ON_TOKEN,
                 CLASSIC_ON_ERROR, CLASSIC_FINISHER);
     }
 }

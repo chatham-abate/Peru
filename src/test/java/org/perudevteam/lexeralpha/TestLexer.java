@@ -1,4 +1,4 @@
-package org.perudevteam.lexer;
+package org.perudevteam.lexeralpha;
 
 import io.vavr.*;
 import io.vavr.collection.*;
@@ -41,18 +41,18 @@ public class TestLexer {
             Option.some((lexeme, context) -> ofMap(HashMap.of( // State 1. (WhiteSpace)
                     "Data", lexeme,
                     "Type", ofEnum(TokenTypes.SPACE),
-                    "Position", context.asMap().get("LineSinceLastToken").get()
+                    "Position", context.asMap().get("InitialLine").get()
             ))),
             Option.some((lexeme, context) -> ofMap(HashMap.of( // State 2. (Int)
                     "Data", lexeme,
                     "Type", ofEnum(TokenTypes.INT),
-                    "Position", context.asMap().get("LineSinceLastToken").get()
+                    "Position", context.asMap().get("InitialLine").get()
             ))),
             Option.none(), // State 3.
             Option.some((lexeme, context) -> ofMap(HashMap.of( // State 4 (Decimal)
                     "Data", lexeme,
                     "Type", ofEnum(TokenTypes.DECIMAL),
-                    "Position", context.asMap().get("LineSinceLastToken").get()
+                    "Position", context.asMap().get("InitialLine").get()
             )))
     );
 
@@ -71,6 +71,7 @@ public class TestLexer {
     private static final Builder<Character, Dynamic> LEXER = Lexer.classicTableLexer(DFA);
 
     private static final Dynamic START_CONTEXT = ofMap(HashMap.of(
+            "InitialLine", ofInt(0),
             "LineSinceLastToken", ofInt(0),
             "CurrentLine", ofInt(0)
     ));

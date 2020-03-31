@@ -1,8 +1,6 @@
-package org.perudevteam.lexer;
+package org.perudevteam.lexeralpha;
 
-import io.vavr.Function1;
 import io.vavr.control.Option;
-import io.vavr.collection.Array;
 
 /**
  * State machine interface.

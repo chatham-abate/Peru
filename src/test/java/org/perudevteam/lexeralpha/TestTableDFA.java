@@ -1,4 +1,4 @@
-package org.perudevteam.lexer;
+package org.perudevteam.lexeralpha;
 
 import io.vavr.Function1;
 import io.vavr.collection.*;
@@ -22,5 +22,6 @@ public class TestTableDFA {
 
         assertEquals(1, dfa.nextState(0, 0).get());
         assertTrue(dfa.nextState(1, 0).isEmpty());
+
     }
 }
