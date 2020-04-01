@@ -134,7 +134,7 @@ public interface Dynamic {
         return false;
     }
 
-    default Dynamic mapSequence(Function1<? super Seq<? extends Dynamic>, ? extends Seq<? extends Dynamic>> f) {
+    default Dynamic mapSequence(Function1<? super Seq<? extends  Dynamic>, ? extends Seq<? extends Dynamic>> f) {
         throw new NullPointerException("Dynamic Value contains no Sequence value.");
     }
 

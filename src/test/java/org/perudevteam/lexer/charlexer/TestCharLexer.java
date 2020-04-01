@@ -171,12 +171,14 @@ public class TestCharLexer {
     private static final Seq<Tuple2<String, CharData>> EXPECTED2 = List.of(
             Tuple.of("ababc", new CharData(TokenType2.LONG, 1)),
             Tuple.of("ab", new CharData(TokenType2.SHORT, 1)),
+            Tuple.of("ab", new CharData(TokenType2.SHORT, 1)),
+            Tuple.of("ab", new CharData(TokenType2.SHORT, 1)),
             Tuple.of("ab", new CharData(TokenType2.SHORT, 1))
     );
 
     @Test
     void testLinearLexer() {
-        Seq<Character> input = List.ofAll("ababcabab".toCharArray());
+        Seq<Character> input = List.ofAll("ababcabababab".toCharArray());
 
         Stream<Tuple2<String, CharData>> stream =
                 LEXER_LINEAR2.buildStreamUnchecked(input, CharLinearContext.INIT_LINEAR_CONTEXT);
