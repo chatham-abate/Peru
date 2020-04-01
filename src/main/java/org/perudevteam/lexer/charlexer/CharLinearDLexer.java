@@ -7,7 +7,13 @@ import org.perudevteam.misc.LineException;
 import org.perudevteam.statemachine.DStateMachine;
 
 public abstract class CharLinearDLexer<CL> extends LinearDLexer<Character, CL, String, CharData, CharLinearContext> {
-    public CharLinearDLexer(DStateMachine<CL, Function1<CharLinearContext, CharData>> d) {
+    public CharLinearDLexer(int mra,
+            DStateMachine<? super CL, ? extends Function1<? super CharLinearContext, ? extends CharData>> d) {
+        super(mra, "", d);
+    }
+
+    public CharLinearDLexer(
+            DStateMachine<? super CL, ? extends Function1<? super CharLinearContext, ? extends CharData>> d) {
         super("", d);
     }
 

@@ -1,5 +1,7 @@
 package org.perudevteam.lexer;
 
+import io.vavr.collection.Map;
+
 public interface LinearContext<C> {
     int getAbsolutePosition();
 
@@ -9,5 +11,5 @@ public interface LinearContext<C> {
 
     boolean isPreError(int absPosition, int state);
 
-    C withPreError(int errorPosition, int errorState);
+    C withPreErrors(Map<Integer, ? extends Integer> preErrors);
 }

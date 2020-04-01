@@ -9,7 +9,8 @@ import io.vavr.control.Option;
 import org.perudevteam.statemachine.DStateMachine;
 
 public abstract class SimpleDLexer<I, CL, L, D, C> extends DLexer<I, CL, L, D, C> {
-    public SimpleDLexer(L initLex, DStateMachine<CL, Function1<C, D>> d) {
+    public SimpleDLexer(L initLex,
+                DStateMachine<? super CL, ? extends Function1<? super C, ? extends D>> d) {
         super(initLex, d);
     }
 

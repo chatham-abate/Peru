@@ -9,7 +9,8 @@ import org.perudevteam.statemachine.DStateMachine;
 public abstract class CharSimpleDLexer<CL> extends
         SimpleDLexer<Character, CL, String, CharData, CharSimpleContext> {
 
-    public CharSimpleDLexer(DStateMachine<CL, Function1<CharSimpleContext, CharData>> d) {
+    public CharSimpleDLexer(DStateMachine<? super CL,
+            ? extends Function1<? super CharSimpleContext, ? extends CharData>> d) {
         super("", d);
     }
 

@@ -29,4 +29,8 @@ public interface Builder<I, C, O> {
             return Stream.of(Try.failure(t));
         }
     }
+
+    default Stream<O> buildStreamUnchecked(Seq<I> input, C context) {
+        return buildStream(input, context).map(Try::get);
+    }
 }

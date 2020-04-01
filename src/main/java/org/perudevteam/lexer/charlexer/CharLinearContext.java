@@ -22,6 +22,8 @@ public class CharLinearContext extends CharSimpleContext implements LinearContex
         failMap = fm.map((p, st) -> Tuple.of(p, Set.narrow(st)));
     }
 
+    int getMapSize() { return failMap.size(); }
+
     @Override
     public int getAbsolutePosition() {
         return absolutePosition;
@@ -54,16 +56,12 @@ public class CharLinearContext extends CharSimpleContext implements LinearContex
     }
 
     @Override
-    public CharLinearContext withPreError(int errorPosition, int errorState) {
-        Map<Integer, Set<Integer>> newMap;
+    public CharLinearContext withPreErrors(Map<Integer, ? extends Integer> preErrors) {
+        Map<Integer, Set<Integer>> preErrorSets = preErrors.mapValues(HashSet::of);
+        Map<Integer, Set<Integer>> newFailMap = failMap.merge(preErrorSets,
+                Set::addAll);
 
-        if (failMap.containsKey(errorPosition)) {
-            newMap = failMap.put(errorPosition, failMap.get(errorPosition).get().add(errorState));
-        } else {
-            newMap = failMap.put(errorPosition, HashSet.of(errorPosition));
-        }
-
-        return new CharLinearContext(newMap, absolutePosition,
+        return new CharLinearContext(newFailMap, absolutePosition,
                 getCurrentLine(), getStartingLine(), getEndingLine());
     }
 

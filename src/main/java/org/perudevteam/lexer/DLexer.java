@@ -23,9 +23,11 @@ public abstract class DLexer<I, CL, L, D, C> implements Builder<I, C, Tuple2<L, 
     // (context) -> (data).
     private DStateMachine<CL, Function1<C, D>> dsm;
 
-    public DLexer(L initLex, DStateMachine<CL, Function1<C, D>> d) {
+    @SuppressWarnings("unchecked")
+    public DLexer(L initLex,
+                  DStateMachine<? super CL, ? extends Function1<? super C, ? extends D>> d) {
         initialLexeme = initLex;
-        dsm = d;
+        dsm = (DStateMachine<CL, Function1<C, D>>) d;
     }
 
     protected L getInitialLexeme() {
