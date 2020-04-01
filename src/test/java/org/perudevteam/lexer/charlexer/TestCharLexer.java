@@ -4,7 +4,9 @@ import io.vavr.Function1;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import io.vavr.collection.*;
+import io.vavr.control.Try;
 import org.junit.jupiter.api.Test;
+import org.perudevteam.misc.Builder;
 import org.perudevteam.statemachine.DFStateMachine;
 import org.perudevteam.statemachine.DStateMachine;
 
@@ -148,7 +150,6 @@ public class TestCharLexer {
      * Finally Tests!
      */
 
-
     private static final Seq<Character> INPUT1 = List.ofAll("123 \n 456 12.34\n".toCharArray());
 
     private static final Seq<Tuple2<String, CharData>> EXPECTED1 = List.of(
@@ -209,5 +210,37 @@ public class TestCharLexer {
 
         assertEquals(23,
                 LEXER_LINEAR1.buildStreamUnchecked(VERBOSE_INPUT, CharLinearContext.INIT_LINEAR_CONTEXT).length());
+    }
+
+    /*
+     * Failure Tests.
+     */
+
+    private static Seq<Seq<Character>> FAILURES1 = List.of(
+            "123 + ",
+            "",
+            " \n *",
+            "123a456",
+            ".123",
+            "0..123",
+            ".",
+            "0."
+    ).map(s -> List.ofAll(s.toCharArray()));
+
+    @Test
+    void testFailures() {
+        expectAllFailures(LEXER_SIMPLE1, CharSimpleContext.INIT_SIMPLE_CONTEXT, FAILURES1);
+        expectAllFailures(LEXER_LINEAR1, CharLinearContext.INIT_LINEAR_CONTEXT, FAILURES1);
+    }
+
+    static <I, C, O> void expectAllFailures(Builder<I, C, O> lexer, C context, Seq<? extends Seq<I>> inputs) {
+        // First create the output for each input.
+        // Then filter the output to just the failures of each stream.
+        // Then get only those streams which are empty... had no failures.
+        Seq<Stream<Try<O>>> outputsWithNoFailures =
+                inputs.map(i -> lexer.buildStream(i, context).filter(Try::isFailure))
+                .filter(Seq::isEmpty);
+
+        assertTrue(outputsWithNoFailures.isEmpty());
     }
 }
