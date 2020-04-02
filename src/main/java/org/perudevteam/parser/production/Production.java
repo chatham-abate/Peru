@@ -35,7 +35,7 @@ public class Production<NT extends Enum<NT>, T extends Enum<T>> {
         return rule;
     }
 
-    public <P extends Enum<P>> Production<NT, P> withProduction(Seq<Either<NT, P>> r) {
+    public <P extends Enum<P>> Production<NT, P> withRule(Seq<Either<NT, P>> r) {
         return new Production<>(source, r);
     }
 
