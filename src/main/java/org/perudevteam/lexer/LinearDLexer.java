@@ -24,6 +24,11 @@ public abstract class LinearDLexer<I, CL, L, D, C extends LinearContext<C>>
     public LinearDLexer(int mra, L initLex,
                 DStateMachine<? super CL, ? extends Function1<? super C, ? extends D>> d) {
         super(initLex, d);
+
+        if (mra < 0) {
+            throw new IllegalArgumentException("Rollback Amount cannot be negative.");
+        }
+
         maxRollbackAmount = mra;
     }
 
@@ -60,7 +65,7 @@ public abstract class LinearDLexer<I, CL, L, D, C extends LinearContext<C>>
 
                 // Finally, clear rollback stack.
                 rollbackStack = HashMap.empty();
-            } else if (rollbackStack.size() < MAX_ROLLBACK_SIZE) {
+            } else if (rollbackStack.size() < maxRollbackAmount) {
                 rollbackStack = rollbackStack.put(algoContext.getAbsolutePosition(), state);
             }
 

@@ -2,16 +2,18 @@ package org.perudevteam.lexer.charlexer;
 
 import java.util.Objects;
 
-public class CharData {
-    private Enum type;
+public class CharData<T extends Enum<T>> {
+    private T type;
     private int lineNumber;
 
-    public CharData(Enum t, int l) {
+    public CharData(T t, int l) {
+        Objects.requireNonNull(t);
+
         type = t;
         lineNumber = l;
     }
 
-    public Enum getType() {
+    public T getType() {
         return type;
     }
 
@@ -19,12 +21,12 @@ public class CharData {
         return lineNumber;
     }
 
-    public CharData withType(Enum t) {
-        return new CharData(t, lineNumber);
+    public <OT extends Enum<OT>> CharData<OT> withType(OT t) {
+        return new CharData<>(t, lineNumber);
     }
 
-    public CharData withLineNumber(int ln) {
-        return new CharData(type, ln);
+    public CharData<T> withLineNumber(int ln) {
+        return new CharData<>(type, ln);
     }
 
     @Override

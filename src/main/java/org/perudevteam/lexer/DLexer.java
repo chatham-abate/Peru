@@ -5,6 +5,8 @@ import io.vavr.Tuple2;
 import org.perudevteam.misc.Builder;
 import org.perudevteam.statemachine.DStateMachine;
 
+import java.util.Objects;
+
 /**
  * @param <I> Input Type.
  * @param <CL> Input Class Type.
@@ -26,6 +28,9 @@ public abstract class DLexer<I, CL, L, D, C> implements Builder<I, C, Tuple2<L, 
     @SuppressWarnings("unchecked")
     public DLexer(L initLex,
                   DStateMachine<? super CL, ? extends Function1<? super C, ? extends D>> d) {
+        Objects.requireNonNull(initLex);
+        Objects.requireNonNull(d);
+
         initialLexeme = initLex;
         dsm = (DStateMachine<CL, Function1<C, D>>) d;
     }

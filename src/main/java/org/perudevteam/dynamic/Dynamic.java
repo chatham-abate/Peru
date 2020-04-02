@@ -38,6 +38,7 @@ public interface Dynamic {
     }
 
     static Dynamic ofString(String v) {
+        Objects.requireNonNull(v);
         return new DynaString(v);
     }
 
@@ -50,18 +51,22 @@ public interface Dynamic {
     }
 
     static Dynamic ofEnum(Enum v) {
+        Objects.requireNonNull(v);
         return new DynaEnum(v);
     }
 
     static Dynamic ofSequence(Seq<? extends Dynamic> v) {
+        Objects.requireNonNull(v);
         return new DynaSeq(v);
     }
 
     static Dynamic ofMap(Map<? super String, ? extends Dynamic> v) {
+        Objects.requireNonNull(v);
         return new DynaMap(v);
     }
 
     static Dynamic ofReference(Object v) {
+        Objects.requireNonNull(v);
         return new DynaRef(v);
     }
 

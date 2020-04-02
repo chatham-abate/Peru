@@ -5,15 +5,20 @@ import io.vavr.collection.Array;
 import io.vavr.collection.Seq;
 import io.vavr.control.Either;
 
-// Functional Production Representation. (Uses Eithers instead of plain Enums.
+import java.util.Objects;
+
+// Functional Production Representation. (Uses Eithers instead of plain Enums).
 public class Production<NT extends Enum<NT>, T extends Enum<T>> {
     private NT source;
 
     // Each member of the rule sequence will either be a terminal, or
-    // a non-terminal
+    // a non-terminal.
     private Seq<Either<NT, T>> rule;
 
     public Production(NT s, Seq<Either<NT, T>> r) {
+        Objects.requireNonNull(s);
+        Objects.requireNonNull(r);
+
         source = s;
         rule = r;
     }

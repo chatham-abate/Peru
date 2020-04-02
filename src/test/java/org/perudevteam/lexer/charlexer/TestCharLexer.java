@@ -12,6 +12,8 @@ import org.perudevteam.statemachine.DStateMachine;
 
 import org.perudevteam.misc.SeqHelpers;
 
+import java.util.Objects;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestCharLexer {
@@ -41,8 +43,8 @@ public class TestCharLexer {
      * DSFM's for language 1.
      */
 
-    private static final DStateMachine<CharType1, Function1<CharSimpleContext, CharData>>
-            DFSM_SIMPLE1 = DFStateMachine.<CharType1, Function1<CharSimpleContext, CharData>>emptyDFSM(5)
+    private static final DStateMachine<CharType1, Function1<CharSimpleContext, CharData<TokenType1>>>
+            DFSM_SIMPLE1 = DFStateMachine.<CharType1, Function1<CharSimpleContext, CharData<TokenType1>>>emptyDFSM(5)
             .withEdge(0, 1, CharType1.SPACE)
             .withEdge(1, 1, CharType1.SPACE)
             .withEdge(0, 2, CharType1.NUMBER)
@@ -50,9 +52,9 @@ public class TestCharLexer {
             .withEdge(2, 3, CharType1.DOT)
             .withEdge(3, 4, CharType1.NUMBER)
             .withEdge(4, 4, CharType1.NUMBER)
-            .withAcceptingState(1, c -> new CharData(TokenType1.WHITESPACE, c.getStartingLine()))
-            .withAcceptingState(2, c -> new CharData(TokenType1.INT, c.getStartingLine()))
-            .withAcceptingState(4, c -> new CharData(TokenType1.DOUBLE, c.getStartingLine()));
+            .withAcceptingState(1, c -> new CharData<>(TokenType1.WHITESPACE, c.getStartingLine()))
+            .withAcceptingState(2, c -> new CharData<>(TokenType1.INT, c.getStartingLine()))
+            .withAcceptingState(4, c -> new CharData<>(TokenType1.DOUBLE, c.getStartingLine()));
 
     /*
      * Lexers for Language 1.
@@ -108,8 +110,8 @@ public class TestCharLexer {
      * Language 2 Simple DSFM.
      */
 
-    private static final DFStateMachine<CharType2, Function1<CharSimpleContext, CharData>>
-            DSFM_SIMPLE2 = DFStateMachine.<CharType2, Function1<CharSimpleContext, CharData>>emptyDFSM(6)
+    private static final DFStateMachine<CharType2, Function1<CharSimpleContext, CharData<TokenType2>>>
+            DSFM_SIMPLE2 = DFStateMachine.<CharType2, Function1<CharSimpleContext, CharData<TokenType2>>>emptyDFSM(6)
             .withEdge(0, 1, CharType2.A)
             .withEdge(1, 2, CharType2.B)
             .withEdge(2, 3, CharType2.A)
@@ -117,8 +119,8 @@ public class TestCharLexer {
             .withEdge(4, 5, CharType2.C)
             .withEdge(2, 5, CharType2.C)
             .withEdge(4, 3, CharType2.A)
-            .withAcceptingState(2, c -> new CharData(TokenType2.SHORT, c.getStartingLine()))
-            .withAcceptingState(5, c -> new CharData(TokenType2.LONG, c.getStartingLine()));
+            .withAcceptingState(2, c -> new CharData<>(TokenType2.SHORT, c.getStartingLine()))
+            .withAcceptingState(5, c -> new CharData<>(TokenType2.LONG, c.getStartingLine()));
 
     /*
      * Language 2 Lexers.
@@ -153,12 +155,12 @@ public class TestCharLexer {
     private static final Seq<Character> INPUT1 = List.ofAll("123 \n 456 12.34\n".toCharArray());
 
     private static final Seq<Tuple2<String, CharData>> EXPECTED1 = List.of(
-            Tuple.of("123", new CharData(TokenType1.INT, 1)),
-            Tuple.of(" \n ", new CharData(TokenType1.WHITESPACE, 1)),
-            Tuple.of("456", new CharData(TokenType1.INT, 2)),
-            Tuple.of(" ", new CharData(TokenType1.WHITESPACE, 2)),
-            Tuple.of("12.34", new CharData(TokenType1.DOUBLE, 2)),
-            Tuple.of("\n", new CharData(TokenType1.WHITESPACE, 2))
+            Tuple.of("123", new CharData<>(TokenType1.INT, 1)),
+            Tuple.of(" \n ", new CharData<>(TokenType1.WHITESPACE, 1)),
+            Tuple.of("456", new CharData<>(TokenType1.INT, 2)),
+            Tuple.of(" ", new CharData<>(TokenType1.WHITESPACE, 2)),
+            Tuple.of("12.34", new CharData<>(TokenType1.DOUBLE, 2)),
+            Tuple.of("\n", new CharData<>(TokenType1.WHITESPACE, 2))
     );
 
     @Test
@@ -169,11 +171,11 @@ public class TestCharLexer {
 
 
     private static final Seq<Tuple2<String, CharData>> EXPECTED2 = List.of(
-            Tuple.of("ababc", new CharData(TokenType2.LONG, 1)),
-            Tuple.of("ab", new CharData(TokenType2.SHORT, 1)),
-            Tuple.of("ab", new CharData(TokenType2.SHORT, 1)),
-            Tuple.of("ab", new CharData(TokenType2.SHORT, 1)),
-            Tuple.of("ab", new CharData(TokenType2.SHORT, 1))
+            Tuple.of("ababc", new CharData<>(TokenType2.LONG, 1)),
+            Tuple.of("ab", new CharData<>(TokenType2.SHORT, 1)),
+            Tuple.of("ab", new CharData<>(TokenType2.SHORT, 1)),
+            Tuple.of("ab", new CharData<>(TokenType2.SHORT, 1)),
+            Tuple.of("ab", new CharData<>(TokenType2.SHORT, 1))
     );
 
     @Test

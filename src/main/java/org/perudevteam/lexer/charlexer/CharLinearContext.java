@@ -7,6 +7,8 @@ import io.vavr.collection.Map;
 import io.vavr.collection.Set;
 import org.perudevteam.lexer.LinearContext;
 
+import java.util.Objects;
+
 public class CharLinearContext extends CharSimpleContext implements LinearContext<CharLinearContext> {
 
     public static final CharLinearContext INIT_LINEAR_CONTEXT =
@@ -18,6 +20,7 @@ public class CharLinearContext extends CharSimpleContext implements LinearContex
     public CharLinearContext(Map<Integer, ? extends Set<? extends Integer>> fm,
                              int ap, int c, int s, int e) {
         super(c, s, e);
+
         absolutePosition = ap;
         failMap = fm.map((p, st) -> Tuple.of(p, Set.narrow(st)));
     }
