@@ -128,11 +128,6 @@ public class CFGrammar<NT extends Enum<NT>, T extends Enum<T>, P extends Product
          return new CFGrammar<>(startSymbol, newProdMap, newTerminalsUsed);
     }
 
-    // Varargs grammar builder.
-    public CFGrammar<NT, T, P> withProductions(P... productions) {
-        return null;
-    }
-
     @Override
     public String toString() {
         StringBuilder strBuilder = new StringBuilder();

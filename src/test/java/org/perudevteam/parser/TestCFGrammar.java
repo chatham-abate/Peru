@@ -1,5 +1,6 @@
 package org.perudevteam.parser;
 
+import io.vavr.collection.HashSet;
 import io.vavr.collection.List;
 import io.vavr.control.Either;
 import org.junit.jupiter.api.*;
@@ -97,6 +98,8 @@ public class TestCFGrammar {
             new CFGrammar<>(NT.A, List.of(prod4));
         });
 
-        new CFGrammar<>(NT.A, List.of(prod4, prod5));
+        CFGrammar g = new CFGrammar<>(NT.A, List.of(prod4, prod5));
+        assertEquals(HashSet.of(NT.B, NT.A), g.getNonTerminalsUsed());
+        assertEquals(HashSet.of(T.E), g.getTerminalsUsed());
     }
 }
