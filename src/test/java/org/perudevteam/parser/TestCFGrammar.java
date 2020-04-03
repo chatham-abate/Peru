@@ -1,7 +1,9 @@
 package org.perudevteam.parser;
 
+import io.vavr.Tuple2;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.List;
+import io.vavr.collection.Set;
 import io.vavr.control.Either;
 import org.junit.jupiter.api.*;
 import org.perudevteam.parser.production.Production;
@@ -101,5 +103,53 @@ public class TestCFGrammar {
         CFGrammar g = new CFGrammar<>(NT.A, List.of(prod4, prod5));
         assertEquals(HashSet.of(NT.B, NT.A), g.getNonTerminalsUsed());
         assertEquals(HashSet.of(T.E), g.getTerminalsUsed());
+    }
+
+    /*
+     * Firsts Sets Tests.
+     */
+
+    private static final CFGrammar<NT, T, Production<NT, T>> G1 = new CFGrammar<>(NT.A, List.of(
+            new Production<>(NT.A, List.of(right(T.E)))
+    ));
+
+    private static final FirstsSets<NT, T, Production<NT, T>> F1 = new FirstsSets<>(G1);
+
+    private static final CFGrammar<NT, T, Production<NT, T>> G2 = new CFGrammar<>(NT.A, List.of(
+            new Production<NT, T>(NT.A, List.of(left(NT.B), left(NT.C))),
+            new Production<>(NT.B, List.of(right(T.E))),
+            new Production<>(NT.C, List.of(right(T.F)))
+    ));
+
+    private static final FirstsSets<NT, T, Production<NT, T>> F2 = new FirstsSets<>(G2);
+
+    private static final CFGrammar<NT, T, Production<NT, T>> G3 = G2.withProduction(new Production<>(
+            NT.B, List.empty()
+    ));
+
+    private static final FirstsSets<NT, T, Production<NT, T>> F3 = new FirstsSets<>(G3);
+
+    private static final CFGrammar<NT, T, Production<NT, T>> G4 = G3.withProduction(new Production<>(
+            NT.C, List.empty()
+    ));
+
+    private static final FirstsSets<NT, T, Production<NT, T>> F4 = new FirstsSets<>(G4);
+
+    @Test
+    void testFirstsSets() {
+        assertEquals(HashSet.of(T.E), F1.getFirstsSet(NT.A));
+
+        assertEquals(HashSet.of(T.E), F2.getFirstsSet(NT.A));
+        assertEquals(HashSet.of(T.F), F2.getFirstsSet(NT.C));
+        assertFalse(F2.mayBeEmpty(NT.A));
+
+        assertEquals(HashSet.of(T.E, T.F), F3.getFirstsSet(NT.A));
+        assertTrue(F3.mayBeEmpty(NT.B));
+
+        assertTrue(F4.mayBeEmpty(NT.A) && F4.mayBeEmpty(NT.B) && F4.mayBeEmpty(NT.C));
+
+        Tuple2<Boolean, Set<T>> ruleTuple = F4.getFirstsSet(List.of(left(NT.A), right(T.G), right(T.H)));
+        assertFalse(ruleTuple._1);
+        assertEquals(HashSet.of(T.E, T.F, T.G), ruleTuple._2);
     }
 }

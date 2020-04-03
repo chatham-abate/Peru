@@ -85,31 +85,49 @@ class FirstsSets<NT extends Enum<NT>, T extends Enum<T>, P extends Production<NT
             }
 
             oldSize = newSize;
-            newSize = size();
+            newSize = 0;
+
+            for (NT nonTerminal: nonTerminals) {
+                newSize += nonTerminalFirstsTemp.get(nonTerminal).get().length();
+            }
+
+            newSize += mayBeEmptyTemp.length();
         }
 
         mayBeEmpty = mayBeEmptyTemp;
         nonTerminalFirsts = nonTerminalFirstsTemp;
     }
 
-    /**
-     * This is the number of firsts symbols appear in this firsts set...
-     * We add the total number of symbols in all non Terminals firsts sets.
-     * We also add the number of possible empty non Terminals, this number may also change
-     * over the course of the algorithm.
-     */
-    private int size() {
-        int size = 0;
-
-        for (NT nonTerminal: nonTerminalFirsts.keySet()) {
-            size += nonTerminalFirsts.get(nonTerminal).get().size();
-        }
-
-        return size + mayBeEmpty.size();
-    }
-
     public Map<NT, Set<T>> getNonTerminalFirsts() {
         return nonTerminalFirsts;
+    }
+
+    private void validateNonTerminal(NT nt) {
+        Objects.requireNonNull(nt);
+        if (!nonTerminalFirsts.containsKey(nt)) {
+            throw new IllegalArgumentException("Given non-terminal is not in this firsts set.");
+        }
+    }
+
+
+    public Set<T> getFirstsSet(NT nt) {
+        validateNonTerminal(nt);
+        return nonTerminalFirsts.get(nt).get();
+    }
+
+    public Tuple2<Boolean, Set<T>> getFirstsSet(Seq<Either<NT, T>> rule) {
+        Objects.requireNonNull(rule);
+        return genRuleFirstSet(rule, nonTerminalFirsts, mayBeEmpty);
+    }
+
+    public boolean mayBeEmpty(NT nt) {
+        validateNonTerminal(nt);
+        return mayBeEmpty.contains(nt);
+    }
+
+    @Override
+    public String toString() {
+        return nonTerminalFirsts.toString() + "\n" + mayBeEmpty.toString();
     }
 }
 

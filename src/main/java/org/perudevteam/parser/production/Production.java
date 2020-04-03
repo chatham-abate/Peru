@@ -1,6 +1,7 @@
 package org.perudevteam.parser.production;
 
 import io.vavr.collection.Array;
+import io.vavr.collection.List;
 import io.vavr.collection.Seq;
 import io.vavr.control.Either;
 
@@ -14,7 +15,7 @@ public class Production<NT extends Enum<NT>, T extends Enum<T>> {
     // a non-terminal.
     private Seq<Either<NT, T>> rule;
 
-    public Production(NT s, Seq<Either<NT, T>> r) {
+    public Production(NT s, Seq<? extends Either<NT, T>> r) {
         Objects.requireNonNull(s);
         Objects.requireNonNull(r);
 
@@ -30,7 +31,7 @@ public class Production<NT extends Enum<NT>, T extends Enum<T>> {
         });
 
         source = s;
-        rule = r;
+        rule = Seq.narrow(r);
     }
 
     public NT getSource() {
