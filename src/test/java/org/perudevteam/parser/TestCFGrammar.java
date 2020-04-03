@@ -164,19 +164,53 @@ public class TestCFGrammar {
 
     @Test
     void testFirstsSets() {
-        assertEquals(HashSet.of(T.E), F1.getFirstSet(NT.A));
+        assertEquals(HashSet.of(T.E), F1.getFirstSet(NT.A)._2);
 
-        assertEquals(HashSet.of(T.E), F2.getFirstSet(NT.A));
-        assertEquals(HashSet.of(T.F), F2.getFirstSet(NT.C));
-        assertFalse(F2.mayBeEmpty(NT.A));
+        assertEquals(HashSet.of(T.E), F2.getFirstSet(NT.A)._2);
+        assertEquals(HashSet.of(T.F), F2.getFirstSet(NT.C)._2);
+        assertFalse(F2.getFirstSet(NT.A)._1);
 
-        assertEquals(HashSet.of(T.E, T.F), F3.getFirstSet(NT.A));
-        assertTrue(F3.mayBeEmpty(NT.B));
+        assertEquals(HashSet.of(T.E, T.F), F3.getFirstSet(NT.A)._2);
+        assertTrue(F3.getFirstSet(NT.B)._1);
 
-        assertTrue(F4.mayBeEmpty(NT.A) && F4.mayBeEmpty(NT.B) && F4.mayBeEmpty(NT.C));
+        assertTrue(F4.getFirstSet(NT.A)._1 && F4.getFirstSet(NT.B)._1 && F4.getFirstSet(NT.C)._1);
 
         Tuple2<Boolean, Set<T>> ruleTuple = F4.getFirstSet(List.of(left(NT.A), right(T.G), right(T.H)));
         assertFalse(ruleTuple._1);
         assertEquals(HashSet.of(T.E, T.F, T.G), ruleTuple._2);
     }
+
+    /*
+     * Closure Tests.
+     */
+
+    @Test
+    void testClosure() {
+        Set<LROneItem<NT, T, Production<NT, T>>> cc0 = HashSet.of(
+                new LROneItem<>(0, new Production<>(NT.A, List.of(right(T.E))))
+        );
+        Set<LROneItem<NT, T, Production<NT, T>>> closure1 = LROneItem.closure(G1, cc0);
+        assertEquals(cc0, closure1);
+
+        cc0 = HashSet.of(
+                new LROneItem<>(0, new Production<NT, T>(NT.A, List.of(left(NT.B), left(NT.C))))
+        );
+
+        // Manual Checks.
+//        System.out.println(LROneItem.closure(G3, cc0));
+//        System.out.println(LROneItem.closure(G4, cc0));
+    }
+
 }
+
+
+
+
+
+
+
+
+
+
+
+

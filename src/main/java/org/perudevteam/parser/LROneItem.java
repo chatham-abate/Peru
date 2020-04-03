@@ -1,5 +1,6 @@
 package org.perudevteam.parser;
 
+import io.vavr.Tuple2;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.List;
 import io.vavr.collection.Seq;
@@ -16,8 +17,14 @@ public class LROneItem <NT extends Enum<NT>, T extends Enum<T>, P extends Produc
      * LR(1) Item static Helpers.
      */
 
-    public <NT extends Enum<NT>, T extends Enum<T>, P extends Production<NT, T>> Set<LROneItem<NT, T, P>>
+    public static <NT extends Enum<NT>, T extends Enum<T>, P extends Production<NT, T>> Set<LROneItem<NT, T, P>>
     closure(CFGrammar<NT, T, P> g, Set<LROneItem<NT, T, P>> set0) {
+        // Perform Null Checks.
+        Objects.requireNonNull(g);
+        Objects.requireNonNull(set0);
+        set0.forEach(Objects::requireNonNull);
+
+        FirstSets<NT, T> firstSets = new FirstSets<>(g);    // Generate first sets for all nts in g.
         List<LROneItem<NT, T, P>> workStack = List.ofAll(set0);
         Set<LROneItem<NT, T, P>> closure = HashSet.empty();
 
@@ -26,16 +33,46 @@ public class LROneItem <NT extends Enum<NT>, T extends Enum<T>, P extends Produc
             LROneItem<NT, T, P> item = workStack.peek();
             workStack = workStack.tail();
 
-            closure = closure.add(item);    // Add item to closure.
+            // Only process items yet to be processed.
+            if (!closure.contains(item)) {
+                closure = closure.add(item);    // Add item to closure.
 
-            if (item.getCursor() == 0 && !item.isEmpty() && item.getProduction().getRule().get(0).isLeft()) {
-                // We have found a production in the form A -> *Bd  where B is a NT.
+                Seq<Either<NT, T>> rule = item.getProduction().getRule();
+                int cursor = item.getCursor();
 
+                if (cursor < rule.length() && rule.get(cursor).isLeft()) {
+                    // Generate ending of the rule.
+                    Seq<Either<NT, T>> ruleEnding = cursor == rule.length() - 1
+                            ? List.empty()
+                            : rule.subSequence(cursor + 1);
 
+                    if (item.hasSuffix()) {
+                        ruleEnding = ruleEnding.append(item.getSuffixAsEither());
+                    }
+
+                    // Calculate endings first tuple.
+                    Tuple2<Boolean, Set<T>> firstSetTuple = firstSets.getFirstSet(ruleEnding);
+
+                    NT source = rule.get(cursor).getLeft();
+                    Set<P> productions = g.getProductions(source);
+
+                    for (T t: firstSetTuple._2) {
+                        for (P production: productions) {
+                            workStack = workStack.prepend(new LROneItem<>(0, production, t));
+                        }
+                    }
+
+                    // If the given rule may derive to completely empty.
+                    if (firstSetTuple._1) {
+                        for (P production: productions) {
+                            workStack = workStack.prepend(new LROneItem<>(0, production));
+                        }
+                    }
+                }
             }
         }
 
-        return null;
+        return closure;
     }
 
     /*
@@ -57,6 +94,7 @@ public class LROneItem <NT extends Enum<NT>, T extends Enum<T>, P extends Produc
     private LROneItem(int c, P p, Option<T> os) {
         Objects.requireNonNull(p);
         Objects.requireNonNull(os);
+        if (!os.isEmpty()) Objects.requireNonNull(os.get());
 
         if (c > p.getRule().length() || c < 0) {
             throw new IllegalArgumentException("Cursor must be in range [0, |rule|].");
@@ -79,12 +117,20 @@ public class LROneItem <NT extends Enum<NT>, T extends Enum<T>, P extends Produc
         return !suffix.isEmpty();
     }
 
-    public T getSuffix() {
+    private void validateSuffix() {
         if (suffix.isEmpty()) {
             throw new NullPointerException("This LROneItem has no suffix.");
         }
+    }
 
+    public T getSuffix() {
+        validateSuffix();
         return suffix.get();
+    }
+
+    public Either<NT, T> getSuffixAsEither() {
+        validateSuffix();
+        return Either.right(suffix.get());
     }
 
     /**

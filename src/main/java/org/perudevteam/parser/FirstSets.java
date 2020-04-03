@@ -109,20 +109,14 @@ class FirstSets<NT extends Enum<NT>, T extends Enum<T>> {
         }
     }
 
-
-    public Set<T> getFirstSet(NT nt) {
+    public Tuple2<Boolean, Set<T>> getFirstSet(NT nt) {
         validateNonTerminal(nt);
-        return nonTerminalFirsts.get(nt).get();
+        return Tuple.of(mayBeEmpty.contains(nt), nonTerminalFirsts.get(nt).get());
     }
 
     public Tuple2<Boolean, Set<T>> getFirstSet(Seq<Either<NT, T>> rule) {
         Objects.requireNonNull(rule);
         return genRuleFirstSet(rule, nonTerminalFirsts, mayBeEmpty);
-    }
-
-    public boolean mayBeEmpty(NT nt) {
-        validateNonTerminal(nt);
-        return mayBeEmpty.contains(nt);
     }
 
     @Override
