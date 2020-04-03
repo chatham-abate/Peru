@@ -142,23 +142,29 @@ public class TestCFGrammar {
 
     private static final FirstSets<NT, T> F1 = new FirstSets<>(G1);
 
+    private static final Production<NT, T>
+            PROD1 = new Production<NT, T>(NT.A, List.of(left(NT.B), left(NT.C))),       // A -> BC
+            PROD2 = new Production<>(NT.B, List.of(right(T.E))),                        // B -> e
+            PROD3 = new Production<>(NT.C, List.of(right(T.F))),                        // C -> f
+            PROD4 = new Production<>(NT.B, List.empty()),                               // B ->
+            PROD5 = new Production<>(NT.C, List.empty());                               // C ->
+
+
     private static final CFGrammar<NT, T, Production<NT, T>> G2 = new CFGrammar<>(NT.A, List.of(
-            new Production<NT, T>(NT.A, List.of(left(NT.B), left(NT.C))),
-            new Production<>(NT.B, List.of(right(T.E))),
-            new Production<>(NT.C, List.of(right(T.F)))
+            PROD1, PROD2, PROD3
     ));
 
     private static final FirstSets<NT, T> F2 = new FirstSets<>(G2);
 
-    private static final CFGrammar<NT, T, Production<NT, T>> G3 = G2.withProduction(new Production<>(
-            NT.B, List.empty()
-    ));
+    private static final CFGrammar<NT, T, Production<NT, T>> G3 = G2.withProduction(
+            PROD4
+    );
 
     private static final FirstSets<NT, T> F3 = new FirstSets<>(G3);
 
-    private static final CFGrammar<NT, T, Production<NT, T>> G4 = G3.withProduction(new Production<>(
-            NT.C, List.empty()
-    ));
+    private static final CFGrammar<NT, T, Production<NT, T>> G4 = G3.withProduction(
+            PROD5
+    );
 
     private static final FirstSets<NT, T> F4 = new FirstSets<>(G4);
 
@@ -181,26 +187,44 @@ public class TestCFGrammar {
     }
 
     /*
-     * Closure Tests.
+     * Closure and Goto Tests.
      */
 
     @Test
     void testClosure() {
-        Set<LROneItem<NT, T, Production<NT, T>>> cc0 = HashSet.of(
-                new LROneItem<>(0, new Production<>(NT.A, List.of(right(T.E))))
-        );
-        Set<LROneItem<NT, T, Production<NT, T>>> closure1 = LROneItem.closure(G1, cc0);
+        Set<LROneItem<NT, T, Production<NT, T>>> cc0 = HashSet.of(new LROneItem<>(0, new Production<>(
+                NT.A, List.of(right(T.E))
+        )));
+        Set<LROneItem<NT, T, Production<NT, T>>> closure1 = LROneItem.closureSet(G1, cc0);
         assertEquals(cc0, closure1);
 
-        cc0 = HashSet.of(
-                new LROneItem<>(0, new Production<NT, T>(NT.A, List.of(left(NT.B), left(NT.C))))
+        cc0 = HashSet.of(new LROneItem<>(0, PROD1));
+
+        Set<LROneItem<NT, T, Production<NT, T>>> expected3 = HashSet.of(
+                new LROneItem<>(0, PROD1),
+                new LROneItem<>(0, PROD2, T.F),
+                new LROneItem<>(0, PROD4, T.F)
         );
 
-        // Manual Checks.
-//        System.out.println(LROneItem.closure(G3, cc0));
-//        System.out.println(LROneItem.closure(G4, cc0));
+        assertEquals(expected3, LROneItem.closureSet(G3, cc0));
+
+        Set<LROneItem<NT, T, Production<NT, T>>> expected4 = expected3
+                .add(new LROneItem<>(0, PROD2)).add(new LROneItem<>(0, PROD4));
+
+        assertEquals(expected4, LROneItem.closureSet(G4, cc0));
     }
 
+    @Test
+    void testGoto() {
+        Set<LROneItem<NT, T, Production<NT, T>>> cc0 = HashSet.of(new LROneItem<>(0, PROD1));
+        Set<LROneItem<NT, T, Production<NT, T>>> goto2 = LROneItem.gotoSet(G2, cc0, left(NT.B));
+        Set<LROneItem<NT, T, Production<NT, T>>> expected2 = HashSet.of(
+                new LROneItem<>(1, PROD1),
+                new LROneItem<>(0, PROD3)
+        );
+
+        assertEquals(expected2, goto2);
+    }
 }
 
 
