@@ -8,7 +8,7 @@ import org.perudevteam.parser.production.Production;
 
 import java.util.Objects;
 
-class FirstsSets<NT extends Enum<NT>, T extends Enum<T>, P extends Production<NT, T>> {
+class FirstSets<NT extends Enum<NT>, T extends Enum<T>> {
 
     /**
      * Generate the firsts set of a specific rule.
@@ -50,10 +50,10 @@ class FirstsSets<NT extends Enum<NT>, T extends Enum<T>, P extends Production<NT
     private Map<NT, Set<T>> nonTerminalFirsts;
     private Set<NT> mayBeEmpty;
 
-    public FirstsSets(CFGrammar<NT, T, P> g) {
+    public FirstSets(CFGrammar<NT, T, ? extends Production<NT, T>> g) {
         Objects.requireNonNull(g);  // Grammar cannot be null.
 
-        Map<NT, Set<P>> productions = g.getProductionMap();
+        Map<NT, Set<Production<NT, T>>> productions = g.getProductionMap().mapValues(Set::narrow);
         Set<NT> nonTerminals = productions.keySet();
 
         Set<NT> mayBeEmptyTemp = HashSet.empty();
@@ -69,7 +69,7 @@ class FirstsSets<NT extends Enum<NT>, T extends Enum<T>, P extends Production<NT
 
             // Iterate over every production p.
             for (NT nonTerminal: nonTerminals) {
-                for (P p: productions.get(nonTerminal).get()) {
+                for (Production<NT, T> p: productions.get(nonTerminal).get()) {
                     NT source = p.getSource();
                     Seq<Either<NT, T>> rule = p.getRule();
                     Tuple2<Boolean, Set<T>> ruleFirstsTuple =
@@ -110,12 +110,12 @@ class FirstsSets<NT extends Enum<NT>, T extends Enum<T>, P extends Production<NT
     }
 
 
-    public Set<T> getFirstsSet(NT nt) {
+    public Set<T> getFirstSet(NT nt) {
         validateNonTerminal(nt);
         return nonTerminalFirsts.get(nt).get();
     }
 
-    public Tuple2<Boolean, Set<T>> getFirstsSet(Seq<Either<NT, T>> rule) {
+    public Tuple2<Boolean, Set<T>> getFirstSet(Seq<Either<NT, T>> rule) {
         Objects.requireNonNull(rule);
         return genRuleFirstSet(rule, nonTerminalFirsts, mayBeEmpty);
     }

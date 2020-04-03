@@ -4,7 +4,6 @@ import io.vavr.Tuple2;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.List;
 import io.vavr.collection.Set;
-import io.vavr.control.Either;
 import org.junit.jupiter.api.*;
 import org.perudevteam.parser.production.Production;
 
@@ -21,6 +20,10 @@ public class TestCFGrammar {
         E, F, G, H
     }
 
+    /*
+     * Production.
+     */
+
     @Test
     void testProductionErrors() {
         assertThrows(NullPointerException.class, () -> {
@@ -28,7 +31,7 @@ public class TestCFGrammar {
         });
 
         assertThrows(NullPointerException.class, () -> {
-            new Production<>(NT.A, List.of(null));
+            new Production<>(NT.A, List.of(null, right(T.F)));
         });
 
         assertThrows(NullPointerException.class, () -> {
@@ -65,6 +68,30 @@ public class TestCFGrammar {
            prod.withSource(null);
         });
     }
+
+    /*
+     * LR(1) Item Tests.
+     */
+
+    @Test
+    void testLROneItemErrors() {
+        Production<NT, T> prod = new Production<>(NT.A, List.of(right(T.E), right(T.F)));
+        LROneItem<NT, T, Production<NT, T>> lrOne = new LROneItem<>(1, prod);
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            lrOne.withProduction(prod.withRule(List.empty()));
+        });
+
+        lrOne.shiftCursor();
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            lrOne.shiftCursor().shiftCursor();
+        });
+    }
+
+    /*
+     * Simple Grammar Tests.
+     */
 
     @Test
     void testGrammarBasics() {
@@ -113,7 +140,7 @@ public class TestCFGrammar {
             new Production<>(NT.A, List.of(right(T.E)))
     ));
 
-    private static final FirstsSets<NT, T, Production<NT, T>> F1 = new FirstsSets<>(G1);
+    private static final FirstSets<NT, T> F1 = new FirstSets<>(G1);
 
     private static final CFGrammar<NT, T, Production<NT, T>> G2 = new CFGrammar<>(NT.A, List.of(
             new Production<NT, T>(NT.A, List.of(left(NT.B), left(NT.C))),
@@ -121,34 +148,34 @@ public class TestCFGrammar {
             new Production<>(NT.C, List.of(right(T.F)))
     ));
 
-    private static final FirstsSets<NT, T, Production<NT, T>> F2 = new FirstsSets<>(G2);
+    private static final FirstSets<NT, T> F2 = new FirstSets<>(G2);
 
     private static final CFGrammar<NT, T, Production<NT, T>> G3 = G2.withProduction(new Production<>(
             NT.B, List.empty()
     ));
 
-    private static final FirstsSets<NT, T, Production<NT, T>> F3 = new FirstsSets<>(G3);
+    private static final FirstSets<NT, T> F3 = new FirstSets<>(G3);
 
     private static final CFGrammar<NT, T, Production<NT, T>> G4 = G3.withProduction(new Production<>(
             NT.C, List.empty()
     ));
 
-    private static final FirstsSets<NT, T, Production<NT, T>> F4 = new FirstsSets<>(G4);
+    private static final FirstSets<NT, T> F4 = new FirstSets<>(G4);
 
     @Test
     void testFirstsSets() {
-        assertEquals(HashSet.of(T.E), F1.getFirstsSet(NT.A));
+        assertEquals(HashSet.of(T.E), F1.getFirstSet(NT.A));
 
-        assertEquals(HashSet.of(T.E), F2.getFirstsSet(NT.A));
-        assertEquals(HashSet.of(T.F), F2.getFirstsSet(NT.C));
+        assertEquals(HashSet.of(T.E), F2.getFirstSet(NT.A));
+        assertEquals(HashSet.of(T.F), F2.getFirstSet(NT.C));
         assertFalse(F2.mayBeEmpty(NT.A));
 
-        assertEquals(HashSet.of(T.E, T.F), F3.getFirstsSet(NT.A));
+        assertEquals(HashSet.of(T.E, T.F), F3.getFirstSet(NT.A));
         assertTrue(F3.mayBeEmpty(NT.B));
 
         assertTrue(F4.mayBeEmpty(NT.A) && F4.mayBeEmpty(NT.B) && F4.mayBeEmpty(NT.C));
 
-        Tuple2<Boolean, Set<T>> ruleTuple = F4.getFirstsSet(List.of(left(NT.A), right(T.G), right(T.H)));
+        Tuple2<Boolean, Set<T>> ruleTuple = F4.getFirstSet(List.of(left(NT.A), right(T.G), right(T.H)));
         assertFalse(ruleTuple._1);
         assertEquals(HashSet.of(T.E, T.F, T.G), ruleTuple._2);
     }
