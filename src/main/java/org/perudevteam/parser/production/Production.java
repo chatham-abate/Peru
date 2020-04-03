@@ -1,6 +1,5 @@
 package org.perudevteam.parser.production;
 
-
 import io.vavr.collection.Array;
 import io.vavr.collection.Seq;
 import io.vavr.control.Either;
@@ -18,6 +17,17 @@ public class Production<NT extends Enum<NT>, T extends Enum<T>> {
     public Production(NT s, Seq<Either<NT, T>> r) {
         Objects.requireNonNull(s);
         Objects.requireNonNull(r);
+
+        // Make sure no either's hold a null value.
+        r.forEach(e -> {
+            Objects.requireNonNull(e);
+
+            if (e.isLeft()) {
+                Objects.requireNonNull(e.getLeft());
+            } else {
+                Objects.requireNonNull(e.get());
+            }
+        });
 
         source = s;
         rule = r;
@@ -41,8 +51,35 @@ public class Production<NT extends Enum<NT>, T extends Enum<T>> {
 
     @Override
     public String toString() {
-        return source.name() + " ->" + rule.map(
-                e -> e.isLeft() ? e.getLeft().name() : e.get().name()
-        );
+        // Mutation for string builder only here.
+        StringBuilder strBuilder = new StringBuilder();
+        strBuilder.append(source.name());
+        strBuilder.append(" -> ");
+
+        for (int i = 0; i < rule.length(); i++) {
+            Either<NT, T> sym = rule.get(i);
+            strBuilder.append(sym.isRight()
+                    ? sym.get() : sym.getLeft());
+
+            if (i < rule.length() - 1) {
+                strBuilder.append(" ");
+            }
+        }
+
+        return strBuilder.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Production<?, ?> that = (Production<?, ?>) o;
+        return Objects.equals(source, that.source) &&
+                Objects.equals(rule, that.rule);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(source, rule);
     }
 }

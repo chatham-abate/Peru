@@ -54,7 +54,7 @@ public class CFGrammar<NT extends Enum<NT>, T extends Enum<T>, P extends Product
             termsUsedTemp = termsUsedTemp.addAll(p.getRule().filter(Either::isRight).map(Either::get));
 
             // Make sure all non-terminals in the rule have their own rules.
-            if (p.getRule().filter(Either::isLeft)      // Get Left Eithers.
+            if (!p.getRule().filter(Either::isLeft)      // Get Left Eithers.
                     .map(Either::getLeft)               // Map to their values.
                     .filter(nt -> !nonTerminalsUsed.contains(nt)).isEmpty()) { // All values without rules.
                 throw new IllegalArgumentException("All non-terminals must have their own rules in the grammar.");
@@ -115,7 +115,8 @@ public class CFGrammar<NT extends Enum<NT>, T extends Enum<T>, P extends Product
                 ? productionMap.put(source, productionMap.get(source).get().add(p))
                 : productionMap.put(source, HashSet.of(p));
 
-         Seq<NT> notRuled = p.getRule()
+        // All nonterminals in the rule which are do not have rules...
+        Seq<NT> notRuled = p.getRule()
                  .filter(Either::isLeft)
                  .map(Either::getLeft)
                  .filter(nt -> !newProdMap.containsKey(nt));
@@ -125,6 +126,27 @@ public class CFGrammar<NT extends Enum<NT>, T extends Enum<T>, P extends Product
          }
 
          return new CFGrammar<>(startSymbol, newProdMap, newTerminalsUsed);
+    }
+
+    // Varargs grammar builder.
+    public CFGrammar<NT, T, P> withProductions(P... productions) {
+        return null;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder strBuilder = new StringBuilder();
+
+        for (NT nonTerminal: productionMap.keySet()) {
+            for (Production<NT, T> p: productionMap.get(nonTerminal).get()) {
+                strBuilder.append(p.toString());
+                strBuilder.append('\n');
+            }
+        }
+
+        String str = strBuilder.toString();
+
+        return str.substring(0, str.length() - 1);  // Exlude final newline Character.
     }
 }
 
