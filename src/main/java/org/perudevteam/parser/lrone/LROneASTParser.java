@@ -86,14 +86,63 @@ public class LROneASTParser<NT extends Enum<NT>, T extends Enum<T>, L, D extends
         tempActionTable = tempActionTable.append(emptyActionRow);
         tempGotoTable = tempGotoTable.append(emptyGotoRow);
 
-        int i = 0;  // Index of cc set we are on.
+        int row = 0; // Current row in the table being generated.
 
         while (!workQueue.isEmpty()) {
             // pop head off work queue.
             Set<LROneItem<NT, T, AttrProduction<NT, T>>> cci = workQueue.head();
             workQueue = workQueue.tail();
 
+            // Categorize shifts by whether the shift is a terminal or a non terminal.
+            Map<NT, Set<LROneItem<NT, T, AttrProduction<NT, T>>>> nonTerminalShifts = HashMap.empty();
+            Map<T, Set<LROneItem<NT, T, AttrProduction<NT, T>>>> terminalShifts = HashMap.empty();
 
+            for (LROneItem<NT, T, AttrProduction<NT, T>> lri: cci) {
+                if (lri.getCursor() == lri.getProduction().getRule().length()) {
+                    // If we are on a reduction, simply add it to the action table...
+                    // reductions are always actions.
+                    final int col = lri.hasSuffix() ? terminalIndex.get(lri.getSuffix()).get() : 0;
+
+                    tempActionTable = tempActionTable.update(row, r -> {
+                        Either<Integer, AttrProduction<NT, T>>  cell = r.get(col);
+                        if (!cell.isLeft() || cell.getLeft() != 0) {
+                            throw new IllegalArgumentException("Table conflict, Grammar is not LR(1).");
+                        }
+
+                        return r.update(col, right(lri.getProduction()));
+                    });
+                } else {
+                    // Otherwise we are on a shift.
+                    Either<NT, T> nextSymEither = lri.getProduction().getRule().get(lri.getCursor());
+                    LROneItem<NT, T, AttrProduction<NT, T>> shiftedLri = lri.shiftCursor();
+
+                    if (nextSymEither.isLeft()) {
+                        // After the cursor comes a nonTerminal.
+                        NT nextSym = nextSymEither.getLeft();
+
+                        nonTerminalShifts = nonTerminalShifts.containsKey(nextSym)
+                                ? nonTerminalShifts.put(nextSym, nonTerminalShifts.get(nextSym).get().add(shiftedLri))
+                                : nonTerminalShifts.put(nextSym, HashSet.of(shiftedLri));
+                    } else {
+                        // After the cursor comes a terminal.
+                        T nextSym = nextSymEither.get();
+
+                        terminalShifts = terminalShifts.containsKey(nextSym)
+                                ? terminalShifts.put(nextSym, terminalShifts.get(nextSym).get().add(shiftedLri))
+                                : terminalShifts.put(nextSym, HashSet.of(shiftedLri));
+                    }
+                }
+            }
+
+            // Reductions have been dealt with, now we must deal with shifts.
+            // First lets perform closures on all of the shift sets.
+            nonTerminalShifts = nonTerminalShifts.mapValues(s -> LROneItem.closureSet(g, firstSets, s));
+            terminalShifts = terminalShifts.mapValues(s -> LROneItem.closureSet(g, firstSets, s));
+
+            // Now for filling in the table.
+            for (T t: terminalShifts.keySet()) {
+
+            }
         }
     }
 
