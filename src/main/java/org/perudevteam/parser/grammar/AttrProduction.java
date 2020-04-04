@@ -26,6 +26,7 @@ public abstract class AttrProduction<NT extends Enum<NT>, T extends Enum<T>> ext
     public Function1<Dynamic, Dynamic> buildAST(
             Seq<? extends Function1<? super Dynamic, ? extends Dynamic>> children) {
         Objects.requireNonNull(children);
+        children.forEach(Objects::requireNonNull);
 
         if (children.length() != getRule().length()) {
             throw new IllegalArgumentException("This rule requires " + getRule().length() + " tokens.");

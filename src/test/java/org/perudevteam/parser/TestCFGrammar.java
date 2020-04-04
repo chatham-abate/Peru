@@ -1,13 +1,17 @@
 package org.perudevteam.parser;
 
+import io.vavr.Function1;
 import io.vavr.Tuple2;
-import io.vavr.collection.HashSet;
-import io.vavr.collection.List;
-import io.vavr.collection.Set;
+import io.vavr.collection.*;
 import org.junit.jupiter.api.*;
+import org.perudevteam.dynamic.Dynamic;
+import org.perudevteam.lexer.charlexer.CharData;
+import org.perudevteam.parser.grammar.AttrCFGrammar;
+import org.perudevteam.parser.grammar.AttrProduction;
 import org.perudevteam.parser.grammar.CFGrammar;
 import org.perudevteam.parser.grammar.Production;
 import org.perudevteam.parser.lrone.FirstSets;
+import org.perudevteam.parser.lrone.LROneASTParser;
 import org.perudevteam.parser.lrone.LROneItem;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -227,6 +231,41 @@ public class TestCFGrammar {
         );
 
         assertEquals(expected2, goto2);
+    }
+
+    /*
+     * Simple AttrCFGrammar Error Tests.
+     */
+
+    @Test
+    void testAttrGrammarErrors() {
+        AttrProduction<NT, T> prod = new AttrProduction<NT, T>(NT.A, List.of(left(NT.A))) {
+            @Override
+            public Function1<Dynamic, Dynamic> buildASTUnsafe(
+                    Seq<? extends Function1<? super Dynamic, ? extends Dynamic>> children) {
+                return null;
+            }
+        };
+
+        AttrCFGrammar<NT, T, AttrProduction<NT, T>, Tuple2<String, CharData<T>>> g =
+                new AttrCFGrammar<>(NT.A, HashMap.empty(), List.of(prod));
+
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            new LROneASTParser<>(g);
+        });
+
+        AttrProduction<NT, T> prod2 = new AttrProduction<NT, T>(NT.B, List.of(right(T.E))) {
+            @Override
+            public Function1<Dynamic, Dynamic> buildASTUnsafe(
+                    Seq<? extends Function1<? super Dynamic, ? extends Dynamic>> children) {
+                return null;
+            }
+        };
+
+        assertThrows(IllegalArgumentException.class, () -> {
+           g.withProduction(prod2);
+        });
     }
 }
 

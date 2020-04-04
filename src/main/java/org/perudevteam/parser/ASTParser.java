@@ -15,6 +15,8 @@ public interface ASTParser<L, D> {
     default Try<Function1<Dynamic, Dynamic>> buildAST(Seq<Tuple2<L, D>> tokens) {
         return Try.of(() -> {
             Objects.requireNonNull(tokens);
+            tokens.forEach(Objects::requireNonNull);
+
             return buildASTUnsafe(tokens);
         });
     }

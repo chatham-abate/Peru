@@ -70,10 +70,6 @@ public class CFGrammar<NT extends Enum<NT>, T extends Enum<T>, P extends Product
 
     // Direct Constructor with no checks... only used by methods of this class.
     protected CFGrammar(NT start, Map<NT, Set<P>> prodMap, Set<T> termsUsed) {
-        Objects.requireNonNull(start);
-        Objects.requireNonNull(prodMap);
-        Objects.requireNonNull(termsUsed);
-
         startSymbol = start;
         productionMap = prodMap;
         terminalsUsed = termsUsed;
@@ -103,12 +99,7 @@ public class CFGrammar<NT extends Enum<NT>, T extends Enum<T>, P extends Product
         return productionMap;
     }
 
-    public CFGrammar<NT, T, P> withProduction(P p) {
-        Objects.requireNonNull(p);  // p cannot be null.
-
-        // Add all terminals in this rule to the terminals used set.
-        Set<T> newTerminalsUsed = terminalsUsed.addAll(p.getRule().filter(Either::isRight).map(Either::get));
-
+    protected Map<NT, Set<P>> newProductionMap(P p) {
         NT source = p.getSource();
         Map<NT, Set<P>> newProdMap = productionMap.containsKey(source)
                 ? productionMap.put(source, productionMap.get(source).get().add(p))
@@ -116,15 +107,24 @@ public class CFGrammar<NT extends Enum<NT>, T extends Enum<T>, P extends Product
 
         // All nonterminals in the rule which are do not have rules...
         Seq<NT> notRuled = p.getRule()
-                 .filter(Either::isLeft)
-                 .map(Either::getLeft)
-                 .filter(nt -> !newProdMap.containsKey(nt));
+                .filter(Either::isLeft)
+                .map(Either::getLeft)
+                .filter(nt -> !newProdMap.containsKey(nt));
 
-         if (!notRuled.isEmpty()) {
-             throw new IllegalArgumentException("Given production has non-terminals which are not defined.");
-         }
+        if (!notRuled.isEmpty()) {
+            throw new IllegalArgumentException("Given production has non-terminals which are not defined.");
+        }
 
-         return new CFGrammar<>(startSymbol, newProdMap, newTerminalsUsed);
+        return newProdMap;
+    }
+
+
+    public CFGrammar<NT, T, P> withProduction(P p) {
+        Objects.requireNonNull(p);  // p cannot be null.
+
+        Set<T> newTerminals = terminalsUsed.addAll(p.getRule().filter(Either::isRight).map(Either::get));
+
+         return new CFGrammar<>(startSymbol, newProductionMap(p), newTerminals);
     }
 
     @Override
