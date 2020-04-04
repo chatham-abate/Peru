@@ -1,8 +1,10 @@
 package org.perudevteam.lexer.charlexer;
 
+import org.perudevteam.misc.Typed;
+
 import java.util.Objects;
 
-public class CharData<T extends Enum<T>> {
+public class CharData<T extends Enum<T>> implements Typed<T> {
     private T type;
     private int lineNumber;
 
@@ -13,6 +15,7 @@ public class CharData<T extends Enum<T>> {
         lineNumber = l;
     }
 
+    @Override
     public T getType() {
         return type;
     }

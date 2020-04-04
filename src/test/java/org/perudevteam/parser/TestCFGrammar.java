@@ -5,7 +5,10 @@ import io.vavr.collection.HashSet;
 import io.vavr.collection.List;
 import io.vavr.collection.Set;
 import org.junit.jupiter.api.*;
-import org.perudevteam.parser.production.Production;
+import org.perudevteam.parser.grammar.CFGrammar;
+import org.perudevteam.parser.grammar.Production;
+import org.perudevteam.parser.lrone.FirstSets;
+import org.perudevteam.parser.lrone.LROneItem;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static io.vavr.control.Either.*;
@@ -195,7 +198,7 @@ public class TestCFGrammar {
         Set<LROneItem<NT, T, Production<NT, T>>> cc0 = HashSet.of(new LROneItem<>(0, new Production<>(
                 NT.A, List.of(right(T.E))
         )));
-        Set<LROneItem<NT, T, Production<NT, T>>> closure1 = LROneItem.closureSet(G1, cc0);
+        Set<LROneItem<NT, T, Production<NT, T>>> closure1 = LROneItem.closureSet(G1, F1, cc0);
         assertEquals(cc0, closure1);
 
         cc0 = HashSet.of(new LROneItem<>(0, PROD1));
@@ -206,18 +209,18 @@ public class TestCFGrammar {
                 new LROneItem<>(0, PROD4, T.F)
         );
 
-        assertEquals(expected3, LROneItem.closureSet(G3, cc0));
+        assertEquals(expected3, LROneItem.closureSet(G3, F3, cc0));
 
         Set<LROneItem<NT, T, Production<NT, T>>> expected4 = expected3
                 .add(new LROneItem<>(0, PROD2)).add(new LROneItem<>(0, PROD4));
 
-        assertEquals(expected4, LROneItem.closureSet(G4, cc0));
+        assertEquals(expected4, LROneItem.closureSet(G4, F4, cc0));
     }
 
     @Test
     void testGoto() {
         Set<LROneItem<NT, T, Production<NT, T>>> cc0 = HashSet.of(new LROneItem<>(0, PROD1));
-        Set<LROneItem<NT, T, Production<NT, T>>> goto2 = LROneItem.gotoSet(G2, cc0, left(NT.B));
+        Set<LROneItem<NT, T, Production<NT, T>>> goto2 = LROneItem.gotoSet(G2, F2, cc0, left(NT.B));
         Set<LROneItem<NT, T, Production<NT, T>>> expected2 = HashSet.of(
                 new LROneItem<>(1, PROD1),
                 new LROneItem<>(0, PROD3)

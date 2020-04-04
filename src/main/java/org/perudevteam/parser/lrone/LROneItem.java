@@ -1,4 +1,4 @@
-package org.perudevteam.parser;
+package org.perudevteam.parser.lrone;
 
 import io.vavr.Tuple2;
 import io.vavr.collection.HashSet;
@@ -7,7 +7,8 @@ import io.vavr.collection.Seq;
 import io.vavr.collection.Set;
 import io.vavr.control.Either;
 import io.vavr.control.Option;
-import org.perudevteam.parser.production.Production;
+import org.perudevteam.parser.grammar.CFGrammar;
+import org.perudevteam.parser.grammar.Production;
 
 import java.util.Objects;
 
@@ -18,13 +19,13 @@ public class LROneItem <NT extends Enum<NT>, T extends Enum<T>, P extends Produc
      */
 
     public static <NT extends Enum<NT>, T extends Enum<T>, P extends Production<NT, T>> Set<LROneItem<NT, T, P>>
-    closureSet(CFGrammar<NT, T, P> g, Set<LROneItem<NT, T, P>> set0) {
+    closureSet(CFGrammar<NT, T, P> g, FirstSets<NT, T> firstSets, Set<LROneItem<NT, T, P>> set0) {
         // Perform Null Checks.
         Objects.requireNonNull(g);
+        Objects.requireNonNull(firstSets);
         Objects.requireNonNull(set0);
         set0.forEach(Objects::requireNonNull);
 
-        FirstSets<NT, T> firstSets = new FirstSets<>(g);    // Generate first sets for all nts in g.
         List<LROneItem<NT, T, P>> workStack = List.ofAll(set0);
         Set<LROneItem<NT, T, P>> closure = HashSet.empty();
 
@@ -76,8 +77,9 @@ public class LROneItem <NT extends Enum<NT>, T extends Enum<T>, P extends Produc
     }
 
     public static <NT extends Enum<NT>, T extends Enum<T>, P extends Production<NT, T>> Set<LROneItem<NT, T, P>>
-    gotoSet(CFGrammar<NT, T, P> g, Set<LROneItem<NT, T, P>> set0, Either<NT, T> symbol) {
+    gotoSet(CFGrammar<NT, T, P> g, FirstSets<NT, T> firstSets, Set<LROneItem<NT, T, P>> set0, Either<NT, T> symbol) {
         Objects.requireNonNull(g);
+        Objects.requireNonNull(firstSets);
         Objects.requireNonNull(set0);
         set0.forEach(Objects::requireNonNull);
         Objects.requireNonNull(symbol);
@@ -93,7 +95,7 @@ public class LROneItem <NT extends Enum<NT>, T extends Enum<T>, P extends Produc
             }
         }
 
-        return closureSet(g, gotoSet);
+        return closureSet(g, firstSets, gotoSet);
     }
 
     /*

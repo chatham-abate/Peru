@@ -1,8 +1,7 @@
-package org.perudevteam.parser;
+package org.perudevteam.parser.grammar;
 
 import io.vavr.collection.*;
 import io.vavr.control.Either;
-import org.perudevteam.parser.production.Production;
 
 import java.util.Objects;
 
@@ -70,7 +69,7 @@ public class CFGrammar<NT extends Enum<NT>, T extends Enum<T>, P extends Product
     }
 
     // Direct Constructor with no checks... only used by methods of this class.
-    private CFGrammar(NT start, Map<NT, Set<P>> prodMap, Set<T> termsUsed) {
+    protected CFGrammar(NT start, Map<NT, Set<P>> prodMap, Set<T> termsUsed) {
         Objects.requireNonNull(start);
         Objects.requireNonNull(prodMap);
         Objects.requireNonNull(termsUsed);
@@ -141,7 +140,7 @@ public class CFGrammar<NT extends Enum<NT>, T extends Enum<T>, P extends Product
 
         String str = strBuilder.toString();
 
-        return str.substring(0, str.length() - 1);  // Exlude final newline Character.
+        return str.substring(0, str.length() - 1);  // Exclude final newline Character.
     }
 }
 

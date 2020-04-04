@@ -1,14 +1,15 @@
-package org.perudevteam.parser;
+package org.perudevteam.parser.lrone;
 
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import io.vavr.collection.*;
 import io.vavr.control.Either;
-import org.perudevteam.parser.production.Production;
+import org.perudevteam.parser.grammar.CFGrammar;
+import org.perudevteam.parser.grammar.Production;
 
 import java.util.Objects;
 
-class FirstSets<NT extends Enum<NT>, T extends Enum<T>> {
+public class FirstSets<NT extends Enum<NT>, T extends Enum<T>> {
 
     /**
      * Generate the firsts set of a specific rule.

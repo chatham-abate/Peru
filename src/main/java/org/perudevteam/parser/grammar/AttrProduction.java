@@ -1,7 +1,6 @@
-package org.perudevteam.parser.production;
+package org.perudevteam.parser.grammar;
 
 import io.vavr.Function1;
-import io.vavr.Function2;
 import io.vavr.collection.Seq;
 import io.vavr.control.Either;
 import org.perudevteam.dynamic.Dynamic;
@@ -10,7 +9,7 @@ import java.util.Objects;
 
 public abstract class AttrProduction<NT extends Enum<NT>, T extends Enum<T>> extends Production<NT, T> {
 
-    public AttrProduction(NT s, Seq<Either<NT, T>> r) {
+    public AttrProduction(NT s, Seq<? extends Either<NT, T>> r) {
         super(s, r);
     }
 
