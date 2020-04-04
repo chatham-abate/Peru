@@ -2,9 +2,7 @@ package org.perudevteam.parser.lrone;
 
 import io.vavr.Function1;
 import io.vavr.Tuple2;
-import io.vavr.collection.Map;
-import io.vavr.collection.Seq;
-import io.vavr.collection.Set;
+import io.vavr.collection.*;
 import io.vavr.control.Either;
 import org.perudevteam.dynamic.Dynamic;
 import org.perudevteam.misc.Typed;
@@ -19,16 +17,28 @@ import java.util.Objects;
 public class LROneASTParser<NT extends Enum<NT>, T extends Enum<T>, L, D extends Typed<T>>
         implements ASTParser<L, D> {
 
+    private Map<NT, Integer> nonTerminalIndex;
+    private Map<T, Integer> terminalIndex;
+
+    @SuppressWarnings("unchecked")
     public LROneASTParser(AttrCFGrammar<NT, T, ? extends AttrProduction<NT, T>, Tuple2<L, D>> grammar) {
         Objects.requireNonNull(grammar);
+        AttrCFGrammar<NT, T, AttrProduction<NT, T>, Tuple2<L, D>> g =
+                (AttrCFGrammar<NT, T, AttrProduction<NT, T>, Tuple2<L, D>>) grammar;
 
         // Put grammar details into local fields.
-        NT startSymbol = grammar.getStartSymbol();
-        Map<NT, Set<AttrProduction<NT, T>>> prodMap = grammar.getProductionMap().mapValues(Set::narrow);
-        Set<T> terminals = grammar.getTerminalsUsed();
-        Set<NT> nonTerminals = grammar.getNonTerminalsUsed();
+        NT startSymbol = g.getStartSymbol();
+        Map<NT, Set<AttrProduction<NT, T>>> prodMap = g.getProductionMap().mapValues(Set::narrow);
+        Set<T> terminals = g.getTerminalsUsed();
+        Set<NT> nonTerminals = g.getNonTerminalsUsed();
+        FirstSets<NT, T> firstSets = new FirstSets<>(g);
 
-        // Start symbol can not be on the rhs of any rules.
+        // Initialize Indices.
+        nonTerminalIndex = HashMap.empty();
+        terminalIndex = HashMap.empty();
+
+        // Start symbol cannot be on the rhs of any rules.
+        int ind = 0;    // Also fill non-terminal index.
         Either<NT, T> startSymbolEither = left(startSymbol);
         for (NT nt: nonTerminals) {
             for (AttrProduction<NT, T> ap: prodMap.get(nt).get()) {
@@ -36,11 +46,55 @@ public class LROneASTParser<NT extends Enum<NT>, T extends Enum<T>, L, D extends
                     throw new IllegalArgumentException("Given start symbol appears on rhs of a production.");
                 }
             }
+
+            nonTerminalIndex = nonTerminalIndex.put(nt, ind);
+            ind++;
         }
 
-        // can we build table using the grammar... then simply drop the grammar....
+        // Fill terminal index.
+        ind = 1;
+        for (T t: terminals) {
+            terminalIndex = terminalIndex.put(t, ind);
+            ind++;
+        }
 
-        // Build tables here, perform
+        // We must build the Canonical Collection set. (CC) and the table at the same time.
+        Seq<Set<LROneItem<NT, T, AttrProduction<NT, T>>>> cc = Queue.empty();
+        Seq<Set<LROneItem<NT, T, AttrProduction<NT, T>>>> workQueue = Queue.empty();
+
+        // temporary goto and action tables.
+        Seq<Array<Either<Integer, AttrProduction<NT, T>>>> tempActionTable = Queue.empty();
+        Seq<Array<Integer>> tempGotoTable = Queue.empty();
+
+        Array<Either<Integer, AttrProduction<NT, T>>> emptyActionRow = Array.fill(terminals.length() + 1, left(0));
+        Array<Integer> emptyGotoRow = Array.fill(nonTerminals.length(), 0);
+
+        // If a set is in the work stack -> that set is in the CC already, yet its specific row is yet to
+        // be calculated and stored in the table.
+
+        // cc0 will manually calculated.
+        Set<LROneItem<NT, T, AttrProduction<NT, T>>> cc0 = prodMap.get(startSymbol).get().map(ap ->
+            new LROneItem<>(0, ap));
+
+        cc0 = LROneItem.closureSet(g, firstSets, cc0);
+
+        // Add cc0 to work stack and CC.
+        cc = cc.append(cc0);
+        workQueue = workQueue.append(cc0);
+
+        // Add state0 rows to the action and goto tables.
+        tempActionTable = tempActionTable.append(emptyActionRow);
+        tempGotoTable = tempGotoTable.append(emptyGotoRow);
+
+        int i = 0;  // Index of cc set we are on.
+
+        while (!workQueue.isEmpty()) {
+            // pop head off work queue.
+            Set<LROneItem<NT, T, AttrProduction<NT, T>>> cci = workQueue.head();
+            workQueue = workQueue.tail();
+
+
+        }
     }
 
     @Override
