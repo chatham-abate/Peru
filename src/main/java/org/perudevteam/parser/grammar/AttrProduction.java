@@ -7,7 +7,14 @@ import org.perudevteam.dynamic.Dynamic;
 
 import java.util.Objects;
 
-public abstract class AttrProduction<NT extends Enum<NT>, T extends Enum<T>> extends Production<NT, T> {
+/**
+ * This class represents a production which can be used to build some result.
+ *
+ * @param <NT> The non terminal enum type of the production.
+ * @param <T> the terminal enum type of the production.
+ * @param <R> The result which can be generated using this production.
+ */
+public abstract class AttrProduction<NT extends Enum<NT>, T extends Enum<T>, R> extends Production<NT, T> {
 
     public AttrProduction(NT s, Seq<? extends Either<NT, T>> r) {
         super(s, r);
@@ -19,12 +26,9 @@ public abstract class AttrProduction<NT extends Enum<NT>, T extends Enum<T>> ext
     // The Value returned the attributes passed up from the children.
 
     // This production will state the rules for how to build ASTs.
-    public abstract Function1<Dynamic, Dynamic> buildASTUnsafe(
-            Seq<? extends Function1<? super Dynamic, ? extends Dynamic>> children);
+    protected abstract R buildResultUnsafe(Seq<? extends R> children);
 
-    // This will perform necessary checks before building the AST.
-    public Function1<Dynamic, Dynamic> buildAST(
-            Seq<? extends Function1<? super Dynamic, ? extends Dynamic>> children) {
+    public R buildResult(Seq<? extends R> children) {
         Objects.requireNonNull(children);
         children.forEach(Objects::requireNonNull);
 
@@ -32,6 +36,6 @@ public abstract class AttrProduction<NT extends Enum<NT>, T extends Enum<T>> ext
             throw new IllegalArgumentException("This rule requires " + getRule().length() + " tokens.");
         }
 
-        return buildASTUnsafe(children);
+        return buildResultUnsafe(children);
     }
 }
