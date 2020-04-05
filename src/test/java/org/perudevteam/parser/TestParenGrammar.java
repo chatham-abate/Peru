@@ -3,10 +3,12 @@ package org.perudevteam.parser;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.List;
 import io.vavr.collection.Set;
+import org.junit.jupiter.api.Test;
 import org.perudevteam.parser.grammar.CFGrammar;
 import org.perudevteam.parser.grammar.Production;
 import org.perudevteam.parser.lrone.FirstSets;
 import org.perudevteam.parser.lrone.LROneItem;
+import org.perudevteam.parser.lrone.LROneTable;
 
 import static io.vavr.control.Either.*;
 
@@ -47,6 +49,11 @@ public class TestParenGrammar {
         System.out.println();
         System.out.println("CC_0 : ");
         LROneItem.closureSet(G, F, CC_0).forEach(System.out::println);
+    }
+
+    @Test
+    void testParenLROneTable() {
+        new LROneTable<>(G);
     }
 
 }
