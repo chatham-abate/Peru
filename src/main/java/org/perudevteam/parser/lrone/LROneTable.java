@@ -3,6 +3,7 @@ package org.perudevteam.parser.lrone;
 import io.vavr.Tuple2;
 import io.vavr.collection.*;
 import io.vavr.control.Either;
+import org.perudevteam.misc.SeqHelpers;
 import org.perudevteam.parser.grammar.CFGrammar;
 import org.perudevteam.parser.grammar.Production;
 import static io.vavr.control.Either.*;
@@ -18,6 +19,8 @@ import java.util.Objects;
 public class LROneTable<NT extends Enum<NT>, T extends Enum<T>, P extends Production<NT, T>> {
     private Array<Array<Integer>> gotoTable;
     private Array<Array<Either<Integer, P>>> actionTable;
+
+    private Array<Set<LROneItem<NT, T, P>>> cc;
 
     private Map<NT, Integer> nonTerminalMap;
     private Map<T, Integer> terminalMap;
@@ -52,17 +55,21 @@ public class LROneTable<NT extends Enum<NT>, T extends Enum<T>, P extends Produc
         int i = 1;  // The 0 column in the action table is saved for eof.
         for (T t: terminals) terminalMap = terminalMap.put(t, i++);
         i = 0;
-        for (NT nt: nonTerminals) nonTerminalMap = nonTerminalMap.put(nt, i++);
+        for (NT nt: nonTerminals) {
+            if (nt != goal) {
+                nonTerminalMap = nonTerminalMap.put(nt, i++);
+            }
+        }
 
         // Now initial CC setup.
         Set<LROneItem<NT, T, P>> cc0 = prodMap.get(goal).get().map(p -> new LROneItem<>(0, p));
         cc0 = LROneItem.closureSet(g, firstSets, cc0);  // Perform closure.
 
-        Vector<Set<LROneItem<NT, T, P>>> cc = Vector.of(cc0);
+        Vector<Set<LROneItem<NT, T, P>>> tempCC = Vector.of(cc0);
 
         // Finally initial Table set up.
         final Array<Either<Integer, P>> blankActionRow = Array.fill(terminals.length() + 1, left(0));
-        final Array<Integer> blankGotoRow = Array.fill(nonTerminals.length(), 0);
+        final Array<Integer> blankGotoRow = Array.fill(nonTerminals.length() - 1, 0);
 
         // Temporary action and goto table.
         Vector<Array<Either<Integer, P>>> tempActionTable = Vector.of(blankActionRow);
@@ -70,8 +77,8 @@ public class LROneTable<NT extends Enum<NT>, T extends Enum<T>, P extends Produc
 
         // Now for work loop!
         int row = 0;
-        while (row < cc.length()) {
-            Set<LROneItem<NT, T, P>> cci = cc.get(row);
+        while (row < tempCC.length()) {
+            Set<LROneItem<NT, T, P>> cci = tempCC.get(row);
 
             Map<NT, Set<LROneItem<NT, T, P>>> ntShifts = HashMap.empty();
             Map<T, Set<LROneItem<NT, T, P>>> tShifts = HashMap.empty();
@@ -93,7 +100,7 @@ public class LROneTable<NT extends Enum<NT>, T extends Enum<T>, P extends Produc
                     }
 
                     // Otherwise update.
-                    tempActionTable.update(row, r -> r.update(col, right(lri.getProduction())));
+                    tempActionTable = tempActionTable.update(row, r -> r.update(col, right(lri.getProduction())));
                 } else {
                     Either<NT, T> nextSymEither = rule.get(cursor);
 
@@ -121,12 +128,12 @@ public class LROneTable<NT extends Enum<NT>, T extends Enum<T>, P extends Produc
             for (T tShift: tShifts.keySet()) {
                 Set<LROneItem<NT, T, P>> ccj = tShifts.get(tShift).get();
 
-                final int ccSize = cc.length();
+                final int ccSize = tempCC.length();
                 final int col = terminalMap.get(tShift).get();
                 int shiftState = 0;
 
                 for (int st = 0; st < ccSize; st++) {
-                    if (cc.get(st).equals(ccj)) {
+                    if (tempCC.get(st).equals(ccj)) {
                         shiftState = st;
                         break;
                     }
@@ -135,7 +142,7 @@ public class LROneTable<NT extends Enum<NT>, T extends Enum<T>, P extends Produc
                 if (shiftState == 0) {
                     // No equal state was found. Create a new state.
                     shiftState = ccSize;
-                    cc = cc.append(ccj);
+                    tempCC = tempCC.append(ccj);
 
                     tempActionTable = tempActionTable.append(blankActionRow);
                     tempGotoTable = tempGotoTable.append(blankGotoRow);
@@ -147,7 +154,7 @@ public class LROneTable<NT extends Enum<NT>, T extends Enum<T>, P extends Produc
                 final int shiftStateFinal = shiftState;
 
                 if (cell.isLeft() && cell.getLeft() == 0) {
-                    tempActionTable.update(row, r -> r.update(col, left(shiftStateFinal)));
+                    tempActionTable = tempActionTable.update(row, r -> r.update(col, left(shiftStateFinal)));
                 } else if (cell.isRight() || cell.getLeft() != shiftStateFinal) {
                     throw new IllegalArgumentException("Given Grammar is not LR(1).");
                 }
@@ -156,12 +163,12 @@ public class LROneTable<NT extends Enum<NT>, T extends Enum<T>, P extends Produc
             for (NT ntShift: ntShifts.keySet()) {
                 Set<LROneItem<NT, T, P>> ccj = ntShifts.get(ntShift).get();
 
-                final int ccSize = cc.length();
+                final int ccSize = tempCC.length();
                 final int col = nonTerminalMap.get(ntShift).get();
                 int shiftState = 0;
 
                 for (int st = 0; st < ccSize; st++) {
-                    if (cc.get(st).equals(ccj)) {
+                    if (tempCC.get(st).equals(ccj)) {
                         shiftState = st;
                         break;
                     }
@@ -169,7 +176,7 @@ public class LROneTable<NT extends Enum<NT>, T extends Enum<T>, P extends Produc
 
                 if (shiftState == 0) {
                     shiftState = ccSize;
-                    cc = cc.append(ccj);
+                    tempCC = tempCC.append(ccj);
 
                     tempActionTable = tempActionTable.append(blankActionRow);
                     tempGotoTable = tempGotoTable.append(blankGotoRow);
@@ -179,7 +186,7 @@ public class LROneTable<NT extends Enum<NT>, T extends Enum<T>, P extends Produc
                 int cell = tempGotoTable.get(row).get(col);
 
                 if (cell == 0) {
-                    tempGotoTable.update(row, r -> r.update(col, shiftStateFinal));
+                    tempGotoTable = tempGotoTable.update(row, r -> r.update(col, shiftStateFinal));
                 } else if (cell != shiftStateFinal) {
                     throw new IllegalArgumentException("Given Grammar is not LR(1).");
                 }
@@ -190,5 +197,47 @@ public class LROneTable<NT extends Enum<NT>, T extends Enum<T>, P extends Produc
 
         gotoTable = Array.ofAll(tempGotoTable);
         actionTable = Array.ofAll(tempActionTable);
+        cc = Array.ofAll(tempCC);
+    }
+
+    public Array<Set<LROneItem<NT, T, P>>> getCC() {
+        return cc;
+    }
+
+    public Array<Array<Integer>> getGotoTable() {
+        return gotoTable;
+    }
+
+    public Array<Array<Either<Integer, P>>> getActionTable() {
+        return actionTable;
+    }
+
+    public String actionTableString() {
+        Seq<String> rowLabels = Array.range(0, cc.length()).map(i -> i + "");
+        Seq<String> colLabels = Array.range(0, terminalMap.keySet().length() + 1).map(i ->
+                i == 0
+                        ? "$"
+                        : terminalMap.keySet().filter(k -> terminalMap.get(k).get().equals(i)).head().name()
+        );
+
+        Seq<Seq<String>> grid = actionTable.map(r -> r.map(cell -> {
+            if (cell.isLeft()) {
+                return cell.getLeft() == 0 ? "" : "s" + cell.getLeft();
+            }
+
+            return cell.get().getSource().name();
+        }));
+
+        return SeqHelpers.gridString(rowLabels, colLabels, grid);
+    }
+
+    public String gotoTableString() {
+        Seq<String> rowLabels = Array.range(0, cc.length()).map(i -> i + "");
+        Seq<String> colLabels = Array.range(0, nonTerminalMap.keySet().length()).map(i ->
+                nonTerminalMap.keySet().filter(nt -> nonTerminalMap.get(nt).get().equals(i)).head().name());
+
+        Seq<Seq<String>> grid = gotoTable.map(r -> r.map(cell -> cell.equals(0) ? "" : cell + ""));
+
+        return SeqHelpers.gridString(rowLabels, colLabels, grid);
     }
 }

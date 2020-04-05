@@ -11,7 +11,6 @@ import org.perudevteam.parser.grammar.AttrProduction;
 import org.perudevteam.parser.grammar.CFGrammar;
 import org.perudevteam.parser.grammar.Production;
 import org.perudevteam.parser.lrone.FirstSets;
-import org.perudevteam.parser.lrone.LROneASTParser;
 import org.perudevteam.parser.lrone.LROneItem;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -194,7 +193,7 @@ public class TestCFGrammar {
     }
 
     /*
-     * Closure and Goto Tests.
+     * Closure Tests.
      */
 
     @Test
@@ -221,18 +220,6 @@ public class TestCFGrammar {
         assertEquals(expected4, LROneItem.closureSet(G4, F4, cc0));
     }
 
-    @Test
-    void testGoto() {
-        Set<LROneItem<NT, T, Production<NT, T>>> cc0 = HashSet.of(new LROneItem<>(0, PROD1));
-        Set<LROneItem<NT, T, Production<NT, T>>> goto2 = LROneItem.gotoSet(G2, F2, cc0, left(NT.B));
-        Set<LROneItem<NT, T, Production<NT, T>>> expected2 = HashSet.of(
-                new LROneItem<>(1, PROD1),
-                new LROneItem<>(0, PROD3)
-        );
-
-        assertEquals(expected2, goto2);
-    }
-
     /*
      * Simple AttrCFGrammar Error Tests.
      */
@@ -250,10 +237,6 @@ public class TestCFGrammar {
         AttrCFGrammar<NT, T, AttrProduction<NT, T>, Tuple2<String, CharData<T>>> g =
                 new AttrCFGrammar<>(NT.A, HashMap.empty(), List.of(prod));
 
-
-        assertThrows(IllegalArgumentException.class, () -> {
-            new LROneASTParser<>(g);
-        });
 
         AttrProduction<NT, T> prod2 = new AttrProduction<NT, T>(NT.B, List.of(right(T.E))) {
             @Override

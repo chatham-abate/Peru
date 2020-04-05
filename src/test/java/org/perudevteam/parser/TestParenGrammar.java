@@ -1,9 +1,8 @@
 package org.perudevteam.parser;
 
-import io.vavr.collection.HashSet;
-import io.vavr.collection.List;
-import io.vavr.collection.Set;
+import io.vavr.collection.*;
 import org.junit.jupiter.api.Test;
+import org.perudevteam.misc.SeqHelpers;
 import org.perudevteam.parser.grammar.CFGrammar;
 import org.perudevteam.parser.grammar.Production;
 import org.perudevteam.parser.lrone.FirstSets;
@@ -11,6 +10,8 @@ import org.perudevteam.parser.lrone.LROneItem;
 import org.perudevteam.parser.lrone.LROneTable;
 
 import static io.vavr.control.Either.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 
 /**
  * Manual Tests on Parentheses grammar.
@@ -42,6 +43,13 @@ public class TestParenGrammar {
             new LROneItem<>(0, PROD1)
     ));
 
+    private static final LROneTable<NT, T, Production<NT, T>> LRONE_TABLE = new LROneTable<>(G);
+
+    @Test
+    void testCCSize() {
+        assertEquals(12, LRONE_TABLE.getCC().length());
+    }
+
     // @Test
     void testParenGrammar() {
         System.out.println("G : ");
@@ -51,9 +59,21 @@ public class TestParenGrammar {
         LROneItem.closureSet(G, F, CC_0).forEach(System.out::println);
     }
 
-    @Test
-    void testParenLROneTable() {
-        new LROneTable<>(G);
+    // @Test
+    void testParenLROneTableCC() {
+        LROneTable<NT, T, Production<NT, T>> lroneTable = new LROneTable<>(G);
+        Array<Set<LROneItem<NT, T, Production<NT, T>>>> cc = lroneTable.getCC();
+
+        for (int i = 0; i < cc.length(); i++) {
+            System.out.println("CC " + i + " : ");
+            cc.get(i).forEach(System.out::println);
+            System.out.println();
+        }
     }
 
+    // @Test
+    void testLROneTableAction() {
+        System.out.println(LRONE_TABLE.actionTableString());
+        System.out.println(LRONE_TABLE.gotoTableString());
+    }
 }
