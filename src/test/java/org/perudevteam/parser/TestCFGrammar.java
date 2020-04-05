@@ -3,7 +3,7 @@ package org.perudevteam.parser;
 import io.vavr.Function1;
 import io.vavr.Tuple2;
 import io.vavr.collection.*;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.Test;
 import org.perudevteam.dynamic.Dynamic;
 import org.perudevteam.lexer.charlexer.CharData;
 import org.perudevteam.parser.grammar.AttrCFGrammar;
@@ -13,8 +13,9 @@ import org.perudevteam.parser.grammar.Production;
 import org.perudevteam.parser.lrone.FirstSets;
 import org.perudevteam.parser.lrone.LROneItem;
 
+import static io.vavr.control.Either.left;
+import static io.vavr.control.Either.right;
 import static org.junit.jupiter.api.Assertions.*;
-import static io.vavr.control.Either.*;
 
 public class TestCFGrammar {
 
@@ -72,26 +73,6 @@ public class TestCFGrammar {
 
         assertThrows(NullPointerException.class, () -> {
            prod.withSource(null);
-        });
-    }
-
-    /*
-     * LR(1) Item Tests.
-     */
-
-    @Test
-    void testLROneItemErrors() {
-        Production<NT, T> prod = new Production<>(NT.A, List.of(right(T.E), right(T.F)));
-        LROneItem<NT, T, Production<NT, T>> lrOne = new LROneItem<>(1, prod);
-
-        assertThrows(IllegalArgumentException.class, () -> {
-            lrOne.withProduction(prod.withRule(List.empty()));
-        });
-
-        lrOne.shiftCursor();
-
-        assertThrows(IllegalArgumentException.class, () -> {
-            lrOne.shiftCursor().shiftCursor();
         });
     }
 
@@ -190,34 +171,6 @@ public class TestCFGrammar {
         Tuple2<Boolean, Set<T>> ruleTuple = F4.getFirstSet(List.of(left(NT.A), right(T.G), right(T.H)));
         assertFalse(ruleTuple._1);
         assertEquals(HashSet.of(T.E, T.F, T.G), ruleTuple._2);
-    }
-
-    /*
-     * Closure Tests.
-     */
-
-    @Test
-    void testClosure() {
-        Set<LROneItem<NT, T, Production<NT, T>>> cc0 = HashSet.of(new LROneItem<>(0, new Production<>(
-                NT.A, List.of(right(T.E))
-        )));
-        Set<LROneItem<NT, T, Production<NT, T>>> closure1 = LROneItem.closureSet(G1, F1, cc0);
-        assertEquals(cc0, closure1);
-
-        cc0 = HashSet.of(new LROneItem<>(0, PROD1));
-
-        Set<LROneItem<NT, T, Production<NT, T>>> expected3 = HashSet.of(
-                new LROneItem<>(0, PROD1),
-                new LROneItem<>(0, PROD2, T.F),
-                new LROneItem<>(0, PROD4, T.F)
-        );
-
-        assertEquals(expected3, LROneItem.closureSet(G3, F3, cc0));
-
-        Set<LROneItem<NT, T, Production<NT, T>>> expected4 = expected3
-                .add(new LROneItem<>(0, PROD2)).add(new LROneItem<>(0, PROD4));
-
-        assertEquals(expected4, LROneItem.closureSet(G4, F4, cc0));
     }
 
     /*

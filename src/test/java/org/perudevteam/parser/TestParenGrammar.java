@@ -50,6 +50,10 @@ public class TestParenGrammar {
         assertEquals(12, LRONE_TABLE.getCC().length());
     }
 
+    /*
+     * Some Manual Tests.
+     */
+
     // @Test
     void testParenGrammar() {
         System.out.println("G : ");
