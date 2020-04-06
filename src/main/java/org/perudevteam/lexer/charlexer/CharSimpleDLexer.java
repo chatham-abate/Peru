@@ -16,7 +16,11 @@ public abstract class CharSimpleDLexer<CL> extends
 
     @Override
     protected CharSimpleContext readInput(Character input, CharSimpleContext context) {
-        return input == '\n' ? context.withCurrentLine(context.getCurrentLine() + 1) : context;
+        // New Line Character means current line increments and current line pos goes to one..
+        // Otherwise line stays the same, line position increments.
+        return input == '\n'
+                ? context.map(l -> l.withCurrent(l.getCurrent() + 1), lp -> lp.withCurrent(1))
+                : context.mapLinePosition(lp -> lp.withCurrent(lp.getCurrent() + 1));
     }
 
     @Override
@@ -26,17 +30,20 @@ public abstract class CharSimpleDLexer<CL> extends
 
     @Override
     protected CharSimpleContext onToken(Tuple2<String, CharData> token, CharSimpleContext context) {
-        return context.withEndingLine(context.getCurrentLine());
+        // Here current line becomes ending line, and current position becomes ending position.
+        return context.map(l -> l.withEnding(l.getCurrent()), lp -> lp.withEnding(lp.getCurrent()));
     }
 
     @Override
     protected Throwable onError(String lexeme, CharSimpleContext context) {
-        return new LineException(context.getStartingLine(), "Lexeme cannot be lexed : " + lexeme);
+        return new LineException(context.getLine().getStarting(),
+                context.getLinePosition().getStarting(), "Lexeme cannot be lexed : " + lexeme);
     }
 
     @Override
     protected CharSimpleContext onSuccess(Tuple2<String, CharData> token, CharSimpleContext context) {
-        return context.withStartingLine(context.getEndingLine())
-                .withCurrentLine(context.getEndingLine());
+        // Here we restart the context to whatever comes directly after the successful token.
+        return context.map(l -> l.withCurrent(l.getEnding()).withStarting(l.getEnding()),
+                lp -> lp.withCurrent(lp.getEnding()).withStarting(lp.getEnding()));
     }
 }

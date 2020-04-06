@@ -52,9 +52,12 @@ public class TestCharLexer {
             .withEdge(2, 3, CharType1.DOT)
             .withEdge(3, 4, CharType1.NUMBER)
             .withEdge(4, 4, CharType1.NUMBER)
-            .withAcceptingState(1, c -> new CharData<>(TokenType1.WHITESPACE, c.getStartingLine()))
-            .withAcceptingState(2, c -> new CharData<>(TokenType1.INT, c.getStartingLine()))
-            .withAcceptingState(4, c -> new CharData<>(TokenType1.DOUBLE, c.getStartingLine()));
+            .withAcceptingState(1, c -> new CharData<>(TokenType1.WHITESPACE,
+                    c.getLine().getStarting(), c.getLinePosition().getStarting()))
+            .withAcceptingState(2, c -> new CharData<>(TokenType1.INT,
+                    c.getLine().getStarting(), c.getLinePosition().getStarting()))
+            .withAcceptingState(4, c -> new CharData<>(TokenType1.DOUBLE,
+                    c.getLine().getStarting(), c.getLinePosition().getStarting()));
 
     /*
      * Lexers for Language 1.
@@ -119,8 +122,10 @@ public class TestCharLexer {
             .withEdge(4, 5, CharType2.C)
             .withEdge(2, 5, CharType2.C)
             .withEdge(4, 3, CharType2.A)
-            .withAcceptingState(2, c -> new CharData<>(TokenType2.SHORT, c.getStartingLine()))
-            .withAcceptingState(5, c -> new CharData<>(TokenType2.LONG, c.getStartingLine()));
+            .withAcceptingState(2, c -> new CharData<>(TokenType2.SHORT,
+                    c.getLine().getStarting(), c.getLinePosition().getStarting()))
+            .withAcceptingState(5, c -> new CharData<>(TokenType2.LONG,
+                    c.getLine().getStarting(), c.getLinePosition().getStarting()));
 
     /*
      * Language 2 Lexers.
@@ -155,12 +160,12 @@ public class TestCharLexer {
     private static final Seq<Character> INPUT1 = List.ofAll("123 \n 456 12.34\n".toCharArray());
 
     private static final Seq<Tuple2<String, CharData>> EXPECTED1 = List.of(
-            Tuple.of("123", new CharData<>(TokenType1.INT, 1)),
-            Tuple.of(" \n ", new CharData<>(TokenType1.WHITESPACE, 1)),
-            Tuple.of("456", new CharData<>(TokenType1.INT, 2)),
-            Tuple.of(" ", new CharData<>(TokenType1.WHITESPACE, 2)),
-            Tuple.of("12.34", new CharData<>(TokenType1.DOUBLE, 2)),
-            Tuple.of("\n", new CharData<>(TokenType1.WHITESPACE, 2))
+            Tuple.of("123", new CharData<>(TokenType1.INT, 1, 1)),
+            Tuple.of(" \n ", new CharData<>(TokenType1.WHITESPACE, 1, 4)),
+            Tuple.of("456", new CharData<>(TokenType1.INT, 2, 2)),
+            Tuple.of(" ", new CharData<>(TokenType1.WHITESPACE, 2, 5)),
+            Tuple.of("12.34", new CharData<>(TokenType1.DOUBLE, 2, 6)),
+            Tuple.of("\n", new CharData<>(TokenType1.WHITESPACE, 2, 11))
     );
 
     @Test
@@ -169,21 +174,21 @@ public class TestCharLexer {
                 LEXER_SIMPLE1.buildStreamUnchecked(INPUT1, CharSimpleContext.INIT_SIMPLE_CONTEXT));
     }
 
+    private static final Seq<Character> INPUT2 = List.ofAll("ababcabababab".toCharArray());
+
 
     private static final Seq<Tuple2<String, CharData>> EXPECTED2 = List.of(
-            Tuple.of("ababc", new CharData<>(TokenType2.LONG, 1)),
-            Tuple.of("ab", new CharData<>(TokenType2.SHORT, 1)),
-            Tuple.of("ab", new CharData<>(TokenType2.SHORT, 1)),
-            Tuple.of("ab", new CharData<>(TokenType2.SHORT, 1)),
-            Tuple.of("ab", new CharData<>(TokenType2.SHORT, 1))
+            Tuple.of("ababc", new CharData<>(TokenType2.LONG, 1, 1)),
+            Tuple.of("ab", new CharData<>(TokenType2.SHORT, 1, 6)),
+            Tuple.of("ab", new CharData<>(TokenType2.SHORT, 1, 8)),
+            Tuple.of("ab", new CharData<>(TokenType2.SHORT, 1, 10)),
+            Tuple.of("ab", new CharData<>(TokenType2.SHORT, 1, 12))
     );
 
     @Test
     void testLinearLexer() {
-        Seq<Character> input = List.ofAll("ababcabababab".toCharArray());
-
         Stream<Tuple2<String, CharData>> stream =
-                LEXER_LINEAR2.buildStreamUnchecked(input, CharLinearContext.INIT_LINEAR_CONTEXT);
+                LEXER_LINEAR2.buildStreamUnchecked(INPUT2, CharLinearContext.INIT_LINEAR_CONTEXT);
 
         assertEquals(EXPECTED2, stream);
     }

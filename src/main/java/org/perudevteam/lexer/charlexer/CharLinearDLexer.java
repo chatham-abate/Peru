@@ -19,10 +19,11 @@ public abstract class CharLinearDLexer<CL> extends LinearDLexer<Character, CL, S
 
     @Override
     protected CharLinearContext readInput(Character input, CharLinearContext context) {
-        // Increment Line number if necessary.
+        // If we read a new line, the current line should be incremented, current line position should be set to 1.
+        // Otherwise, just increment line position.
         return input == '\n'
-                ? context.withCurrentLine(context.getCurrentLine() + 1)
-                : context;
+                ? context.map(l -> l.withCurrent(l.getCurrent() + 1), lp -> lp.withCurrent(1))
+                : context.mapLinePosition(lp -> lp.withCurrent(lp.getCurrent() + 1));
     }
 
     @Override
@@ -32,17 +33,21 @@ public abstract class CharLinearDLexer<CL> extends LinearDLexer<Character, CL, S
 
     @Override
     protected CharLinearContext onToken(Tuple2<String, CharData> token, CharLinearContext context) {
-        return context.withEndingLine(context.getCurrentLine());
+        // On token shift ending line and line position to current line and line position.
+        return context.map(l -> l.withEnding(l.getCurrent()), lp -> lp.withEnding(lp.getCurrent()));
     }
 
     @Override
     protected Throwable onError(String lexeme, CharLinearContext context) {
-        return new LineException(context.getStartingLine(), "Lexeme cannot be lexed : " + lexeme);
+        return new LineException(context.getLine().getStarting(),
+                context.getLinePosition().getStarting(), "Lexeme cannot be lexed : " + lexeme);
     }
 
     @Override
     protected CharLinearContext onSuccess(Tuple2<String, CharData> token, CharLinearContext context) {
-        return context.withStartingLine(context.getEndingLine())
-                .withCurrentLine(context.getEndingLine());
+        // Shift current back to ending, and starting up to ending.
+
+        return context.map(l -> l.withStarting(l.getEnding()).withCurrent(l.getEnding()),
+                lp -> lp.withStarting(lp.getEnding()).withCurrent(lp.getEnding()));
     }
 }

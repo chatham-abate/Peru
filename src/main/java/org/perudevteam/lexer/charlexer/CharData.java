@@ -6,13 +6,17 @@ import java.util.Objects;
 
 public class CharData<T extends Enum<T>> implements Typed<T> {
     private T type;
-    private int lineNumber;
 
-    public CharData(T t, int l) {
+    private int line;
+    private int linePosition;
+
+    public CharData(T t, int l, int lp) {
         Objects.requireNonNull(t);
 
         type = t;
-        lineNumber = l;
+
+        line = l;
+        linePosition = lp;
     }
 
     @Override
@@ -20,34 +24,47 @@ public class CharData<T extends Enum<T>> implements Typed<T> {
         return type;
     }
 
-    public int getLineNumber() {
-        return lineNumber;
+    public int getLine() {
+        return line;
+    }
+
+    public int getLinePosition() {
+        return linePosition;
     }
 
     public <OT extends Enum<OT>> CharData<OT> withType(OT t) {
-        return new CharData<>(t, lineNumber);
+        return new CharData<>(t, line, linePosition);
     }
 
-    public CharData<T> withLineNumber(int ln) {
-        return new CharData<>(type, ln);
+    public CharData<T> withLine(int l) {
+        return new CharData<>(type, l, linePosition);
+    }
+
+    public CharData<T> withLinePosition(int lp) {
+        return new CharData<>(type, line, linePosition);
     }
 
     @Override
     public String toString() {
-        return "[" + type.name() + ", " + lineNumber + "]";
+        return "[" + line + " : " + linePosition + " : " + type.name() + "]";
     }
+
+    /*
+     * Generated hashCode and equals.
+     */
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        CharData charData = (CharData) o;
-        return lineNumber == charData.lineNumber &&
+        CharData<?> charData = (CharData<?>) o;
+        return line == charData.line &&
+                linePosition == charData.linePosition &&
                 type.equals(charData.type);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, lineNumber);
+        return Objects.hash(type, line, linePosition);
     }
 }
