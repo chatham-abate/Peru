@@ -1,17 +1,22 @@
 package org.perudevteam.parser;
 
 import io.vavr.Function1;
+import io.vavr.Function2;
 import io.vavr.Tuple2;
 import io.vavr.collection.*;
+import io.vavr.control.Either;
 import org.junit.jupiter.api.Test;
 import org.perudevteam.dynamic.Dynamic;
 import org.perudevteam.lexer.charlexer.CharData;
+import org.perudevteam.misc.Typed;
 import org.perudevteam.parser.grammar.AttrCFGrammar;
 import org.perudevteam.parser.grammar.AttrProduction;
 import org.perudevteam.parser.grammar.CFGrammar;
 import org.perudevteam.parser.grammar.Production;
 import org.perudevteam.parser.lrone.FirstSets;
 import org.perudevteam.parser.lrone.LROneItem;
+
+import java.lang.reflect.Type;
 
 import static io.vavr.control.Either.left;
 import static io.vavr.control.Either.right;
@@ -177,30 +182,37 @@ public class TestCFGrammar {
      * Simple AttrCFGrammar Error Tests.
      */
 
+    private static final Seq<Either<NT, T>> A_RULE1 = List.of(
+        right(T.E)
+    );
+    private static final AttrProduction<NT, T, String> A_PROD1 =
+            new AttrProduction<NT, T, String>(NT.A, A_RULE1) {
+        @Override
+        protected String buildResultUnsafe(Seq<? extends String> children) {
+            return "";
+        }
+    };
+
+    private static final Map<T, Function2<String, Typed<T>, String>> TERM_RES_GENS1 = HashMap.of(
+        T.E, (l, d) -> l
+    );
+
+    private static final AttrCFGrammar<NT, T, AttrProduction<NT, T, String>, String, Typed<T>, String> A_G1 =
+            new AttrCFGrammar<>(NT.A, TERM_RES_GENS1, List.of(A_PROD1));
+
+    private static final Seq<Either<NT, T>> A_RULE2 = List.of(right(T.H));
+    private static final AttrProduction<NT, T, String> A_PROD2 = new AttrProduction<NT, T, String>(NT.A, A_RULE2) {
+        @Override
+        protected String buildResultUnsafe(Seq<? extends String> children) {
+            return "";
+        }
+    };
+
     @Test
-    void testAttrGrammarErrors() {
-        AttrProduction<NT, T> prod = new AttrProduction<NT, T>(NT.A, List.of(left(NT.A))) {
-            @Override
-            public Function1<Dynamic, Dynamic> buildASTUnsafe(
-                    Seq<? extends Function1<? super Dynamic, ? extends Dynamic>> children) {
-                return null;
-            }
-        };
-
-        AttrCFGrammar<NT, T, AttrProduction<NT, T>, Tuple2<String, CharData<T>>> g =
-                new AttrCFGrammar<>(NT.A, HashMap.empty(), List.of(prod));
-
-
-        AttrProduction<NT, T> prod2 = new AttrProduction<NT, T>(NT.B, List.of(right(T.E))) {
-            @Override
-            public Function1<Dynamic, Dynamic> buildASTUnsafe(
-                    Seq<? extends Function1<? super Dynamic, ? extends Dynamic>> children) {
-                return null;
-            }
-        };
-
+    void testAttrGrammarBasics() {
+        // Test adding a production with unseen terminals throws an error.
         assertThrows(IllegalArgumentException.class, () -> {
-           g.withProduction(prod2);
+           A_G1.withProduction(A_PROD2);
         });
     }
 }

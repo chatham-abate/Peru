@@ -124,7 +124,7 @@ public class CFGrammar<NT extends Enum<NT>, T extends Enum<T>, P extends Product
 
         Set<T> newTerminals = terminalsUsed.addAll(p.getRule().filter(Either::isRight).map(Either::get));
 
-         return new CFGrammar<>(startSymbol, newProductionMap(p), newTerminals);
+        return new CFGrammar<>(startSymbol, newProductionMap(p), newTerminals);
     }
 
     @Override

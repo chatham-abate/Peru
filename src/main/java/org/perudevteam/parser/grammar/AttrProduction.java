@@ -9,6 +9,7 @@ import java.util.Objects;
 
 /**
  * This class represents a production which can be used to build some result.
+ * Results are built in a bottom up manor.
  *
  * @param <NT> The non terminal enum type of the production.
  * @param <T> the terminal enum type of the production.
@@ -20,12 +21,12 @@ public abstract class AttrProduction<NT extends Enum<NT>, T extends Enum<T>, R> 
         super(s, r);
     }
 
-    // An abstract syntax tree will simply be a function which takes an environment Dynamic and returns
-    // some value dynamic.
-    // The environment represents the attributes passed down from the parent.
-    // The Value returned the attributes passed up from the children.
-
-    // This production will state the rules for how to build ASTs.
+    /**
+     * This production holds a rule with a certain number of symbols.
+     * Each one of those symbols should be able to produce some result R.
+     * These ordered results are then passed into this function to create
+     * the result for this production.
+     */
     protected abstract R buildResultUnsafe(Seq<? extends R> children);
 
     public R buildResult(Seq<? extends R> children) {

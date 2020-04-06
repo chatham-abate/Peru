@@ -200,6 +200,16 @@ public class LROneTable<NT extends Enum<NT>, T extends Enum<T>, P extends Produc
         cc = Array.ofAll(tempCC);
     }
 
+    /**
+     * Confirm a given state is valid.
+     */
+    protected void validateState(int state) {
+        if (state < 0 || state >= cc.length()) {
+            throw new IndexOutOfBoundsException("Given state is not valid.");
+        }
+    }
+
+
     public Array<Set<LROneItem<NT, T, P>>> getCC() {
         return cc;
     }
@@ -208,8 +218,40 @@ public class LROneTable<NT extends Enum<NT>, T extends Enum<T>, P extends Produc
         return gotoTable;
     }
 
+    /**
+     * Get the shift for being at a certain state with a non-terminal lookahead.
+     */
+    public Integer gotoShift(int state, NT nonTerminal) {
+        validateState(state);
+        if (!nonTerminalMap.containsKey(nonTerminal)) {
+            throw new IllegalArgumentException("Given Non Terminal not used in the table");
+        }
+
+        return gotoTable.get(state).get(nonTerminalMap.get(nonTerminal).get());
+    }
+
     public Array<Array<Either<Integer, P>>> getActionTable() {
         return actionTable;
+    }
+
+    /**
+     * Get the action for being at a certain state with a terminal lookahead.
+     */
+    public Either<Integer, P> actionMove(int state, T terminal) {
+        validateState(state);
+        if (!terminalMap.containsKey(terminal)) {
+            throw new IllegalArgumentException("Given Terminal not used in the table");
+        }
+
+        return actionTable.get(state).get(terminalMap.get(terminal).get());
+    }
+
+    /**
+     * Get the action for being at a certain state with an EOF lookahead.
+     */
+    public Either<Integer, P> actionMove(int state) {
+        validateState(state);
+        return actionTable.get(state).get(0);
     }
 
     public String actionTableString() {
