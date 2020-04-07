@@ -29,19 +29,25 @@ public abstract class CharSimpleDLexer<CL, T extends Enum<T>> extends
     }
 
     @Override
-    protected CharSimpleContext onToken(Tuple2<String, CharData<T>> token, CharSimpleContext context) {
+    protected CharSimpleContext onToken(String lexeme, CharData<T> data, CharSimpleContext context) {
         // Here current line becomes ending line, and current position becomes ending position.
         return context.map(l -> l.withEnding(l.getCurrent()), lp -> lp.withEnding(lp.getCurrent()));
     }
 
     @Override
-    protected Throwable onError(String lexeme, CharSimpleContext context) {
-        return new LineException(context.getLine().getStarting(),
-                context.getLinePosition().getStarting(), "Lexeme cannot be lexed : " + lexeme);
+    protected LineException makeError(String lexeme, CharSimpleContext context) {
+        return new LineException(context.getLine().getStarting(), context.getLinePosition().getStarting(),
+                "Lexeme cannot be lexed.");
     }
 
     @Override
-    protected CharSimpleContext onSuccess(Tuple2<String, CharData<T>> token, CharSimpleContext context) {
+    protected CharSimpleContext onError(String lexeme, CharSimpleContext context) {
+        return context.map(l -> l.withEnding(l.getCurrent()).withStarting(l.getCurrent()),
+                lp -> lp.withEnding(lp.getCurrent()).withStarting(lp.getCurrent()));
+    }
+
+    @Override
+    protected CharSimpleContext onSuccess(String lexeme, CharData<T> data, CharSimpleContext context) {
         // Here we restart the context to whatever comes directly after the successful token.
         return context.map(l -> l.withCurrent(l.getEnding()).withStarting(l.getEnding()),
                 lp -> lp.withCurrent(lp.getEnding()).withStarting(lp.getEnding()));

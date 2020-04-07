@@ -6,6 +6,7 @@ import io.vavr.Tuple2;
 import io.vavr.Tuple3;
 import io.vavr.collection.Seq;
 import io.vavr.control.Option;
+import io.vavr.control.Try;
 import org.perudevteam.statemachine.DStateMachine;
 
 public abstract class SimpleDLexer<I, CL, L, D, C> extends DLexer<I, CL, L, D, C> {
@@ -15,9 +16,7 @@ public abstract class SimpleDLexer<I, CL, L, D, C> extends DLexer<I, CL, L, D, C
     }
 
     @Override
-    public Tuple3<Tuple2<L, D>, C, Seq<I>> buildUnchecked(Seq<I> input, C context) throws Throwable {
-        DLexer.validateInputSequenceNonEmpty(input);
-
+    public Tuple3<Tuple2<L, Try<D>>, C, Seq<I>> buildUnchecked(Seq<I> input, C context) {
         C algoContext = context;
         Seq<I> tail = input;
 
@@ -25,7 +24,7 @@ public abstract class SimpleDLexer<I, CL, L, D, C> extends DLexer<I, CL, L, D, C
         L lexeme = getInitialLexeme();
         Option<Integer> stateOp = Option.of(0);
 
-        Tuple2<L, D> lastToken = null;
+        Tuple2<L, Try<D>> lastToken = null;
         Seq<I> lastTail = null;
 
         DStateMachine<CL, Function1<C, D>> dsm = getDSM();
@@ -39,11 +38,11 @@ public abstract class SimpleDLexer<I, CL, L, D, C> extends DLexer<I, CL, L, D, C
                 // Build data for token.
                 D data = dataBuilderOp.get().apply(algoContext);
 
-                lastToken = Tuple.of(lexeme, data);
+                lastToken = Tuple.of(lexeme,Try.success(data));
                 lastTail = tail;    // Save tail position.
 
                 // Signal Context.
-                algoContext = onToken(lastToken, algoContext);
+                algoContext = onToken(lexeme, data, algoContext);
             }
 
             // Now to read next input...
@@ -63,11 +62,11 @@ public abstract class SimpleDLexer<I, CL, L, D, C> extends DLexer<I, CL, L, D, C
         }
 
         if (lastToken == null) {
-            throw onError(lexeme, algoContext);
+            Try<D> errorData = Try.failure(makeError(lexeme, algoContext));
+            return Tuple.of(Tuple.of(lexeme, errorData), onError(lexeme, algoContext), tail);
         }
 
-        algoContext = onSuccess(lastToken, algoContext);
-
+        algoContext = onSuccess(lastToken._1, lastToken._2.get(), algoContext);
         return Tuple.of(lastToken, algoContext, lastTail);
     }
 }

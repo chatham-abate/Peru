@@ -109,7 +109,9 @@ public abstract class LROneParser<NT extends Enum<NT>, T extends Enum<T>, L, D e
 
                 // Performing the shift entails pushing lookahead result and current state
                 // onto the state and result stacks.
-                resultStack = resultStack.prepend(g.buildTerminalResult(lookahead._1, lookahead._2));
+                R terminalResult = g.buildTerminalResult(lookahead._1, lookahead._2);
+
+                resultStack = resultStack.prepend(terminalResult);
                 stateStack = stateStack.prepend(shift);
 
                 // We must also move past the given token in the tokensLeft list.

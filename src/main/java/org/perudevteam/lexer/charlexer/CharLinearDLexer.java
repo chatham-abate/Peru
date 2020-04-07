@@ -33,19 +33,25 @@ public abstract class CharLinearDLexer<CL, T extends Enum<T>>
     }
 
     @Override
-    protected CharLinearContext onToken(Tuple2<String, CharData<T>> token, CharLinearContext context) {
+    protected CharLinearContext onToken(String lexeme, CharData<T> data, CharLinearContext context) {
         // On token shift ending line and line position to current line and line position.
         return context.map(l -> l.withEnding(l.getCurrent()), lp -> lp.withEnding(lp.getCurrent()));
     }
 
     @Override
-    protected Throwable onError(String lexeme, CharLinearContext context) {
+    protected Throwable makeError(String lexeme, CharLinearContext context) {
         return new LineException(context.getLine().getStarting(),
-                context.getLinePosition().getStarting(), "Lexeme cannot be lexed : " + lexeme);
+                context.getLinePosition().getStarting(), "Lexeme cannot be lexed." + lexeme);
     }
 
     @Override
-    protected CharLinearContext onSuccess(Tuple2<String, CharData<T>> token, CharLinearContext context) {
+    protected CharLinearContext onError(String lexeme, CharLinearContext context) {
+        return context.map(l -> l.withStarting(l.getCurrent()).withEnding(l.getCurrent()),
+                lp -> lp.withStarting(lp.getCurrent()).withEnding(lp.getCurrent()));
+    }
+
+    @Override
+    protected CharLinearContext onSuccess(String lexeme, CharData<T> data, CharLinearContext context) {
         // Shift current back to ending, and starting up to ending.
 
         return context.map(l -> l.withStarting(l.getEnding()).withCurrent(l.getEnding()),

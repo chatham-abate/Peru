@@ -6,7 +6,9 @@ import io.vavr.Tuple2;
 import io.vavr.collection.*;
 import io.vavr.control.Try;
 import org.junit.jupiter.api.Test;
+import org.perudevteam.lexer.DLexer;
 import org.perudevteam.misc.Builder;
+import org.perudevteam.misc.LineException;
 import org.perudevteam.statemachine.DFStateMachine;
 import org.perudevteam.statemachine.DStateMachine;
 
@@ -175,7 +177,7 @@ public class TestCharLexer {
     @Test
     void testSimpleLexer() {
         assertEquals(EXPECTED1,
-                LEXER_SIMPLE1.buildStreamUnchecked(INPUT1, CharSimpleContext.INIT_SIMPLE_CONTEXT));
+                LEXER_SIMPLE1.buildSuccessfulTokenStream(INPUT1, CharSimpleContext.INIT_SIMPLE_CONTEXT));
     }
 
     private static final Seq<Character> INPUT2 = List.ofAll("ababcabababab".toCharArray());
@@ -192,7 +194,7 @@ public class TestCharLexer {
     @Test
     void testLinearLexer() {
         Stream<Tuple2<String, CharData<TokenType2>>> stream =
-                LEXER_LINEAR2.buildStreamUnchecked(INPUT2, CharLinearContext.INIT_LINEAR_CONTEXT);
+                LEXER_LINEAR2.buildSuccessfulTokenStream(INPUT2, CharLinearContext.INIT_LINEAR_CONTEXT);
 
         assertEquals(EXPECTED2, stream);
     }
@@ -202,11 +204,11 @@ public class TestCharLexer {
         Seq<Character> input = SeqHelpers.fileUnchecked("src/test/testcases/TestCaseLinearDLexer.txt");
 
         double linearStart = System.nanoTime();
-        LEXER_LINEAR2.buildStreamUnchecked(input, CharLinearContext.INIT_LINEAR_CONTEXT).toArray().length();
+        LEXER_LINEAR2.buildSuccessfulTokenStream(input, CharLinearContext.INIT_LINEAR_CONTEXT).toArray().length();
         double linearEnd = System.nanoTime();
 
         double simpleStart = System.nanoTime();
-        LEXER_SIMPLE2.buildStreamUnchecked(input, CharLinearContext.INIT_LINEAR_CONTEXT).toArray().length();
+        LEXER_SIMPLE2.buildSuccessfulTokenStream(input, CharLinearContext.INIT_LINEAR_CONTEXT).toArray().length();
         double simpleEnd = System.nanoTime();
 
         assertTrue((linearStart - linearEnd) < (simpleStart - simpleEnd));
@@ -219,41 +221,65 @@ public class TestCharLexer {
     @Test
     void testVerboseNumberOfTokens() {
         assertEquals(23,
-                LEXER_SIMPLE1.buildStreamUnchecked(VERBOSE_INPUT, CharSimpleContext.INIT_SIMPLE_CONTEXT).length());
+                LEXER_SIMPLE1.buildSuccessfulTokenStream(
+                        VERBOSE_INPUT, CharSimpleContext.INIT_SIMPLE_CONTEXT).length());
 
         assertEquals(23,
-                LEXER_LINEAR1.buildStreamUnchecked(VERBOSE_INPUT, CharLinearContext.INIT_LINEAR_CONTEXT).length());
+                LEXER_LINEAR1.buildSuccessfulTokenStream(
+                        VERBOSE_INPUT, CharLinearContext.INIT_LINEAR_CONTEXT).length());
     }
 
     /*
      * Failure Tests.
      */
 
-    private static Seq<Seq<Character>> FAILURES1 = List.of(
-            "123 + ",
-            "",
-            " \n *",
-            "123a456",
-            ".123",
-            "0..123",
-            ".",
-            "0."
-    ).map(s -> List.ofAll(s.toCharArray()));
+    private static Seq<Tuple2<Seq<Character>, Integer>> FAILURES1 = List.of(
+            Tuple.of("123 + ", 1),
+            Tuple.of("++", 2),
+            Tuple.of(" \n *", 1),
+            Tuple.of("123a456", 1),
+            Tuple.of(".123", 1),
+            Tuple.of("0..123", 2),
+            Tuple.of(".", 1),
+            Tuple.of("0.", 1)
+    ).map(tuple -> tuple.map1(s -> List.ofAll(s.toCharArray())));
 
     @Test
     void testFailures() {
-        expectAllFailures(LEXER_SIMPLE1, CharSimpleContext.INIT_SIMPLE_CONTEXT, FAILURES1);
-        expectAllFailures(LEXER_LINEAR1, CharLinearContext.INIT_LINEAR_CONTEXT, FAILURES1);
+        expectFailures(LEXER_SIMPLE1, CharSimpleContext.INIT_SIMPLE_CONTEXT, FAILURES1);
+        expectFailures(LEXER_LINEAR1, CharLinearContext.INIT_LINEAR_CONTEXT, FAILURES1);
     }
 
-    static <I, C, O> void expectAllFailures(Builder<I, C, O> lexer, C context, Seq<? extends Seq<I>> inputs) {
-        // First create the output for each input.
-        // Then filter the output to just the failures of each stream.
-        // Then get only those streams which are empty... had no failures.
-        Seq<Stream<Try<O>>> outputsWithNoFailures =
-                inputs.map(i -> lexer.buildStream(i, context).filter(Try::isFailure))
-                .filter(Seq::isEmpty);
+    static <I, L, D, C> void expectFailures(DLexer<I, ?, L, D, C> lexer, C context,
+         Seq<? extends Tuple2<? extends Seq<I>, ? extends Integer>> inputs) {
 
-        assertTrue(outputsWithNoFailures.isEmpty());
+        inputs.forEach(tuple -> {
+            Seq<Tuple2<L, Try<D>>> tokens = lexer.buildStream(tuple._1, context);
+
+            assertEquals(tuple._2, tokens.filter(t -> t._2.isFailure()).length());
+        });
+    }
+
+    static final Seq<Character> ERROR_INPUT = List.ofAll("acabcacababc".toCharArray());
+
+    static final Seq<String> EXPECTED_LEXEMES = List.of(
+            "ac",
+            "abc",
+            "ac",
+            "ababc"
+    );
+
+    @Test
+    void testLanguage2Recovery() {
+        LEXER_SIMPLE2.buildStream(ERROR_INPUT, CharSimpleContext.INIT_SIMPLE_CONTEXT).forEach(System.out::println);
+
+        Seq<String> simpleLexemes = LEXER_SIMPLE2.buildStream(ERROR_INPUT, CharSimpleContext.INIT_SIMPLE_CONTEXT)
+                .map(tuple -> tuple._1);
+
+        Seq<String> linearLexemes = LEXER_LINEAR2.buildStream(ERROR_INPUT, CharLinearContext.INIT_LINEAR_CONTEXT)
+                .map(tuple -> tuple._1);
+
+        assertEquals(EXPECTED_LEXEMES, simpleLexemes);
+        assertEquals(EXPECTED_LEXEMES, linearLexemes);
     }
 }

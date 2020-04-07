@@ -67,11 +67,11 @@ public class TestIntegerAttrCFGrammar {
     };
 
     // Manual Lexer Test.
-    @Test
+    // @Test
     void testLexer() {
-        String input = "1+";
+        String input = "1+.2123\n23";
 
-        LEXER.buildStreamUnchecked(List.ofAll(input.toCharArray()), CharSimpleContext.INIT_SIMPLE_CONTEXT)
+        LEXER.buildStream(List.ofAll(input.toCharArray()), CharSimpleContext.INIT_SIMPLE_CONTEXT)
                 .forEach(System.out::println);
     }
 
@@ -90,9 +90,7 @@ public class TestIntegerAttrCFGrammar {
     SUM_PROD1 = new AttrProduction<NT, T, Integer>(NT.SUM, List.of(left(NT.SUM), right(T.ADDOP), right(T.NUMBER))) {
         @Override
         protected Integer buildResultUnsafe(Seq<? extends Integer> children) {
-            return children.get(1) == '+'
-                    ? children.get(0) + children.get(2)
-                    : children.get(0) - children.get(2);
+            return children.get(0) + (children.get(1) * children.get(2));
         }
     },
     SUM_PROD2 = new AttrProduction<NT, T, Integer>(NT.SUM, List.of(right(T.NUMBER))) {
@@ -104,7 +102,7 @@ public class TestIntegerAttrCFGrammar {
 
     private static final Map<T, Function2<String, CharData<T>, Integer>> TERM_GENERATORS = HashMap.of(
             T.NUMBER, (l, d) -> Integer.parseInt(l),
-            T.ADDOP, (l, d) -> 0
+            T.ADDOP, (l, d) -> l.equals("+") ? 1 : -1
     );
 
     private static final AttrCFGrammar<NT, T, AttrProduction<NT, T, Integer>, String, CharData<T>, Integer>
@@ -142,13 +140,17 @@ public class TestIntegerAttrCFGrammar {
         for (int i = 0; i < INPUTS.length(); i++) {
             Seq<Character> input = List.ofAll(INPUTS.get(i).toCharArray());
             Seq<Tuple2<String, CharData<T>>> tokens =
-                    LEXER.buildStreamUnchecked(input, CharSimpleContext.INIT_SIMPLE_CONTEXT);
+                    LEXER.buildSuccessfulTokenStream(input, CharSimpleContext.INIT_SIMPLE_CONTEXT);
+
+            int result;
 
             try {
-                assertEquals(RESULTS.get(i), PARSER.parse(tokens));
+                result = PARSER.parse(tokens);
             } catch (Throwable e) {
-
+                throw new RuntimeException();
             }
+
+            assertEquals(RESULTS.get(i), result);
         }
     }
 
@@ -166,7 +168,7 @@ public class TestIntegerAttrCFGrammar {
         for (String errorStr: ERRORS) {
             Seq<Character> errorInput = List.ofAll(errorStr.toCharArray());
             Seq<Tuple2<String, CharData<T>>> errorTokens =
-                    LEXER.buildStreamUnchecked(errorInput, CharSimpleContext.INIT_SIMPLE_CONTEXT);
+                    LEXER.buildSuccessfulTokenStream(errorInput, CharSimpleContext.INIT_SIMPLE_CONTEXT);
 
             assertThrows(Exception.class, () -> {
                 PARSER.parse(errorTokens);

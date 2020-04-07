@@ -9,6 +9,7 @@ import io.vavr.collection.List;
 import io.vavr.collection.Map;
 import io.vavr.collection.Seq;
 import io.vavr.control.Option;
+import io.vavr.control.Try;
 import org.perudevteam.statemachine.DStateMachine;
 
 public abstract class LinearDLexer<I, CL, L, D, C extends LinearContext<C>>
@@ -33,9 +34,7 @@ public abstract class LinearDLexer<I, CL, L, D, C extends LinearContext<C>>
     }
 
     @Override
-    public Tuple3<Tuple2<L, D>, C, Seq<I>> buildUnchecked(Seq<I> input, C context) throws Throwable {
-        DLexer.validateInputSequenceNonEmpty(input);
-
+    public Tuple3<Tuple2<L, Try<D>>, C, Seq<I>> buildUnchecked(Seq<I> input, C context) {
         // Rollback stack in form (position, state).
         // Starting at the given position, and state 0.
         Map<Integer, Integer> rollbackStack = HashMap.empty();
@@ -46,7 +45,7 @@ public abstract class LinearDLexer<I, CL, L, D, C extends LinearContext<C>>
         L lexeme = getInitialLexeme();
         Option<Integer> stateOp = Option.of(0);
 
-        Tuple2<L, D> lastToken = null;
+        Tuple2<L, Try<D>> lastToken = null;
         Seq<I> lastTail = null;
         int lastAbsolutePosition = algoContext.getAbsolutePosition();
 
@@ -59,11 +58,12 @@ public abstract class LinearDLexer<I, CL, L, D, C extends LinearContext<C>>
 
             if (!dataBuilderOp.isEmpty()) {
                 Function1<C, D> dataBuilder = dataBuilderOp.get();
-                lastToken = Tuple.of(lexeme, dataBuilder.apply(algoContext));
+                D data = dataBuilder.apply(algoContext);
+                lastToken = Tuple.of(lexeme, Try.success(data));
                 lastTail = tail;
                 lastAbsolutePosition = algoContext.getAbsolutePosition();
 
-                algoContext = onToken(lastToken, algoContext);
+                algoContext = onToken(lexeme, data, algoContext);
 
                 // Finally, clear rollback stack.
                 rollbackStack = HashMap.empty();
@@ -87,9 +87,17 @@ public abstract class LinearDLexer<I, CL, L, D, C extends LinearContext<C>>
             stateOp = dsm.getNextState(state, inputClass(symbol));
         }
 
-
+        /*
+         * In an error situation, we want recovery to be an option.
+         * So, we accept the full unrecognizable lexeme, and return its
+         * data type as a failure.
+         */
         if (lastToken == null) {
-            throw onError(lexeme, algoContext);
+            algoContext = algoContext.dropPreErrorsBefore(algoContext.getAbsolutePosition());
+            Try<D> errorData = Try.failure(makeError(lexeme, algoContext));
+
+            // Error.
+            return Tuple.of(Tuple.of(lexeme, errorData), onError(lexeme, algoContext), tail);
         }
 
         algoContext = algoContext.dropPreErrorsBefore(lastAbsolutePosition);
@@ -97,6 +105,6 @@ public abstract class LinearDLexer<I, CL, L, D, C extends LinearContext<C>>
         algoContext = algoContext.withAbsolutePosition(lastAbsolutePosition);
 
         // Success.
-        return Tuple.of(lastToken, onSuccess(lastToken, algoContext), lastTail);
+        return Tuple.of(lastToken, onSuccess(lastToken._1, lastToken._2.get(), algoContext), lastTail);
     }
 }
