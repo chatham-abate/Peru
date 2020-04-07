@@ -6,14 +6,15 @@ import org.perudevteam.lexer.LinearDLexer;
 import org.perudevteam.misc.LineException;
 import org.perudevteam.statemachine.DStateMachine;
 
-public abstract class CharLinearDLexer<CL> extends LinearDLexer<Character, CL, String, CharData, CharLinearContext> {
+public abstract class CharLinearDLexer<CL, T extends Enum<T>>
+        extends LinearDLexer<Character, CL, String, CharData<T>, CharLinearContext> {
     public CharLinearDLexer(int mra,
-            DStateMachine<? super CL, ? extends Function1<? super CharLinearContext, ? extends CharData>> d) {
+            DStateMachine<? super CL, ? extends Function1<? super CharLinearContext, ? extends CharData<T>>> d) {
         super(mra, "", d);
     }
 
     public CharLinearDLexer(
-            DStateMachine<? super CL, ? extends Function1<? super CharLinearContext, ? extends CharData>> d) {
+            DStateMachine<? super CL, ? extends Function1<? super CharLinearContext, ? extends CharData<T>>> d) {
         super("", d);
     }
 
@@ -32,7 +33,7 @@ public abstract class CharLinearDLexer<CL> extends LinearDLexer<Character, CL, S
     }
 
     @Override
-    protected CharLinearContext onToken(Tuple2<String, CharData> token, CharLinearContext context) {
+    protected CharLinearContext onToken(Tuple2<String, CharData<T>> token, CharLinearContext context) {
         // On token shift ending line and line position to current line and line position.
         return context.map(l -> l.withEnding(l.getCurrent()), lp -> lp.withEnding(lp.getCurrent()));
     }
@@ -44,7 +45,7 @@ public abstract class CharLinearDLexer<CL> extends LinearDLexer<Character, CL, S
     }
 
     @Override
-    protected CharLinearContext onSuccess(Tuple2<String, CharData> token, CharLinearContext context) {
+    protected CharLinearContext onSuccess(Tuple2<String, CharData<T>> token, CharLinearContext context) {
         // Shift current back to ending, and starting up to ending.
 
         return context.map(l -> l.withStarting(l.getEnding()).withCurrent(l.getEnding()),

@@ -33,7 +33,9 @@ public abstract class LinearDLexer<I, CL, L, D, C extends LinearContext<C>>
     }
 
     @Override
-    public Tuple3<Tuple2<L, D>, C, Seq<I>> build(Seq<I> input, C context) throws Throwable {
+    public Tuple3<Tuple2<L, D>, C, Seq<I>> buildUnchecked(Seq<I> input, C context) throws Throwable {
+        DLexer.validateInputSequenceNonEmpty(input);
+
         // Rollback stack in form (position, state).
         // Starting at the given position, and state 0.
         Map<Integer, Integer> rollbackStack = HashMap.empty();

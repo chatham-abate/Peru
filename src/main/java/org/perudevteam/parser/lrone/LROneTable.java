@@ -25,8 +25,6 @@ public class LROneTable<NT extends Enum<NT>, T extends Enum<T>, P extends Produc
     private Map<NT, Integer> nonTerminalMap;
     private Map<T, Integer> terminalMap;
 
-    private NT goal;
-
     public LROneTable(CFGrammar<NT, T, P> g) {
         Objects.requireNonNull(g);  // The given grammar cannot be null.
 
@@ -37,7 +35,7 @@ public class LROneTable<NT extends Enum<NT>, T extends Enum<T>, P extends Produc
         FirstSets<NT, T> firstSets = new FirstSets<>(g);
 
         // Goal is the start symbol of the grammar.
-        goal = g.getStartSymbol();
+        NT goal = g.getStartSymbol();
 
         // First we must confirm that goal is not on the rhs of any productions.
         for (NT nt: nonTerminals) {

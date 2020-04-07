@@ -2,6 +2,7 @@ package org.perudevteam.lexer;
 
 import io.vavr.Function1;
 import io.vavr.Tuple2;
+import io.vavr.collection.Seq;
 import org.perudevteam.misc.Builder;
 import org.perudevteam.statemachine.DStateMachine;
 
@@ -20,6 +21,12 @@ import java.util.Objects;
  * to find the largest valid Lexeme.
  */
 public abstract class DLexer<I, CL, L, D, C> implements Builder<I, C, Tuple2<L, D>> {
+    public static <I> void validateInputSequenceNonEmpty(Seq<I> input) {
+        if (input.isEmpty()) {
+            throw new IllegalArgumentException("Cannot lex empty input.");
+        }
+    }
+
     private L initialLexeme;
 
     // (context) -> (data).

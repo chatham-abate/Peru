@@ -15,7 +15,9 @@ public abstract class SimpleDLexer<I, CL, L, D, C> extends DLexer<I, CL, L, D, C
     }
 
     @Override
-    public Tuple3<Tuple2<L, D>, C, Seq<I>> build(Seq<I> input, C context) throws Throwable {
+    public Tuple3<Tuple2<L, D>, C, Seq<I>> buildUnchecked(Seq<I> input, C context) throws Throwable {
+        DLexer.validateInputSequenceNonEmpty(input);
+
         C algoContext = context;
         Seq<I> tail = input;
 

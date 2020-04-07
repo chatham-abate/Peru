@@ -11,7 +11,7 @@ import static io.vavr.control.Either.left;
 import static io.vavr.control.Either.right;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class testLROne {
+public class TestLROne {
 
     enum NT {
         A, B, C, D

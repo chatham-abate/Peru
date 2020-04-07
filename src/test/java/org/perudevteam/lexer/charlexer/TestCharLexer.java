@@ -63,7 +63,8 @@ public class TestCharLexer {
      * Lexers for Language 1.
      */
 
-    private static final CharSimpleDLexer<CharType1> LEXER_SIMPLE1 = new CharSimpleDLexer<CharType1>(DFSM_SIMPLE1) {
+    private static final CharSimpleDLexer<CharType1, TokenType1> LEXER_SIMPLE1 =
+            new CharSimpleDLexer<CharType1, TokenType1>(DFSM_SIMPLE1) {
         @Override
         protected CharType1 inputClass(Character input) {
             if (Character.isWhitespace(input)) {
@@ -78,7 +79,8 @@ public class TestCharLexer {
         }
     };
 
-    private static final CharLinearDLexer<CharType1> LEXER_LINEAR1 = new CharLinearDLexer<CharType1>(DFSM_SIMPLE1) {
+    private static final CharLinearDLexer<CharType1, TokenType1> LEXER_LINEAR1 =
+            new CharLinearDLexer<CharType1, TokenType1>(DFSM_SIMPLE1) {
         @Override
         protected CharType1 inputClass(Character input) {
             if (Character.isWhitespace(input)) {
@@ -138,7 +140,8 @@ public class TestCharLexer {
     );
 
     // Simple Lexer on DSFM2.
-    private static final CharSimpleDLexer<CharType2> LEXER_SIMPLE2 = new CharSimpleDLexer<CharType2>(DSFM_SIMPLE2) {
+    private static final CharSimpleDLexer<CharType2, TokenType2> LEXER_SIMPLE2 =
+            new CharSimpleDLexer<CharType2, TokenType2>(DSFM_SIMPLE2) {
         @Override
         protected CharType2 inputClass(Character input) {
             return CHAR_MAP2.getOrElse(input, CharType2.OTHER);
@@ -146,7 +149,8 @@ public class TestCharLexer {
     };
 
     // Linear Lexer on DSFM2
-    private static final CharLinearDLexer<CharType2> LEXER_LINEAR2 = new CharLinearDLexer<CharType2>(DSFM_SIMPLE2) {
+    private static final CharLinearDLexer<CharType2, TokenType2> LEXER_LINEAR2 =
+            new CharLinearDLexer<CharType2, TokenType2>(DSFM_SIMPLE2) {
         @Override
         protected CharType2 inputClass(Character input) {
             return CHAR_MAP2.getOrElse(input, CharType2.OTHER);
@@ -187,7 +191,7 @@ public class TestCharLexer {
 
     @Test
     void testLinearLexer() {
-        Stream<Tuple2<String, CharData>> stream =
+        Stream<Tuple2<String, CharData<TokenType2>>> stream =
                 LEXER_LINEAR2.buildStreamUnchecked(INPUT2, CharLinearContext.INIT_LINEAR_CONTEXT);
 
         assertEquals(EXPECTED2, stream);

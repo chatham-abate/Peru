@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Manual Tests on Parentheses grammar.
  */
-public class TestParenGrammar {
+public class TestParenCFGrammar {
 
     enum NT {
         GOAL, LIST, PAIR

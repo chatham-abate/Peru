@@ -10,6 +10,10 @@ public class CharData<T extends Enum<T>> implements Typed<T> {
     private int line;
     private int linePosition;
 
+    public CharData(T t, CharSimpleContext context) {
+        this(t, context.getLine().getStarting(), context.getLinePosition().getStarting());
+    }
+
     public CharData(T t, int l, int lp) {
         Objects.requireNonNull(t);
 

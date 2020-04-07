@@ -14,18 +14,18 @@ import java.util.Objects;
  */
 @FunctionalInterface
 public interface Builder<I, C, O> {
-    Tuple3<O, C, Seq<I>> build(Seq<I> input, C context) throws Throwable;
+    Tuple3<O, C, Seq<I>> buildUnchecked(Seq<I> input, C context) throws Throwable;
 
-    default Tuple3<O, C, Seq<I>> buildWithNullChecks(Seq<I> input, C context) throws Throwable {
+    default Tuple3<O, C, Seq<I>> build(Seq<I> input, C context) throws Throwable {
         Objects.requireNonNull(input);
         Objects.requireNonNull(context);
 
-        return build(input, context);
+        return buildUnchecked(input, context);
     }
 
     default Stream<Try<O>> buildStream(Seq<I> input, C context) {
         try {
-            Tuple3<O, C, Seq<I>> output = buildWithNullChecks(input, context);
+            Tuple3<O, C, Seq<I>> output = build(input, context);
 
             O construct = output._1;
             C newContext = output._2;

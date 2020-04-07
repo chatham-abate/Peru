@@ -6,11 +6,11 @@ import org.perudevteam.lexer.SimpleDLexer;
 import org.perudevteam.misc.LineException;
 import org.perudevteam.statemachine.DStateMachine;
 
-public abstract class CharSimpleDLexer<CL> extends
-        SimpleDLexer<Character, CL, String, CharData, CharSimpleContext> {
+public abstract class CharSimpleDLexer<CL, T extends Enum<T>> extends
+        SimpleDLexer<Character, CL, String, CharData<T>, CharSimpleContext> {
 
     public CharSimpleDLexer(DStateMachine<? super CL,
-            ? extends Function1<? super CharSimpleContext, ? extends CharData>> d) {
+            ? extends Function1<? super CharSimpleContext, ? extends CharData<T>>> d) {
         super("", d);
     }
 
@@ -29,7 +29,7 @@ public abstract class CharSimpleDLexer<CL> extends
     }
 
     @Override
-    protected CharSimpleContext onToken(Tuple2<String, CharData> token, CharSimpleContext context) {
+    protected CharSimpleContext onToken(Tuple2<String, CharData<T>> token, CharSimpleContext context) {
         // Here current line becomes ending line, and current position becomes ending position.
         return context.map(l -> l.withEnding(l.getCurrent()), lp -> lp.withEnding(lp.getCurrent()));
     }
@@ -41,7 +41,7 @@ public abstract class CharSimpleDLexer<CL> extends
     }
 
     @Override
-    protected CharSimpleContext onSuccess(Tuple2<String, CharData> token, CharSimpleContext context) {
+    protected CharSimpleContext onSuccess(Tuple2<String, CharData<T>> token, CharSimpleContext context) {
         // Here we restart the context to whatever comes directly after the successful token.
         return context.map(l -> l.withCurrent(l.getEnding()).withStarting(l.getEnding()),
                 lp -> lp.withCurrent(lp.getEnding()).withStarting(lp.getEnding()));

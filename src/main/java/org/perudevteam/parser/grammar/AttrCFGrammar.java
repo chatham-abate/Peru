@@ -49,7 +49,9 @@ public class AttrCFGrammar<NT extends Enum<NT>, T extends Enum<T>,
         terminalResGenerators = termResGens;
     }
 
-    public R buildTerminalResult(T terminal, L lexeme, D data) {
+    public R buildTerminalResult(L lexeme, D data) {
+        T terminal = data.getType();
+
         if (!getTerminalsUsed().contains(terminal)) {
             throw new IllegalArgumentException("Given terminal not used in this grammar.");
         }
