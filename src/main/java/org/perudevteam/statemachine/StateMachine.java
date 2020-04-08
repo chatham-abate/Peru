@@ -2,6 +2,8 @@ package org.perudevteam.statemachine;
 
 import io.vavr.control.Option;
 
+import java.util.Objects;
+
 public interface StateMachine<O> {
     default boolean validState(int st) {
         return st >= 0; // States should always be positive.

@@ -3,6 +3,8 @@ package org.perudevteam.statemachine;
 import io.vavr.control.Option;
 import io.vavr.collection.*;
 
+import java.util.Objects;
+
 // Deterministic Finite State Machine.
 public class DFStateMachine<I, O> implements DStateMachine<I, O>, FStateMachine<O> {
 
@@ -33,7 +35,30 @@ public class DFStateMachine<I, O> implements DStateMachine<I, O>, FStateMachine<
     public DFStateMachine<I, O> withEdge(int from, int to, I in) {
         validateState(from);
         validateState(to);
+        Objects.requireNonNull(in);
+
         return new DFStateMachine<>(transitionTable.update(from, m -> m.put(in, to)), acceptingStates);
+    }
+
+    private DFStateMachine<I, O> withEdgeUnsafe(int from, int to, I in) {
+        return new DFStateMachine<>(transitionTable.update(from, m -> m.put(in, to)), acceptingStates);
+    }
+
+    @Override
+    public DFStateMachine<I, O> withEdges(int from, int to, Seq<I> ins) {
+        Objects.requireNonNull(ins);
+        ins.forEach(Objects::requireNonNull);
+
+        validateState(from);
+        validateState(to);
+
+        DFStateMachine<I, O> dsm = this;
+
+        for (I in: ins) {
+            dsm = dsm.withEdgeUnsafe(from, to, in);
+        }
+
+        return dsm;
     }
 
     // Finite State Machine Function.

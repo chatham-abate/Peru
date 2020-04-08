@@ -1,6 +1,9 @@
 package org.perudevteam.statemachine;
 
+import io.vavr.collection.Seq;
 import io.vavr.control.Option;
+
+import java.util.Objects;
 
 // Deterministic State Machine.
 public interface DStateMachine<I, O> extends StateMachine<O> {
@@ -13,8 +16,12 @@ public interface DStateMachine<I, O> extends StateMachine<O> {
 
     default Option<Integer> getNextState(int st, I in) {
         validateState(st);
+        Objects.requireNonNull(in);
+
         return getNextStateUnsafe(st, in);
     }
 
     DStateMachine<I, O> withEdge(int from, int to, I in);
+
+    DStateMachine<I, O> withEdges(int from, int to, Seq<I> ins);
 }
