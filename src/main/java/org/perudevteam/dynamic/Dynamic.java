@@ -42,6 +42,10 @@ public interface Dynamic {
         return new DynaString(v);
     }
 
+    static Dynamic ofBoolean(boolean v) {
+        return v ? ofTrue() : ofFalse();
+    }
+
     static Dynamic ofTrue() {
         return TRUE;
     }
