@@ -45,17 +45,22 @@ public class DFStateMachine<I, O> implements DStateMachine<I, O>, FStateMachine<
     }
 
     @Override
-    public DFStateMachine<I, O> withEdges(int from, int to, Seq<I> ins) {
+    public DFStateMachine<I, O> withEdges(Seq<Integer> froms, int to, Seq<I> ins) {
         Objects.requireNonNull(ins);
         ins.forEach(Objects::requireNonNull);
 
-        validateState(from);
-        validateState(to);
+        Objects.requireNonNull(froms);
+        froms.forEach(i -> {
+            Objects.requireNonNull(i);
+            validateState(i);
+        });
 
         DFStateMachine<I, O> dsm = this;
 
-        for (I in: ins) {
-            dsm = dsm.withEdgeUnsafe(from, to, in);
+        for (int from: froms) {
+            for (I in: ins) {
+                dsm = dsm.withEdgeUnsafe(from, to, in);
+            }
         }
 
         return dsm;

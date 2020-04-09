@@ -23,5 +23,5 @@ public interface DStateMachine<I, O> extends StateMachine<O> {
 
     DStateMachine<I, O> withEdge(int from, int to, I in);
 
-    DStateMachine<I, O> withEdges(int from, int to, Seq<I> ins);
+    DStateMachine<I, O> withEdges(Seq<Integer> froms, int to, Seq<I> ins);
 }

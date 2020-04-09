@@ -60,7 +60,8 @@ public interface Dynamic {
         return new DynaSeq(v);
     }
 
-    static Dynamic ofMap(Map<? super String, ? extends Dynamic> v) {
+    // Maps must be from some type of String to some type of Dynamic.
+    static Dynamic ofMap(Map<? extends String, ? extends Dynamic> v) {
         Objects.requireNonNull(v);
         return new DynaMap(v);
     }
@@ -139,11 +140,11 @@ public interface Dynamic {
         return false;
     }
 
-    default Dynamic mapSequence(Function1<? super Seq<? extends  Dynamic>, ? extends Seq<? extends Dynamic>> f) {
+    default Dynamic mapSequence(Function1<? super Seq<Dynamic>, ? extends Seq<? extends Dynamic>> f) {
         throw new NullPointerException("Dynamic Value contains no Sequence value.");
     }
 
-    default Map<? super String, Dynamic> asMap() {
+    default Map<String, Dynamic> asMap() {
         throw new NullPointerException("Dynamic Value contains no Map value.");
     }
 
@@ -151,8 +152,8 @@ public interface Dynamic {
         return false;
     }
 
-    default Dynamic mapMap(Function1<? super Map<? super String, ? extends Dynamic>,
-            ? extends Map<? super String, ? extends Dynamic>> f) {
+    default Dynamic mapMap(Function1<? super Map<String, Dynamic>,
+            ? extends Map<? extends String, ? extends Dynamic>> f) {
         throw new NullPointerException("Dynamic Value contains no Map value.");
     }
 
@@ -395,7 +396,7 @@ public interface Dynamic {
         }
 
         @Override
-        public Dynamic mapSequence(Function1<? super Seq<? extends Dynamic>, ? extends Seq<? extends Dynamic>> f) {
+        public Dynamic mapSequence(Function1<? super Seq<Dynamic>, ? extends Seq<? extends Dynamic>> f) {
             return new DynaSeq(f.apply(value));
         }
 
@@ -418,14 +419,14 @@ public interface Dynamic {
     }
 
     class DynaMap implements Dynamic {
-        private Map<? super String, Dynamic> value;
-        @SuppressWarnings("unchecked")
-        private DynaMap(Map<? super String, ? extends Dynamic> v) {
-            value = (Map<? super String, Dynamic>) v;
+        private Map<String, Dynamic> value;
+
+        private DynaMap(Map<? extends String, ? extends Dynamic> v) {
+            value = Map.narrow(v);
         }
 
         @Override
-        public Map<? super String, Dynamic> asMap() {
+        public Map<String, Dynamic> asMap() {
             return value;
         }
 
@@ -435,8 +436,8 @@ public interface Dynamic {
         }
 
         @Override
-        public Dynamic mapMap(Function1<? super Map<? super String, ? extends Dynamic>,
-                ? extends Map<? super String, ? extends Dynamic>> f) {
+        public Dynamic mapMap(Function1<? super Map<String, Dynamic>,
+                ? extends Map<? extends String, ? extends Dynamic>> f) {
             return new DynaMap(f.apply(value));
         }
 
