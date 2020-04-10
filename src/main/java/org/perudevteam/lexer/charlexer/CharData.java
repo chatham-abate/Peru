@@ -1,10 +1,10 @@
 package org.perudevteam.lexer.charlexer;
 
-import org.perudevteam.misc.Typed;
+import org.perudevteam.parser.Tokenized;
 
 import java.util.Objects;
 
-public class CharData<T extends Enum<T>> implements Typed<T> {
+public class CharData<T extends Enum<T>> implements Tokenized<T> {
     private T type;
 
     private int line;
@@ -24,7 +24,7 @@ public class CharData<T extends Enum<T>> implements Typed<T> {
     }
 
     @Override
-    public T getType() {
+    public T getTokenType() {
         return type;
     }
 

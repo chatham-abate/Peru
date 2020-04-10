@@ -7,20 +7,18 @@ import io.vavr.collection.HashMap;
 import io.vavr.collection.List;
 import io.vavr.collection.Map;
 import io.vavr.collection.Seq;
+import io.vavr.control.Try;
 import org.junit.jupiter.api.Test;
 import org.perudevteam.lexer.charlexer.CharData;
 import org.perudevteam.lexer.charlexer.CharSimpleContext;
 import org.perudevteam.lexer.charlexer.CharSimpleDLexer;
-import org.perudevteam.misc.Builder;
 import org.perudevteam.misc.LineException;
-import org.perudevteam.misc.SeqHelpers;
 import org.perudevteam.parser.grammar.AttrCFGrammar;
 import org.perudevteam.parser.grammar.AttrProduction;
 import org.perudevteam.parser.lrone.LROneParser;
 import org.perudevteam.statemachine.DFStateMachine;
 import org.perudevteam.statemachine.DStateMachine;
 
-import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import static io.vavr.control.Either.*;
 
@@ -112,7 +110,7 @@ public class TestIntegerAttrCFGrammar {
             PARSER = new LROneParser<NT, T, String, CharData<T>, Integer>(G) {
         @Override
         protected Exception onError(Tuple2<String, CharData<T>> lookAhead) {
-            return new LineException(lookAhead._2, "Unexpected Token : " + lookAhead._2.getType().name());
+            return new LineException(lookAhead._2, "Unexpected Token : " + lookAhead._2.getTokenType().name());
         }
 
         @Override
@@ -142,15 +140,9 @@ public class TestIntegerAttrCFGrammar {
             Seq<Tuple2<String, CharData<T>>> tokens =
                     LEXER.buildSuccessfulTokenStream(input, CharSimpleContext.INIT_SIMPLE_CONTEXT);
 
-            int result;
-
-            try {
-                result = PARSER.parse(tokens);
-            } catch (Throwable e) {
-                throw new RuntimeException();
-            }
-
-            assertEquals(RESULTS.get(i), result);
+            Try<Integer> result = PARSER.parse(tokens);
+            assertTrue(result.isSuccess());
+            assertEquals(RESULTS.get(i), result.get());
         }
     }
 
@@ -170,9 +162,7 @@ public class TestIntegerAttrCFGrammar {
             Seq<Tuple2<String, CharData<T>>> errorTokens =
                     LEXER.buildSuccessfulTokenStream(errorInput, CharSimpleContext.INIT_SIMPLE_CONTEXT);
 
-            assertThrows(Exception.class, () -> {
-                PARSER.parse(errorTokens);
-            });
+            assertTrue(PARSER.parse(errorTokens).isFailure());
         }
     }
 }

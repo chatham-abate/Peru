@@ -5,12 +5,12 @@ import io.vavr.collection.List;
 import io.vavr.collection.Seq;
 import io.vavr.control.Either;
 import io.vavr.control.Option;
-import org.perudevteam.misc.Typed;
+import io.vavr.control.Try;
+import org.perudevteam.parser.Tokenized;
 import org.perudevteam.parser.Parser;
 import org.perudevteam.parser.grammar.AttrCFGrammar;
 import org.perudevteam.parser.grammar.AttrProduction;
 
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -22,7 +22,7 @@ import java.util.Objects;
  * @param <D> Data Type.
  * @param <R> Result type produced by this parser.
  */
-public abstract class LROneParser<NT extends Enum<NT>, T extends Enum<T>, L, D extends Typed<T>, R>
+public abstract class LROneParser<NT extends Enum<NT>, T extends Enum<T>, L, D extends Tokenized<T>, R>
         implements Parser<T, L, D, R> {
 
     private AttrCFGrammar<NT, T, AttrProduction<NT, T, R>, L, D, R> g;
@@ -46,7 +46,7 @@ public abstract class LROneParser<NT extends Enum<NT>, T extends Enum<T>, L, D e
     protected abstract Throwable onError();
 
     @Override
-    public R parseUnchecked(Seq<Tuple2<L, D>> tokens) throws Throwable {
+    public Try<R> parseUnchecked(Seq<Tuple2<L, D>> tokens) {
         List<Integer> stateStack = List.of(0);
         List<R> resultStack = List.empty();
         NT goal = g.getStartSymbol();
@@ -61,12 +61,12 @@ public abstract class LROneParser<NT extends Enum<NT>, T extends Enum<T>, L, D e
             int state = stateStack.peek();
             Option<Tuple2<L, D>> lookaheadOpt = tokensLeft.headOption();
             Either<Integer, AttrProduction<NT, T, R>> move =
-                    lookaheadOpt.map(lkh -> table.actionMove(state, lkh._2.getType()))
+                    lookaheadOpt.map(lkh -> table.actionMove(state, lkh._2.getTokenType()))
                             .getOrElse(table.actionMove(state));
 
             // Perform initial error check.
             if (move.isLeft() && move.getLeft() == 0) {
-                throw lookaheadOpt.isEmpty() ? onError() : onError(lookaheadOpt.get());
+                return Try.failure(lookaheadOpt.isEmpty() ? onError() : onError(lookaheadOpt.get()));
             }
 
             if (move.isRight()) {
@@ -87,14 +87,14 @@ public abstract class LROneParser<NT extends Enum<NT>, T extends Enum<T>, L, D e
 
                 // Check for acceptance state.
                 if (resultType.equals(goal) && lookaheadOpt.isEmpty()) {
-                    return result;  // ACCEPT State!
+                    return Try.success(result);  // ACCEPT State!
                 }
 
                 resultStack = resultStack.prepend(result);  // Push result onto result stack.
                 int gotoState = table.gotoShift(stateStack.peek(), resultType);
 
                 if (gotoState == 0) {
-                    throw lookaheadOpt.isEmpty() ? onError() : onError(lookaheadOpt.get());
+                    return Try.failure(lookaheadOpt.isEmpty() ? onError() : onError(lookaheadOpt.get()));
                 }
 
                 // If not an error, simply push our new goto state onto the state stack.

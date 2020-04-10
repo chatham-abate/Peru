@@ -5,7 +5,7 @@ import io.vavr.collection.Map;
 import io.vavr.collection.Seq;
 import io.vavr.collection.Set;
 import io.vavr.control.Either;
-import org.perudevteam.misc.Typed;
+import org.perudevteam.parser.Tokenized;
 
 import java.util.Objects;
 
@@ -22,7 +22,7 @@ import java.util.Objects;
  * @param <R> Result Type.
  */
 public class AttrCFGrammar<NT extends Enum<NT>, T extends Enum<T>,
-        P extends AttrProduction<NT, T, R>, L, D extends Typed<T>, R> extends CFGrammar<NT, T, P> {
+        P extends AttrProduction<NT, T, R>, L, D extends Tokenized<T>, R> extends CFGrammar<NT, T, P> {
 
     private Map<? super T, Function2<L, D, R>> terminalResGenerators;
 
@@ -50,7 +50,7 @@ public class AttrCFGrammar<NT extends Enum<NT>, T extends Enum<T>,
     }
 
     public R buildTerminalResult(L lexeme, D data) {
-        T terminal = data.getType();
+        T terminal = data.getTokenType();
 
         if (!getTerminalsUsed().contains(terminal)) {
             throw new IllegalArgumentException("Given terminal not used in this grammar.");

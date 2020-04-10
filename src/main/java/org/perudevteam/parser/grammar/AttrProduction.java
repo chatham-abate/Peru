@@ -3,7 +3,6 @@ package org.perudevteam.parser.grammar;
 import io.vavr.Function1;
 import io.vavr.collection.Seq;
 import io.vavr.control.Either;
-import org.perudevteam.dynamic.Dynamic;
 
 import java.util.Objects;
 
