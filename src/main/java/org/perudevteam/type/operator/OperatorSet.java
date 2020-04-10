@@ -1,5 +1,6 @@
 package org.perudevteam.type.operator;
 
+import io.vavr.collection.HashMap;
 import io.vavr.collection.Map;
 import io.vavr.control.Try;
 import org.perudevteam.type.Tagged;
@@ -7,27 +8,19 @@ import org.perudevteam.type.Tagged;
 import java.util.Objects;
 
 public class OperatorSet<OT extends Enum<OT>, DT extends Enum<DT>, DC extends Tagged<DT>> {
+
+    private static final OperatorSet EMPTY = new OperatorSet<>(HashMap.empty(), HashMap.empty());
+
+    @SuppressWarnings("unchecked")
+    public static <OT extends Enum<OT>, DT extends Enum<DT>, DC extends Tagged<DT>> OperatorSet<OT, DT, DC> empty() {
+        return (OperatorSet<OT, DT, DC>) EMPTY;
+    }
+
     private Map<OT, Map<DT, UnaryOperator<OT, DT, DC>>> unaries;
     private Map<OT, Map<DT, Map<DT, BinaryOperator<OT, DT, DC>>>> binaries;
 
-    public OperatorSet(Map<OT, ? extends Map<DT, ? extends UnaryOperator<OT, DT, DC>>> uns,
-                       Map<OT, ? extends Map<DT, ? extends Map<DT, BinaryOperator<OT, DT, DC>>>> bins) {
-        this(Map.narrow(uns.mapValues(Map::narrow)), Map.narrow(bins.mapValues(Map::narrow)), true);
-    }
-
     private OperatorSet(Map<OT, Map<DT, UnaryOperator<OT, DT, DC>>> uns,
-                        Map<OT, Map<DT, Map<DT, BinaryOperator<OT, DT, DC>>>> bins, boolean check) {
-        if (check) {
-            Objects.requireNonNull(uns);
-            uns.values().forEach(Objects::requireNonNull);
-
-            Objects.requireNonNull(bins);
-            bins.values().forEach(v -> {
-                Objects.requireNonNull(v);
-                v.values().forEach(Objects::requireNonNull);
-            });
-        }
-
+                        Map<OT, Map<DT, Map<DT, BinaryOperator<OT, DT, DC>>>> bins) {
         unaries = uns;
         binaries = bins;
     }
@@ -70,14 +63,47 @@ public class OperatorSet<OT extends Enum<OT>, DT extends Enum<DT>, DC extends Ta
     }
 
     public OperatorSet<OT, DT, DC> withUnaryOperator(DT dataTag, UnaryOperator<OT, DT, DC> op) {
-//        Objects.requireNonNull(dataTag);
-//        Objects.requireNonNull(op);
-//
-//        OT operatorTag = op.getTag();
-//
-//        if (!unaries.containsKey(operatorTag))
-//
-//        return new OperatorSet<>()
-        return null;
+        Objects.requireNonNull(dataTag);
+        Objects.requireNonNull(op);
+
+        OT operatorTag = op.getTag();
+        Map<OT, Map<DT, UnaryOperator<OT, DT, DC>>> newUnaries;
+
+        if (unaries.containsKey(operatorTag)) {
+            // If unaries does contain the given operator tag,
+            // we no the given operator must have at least 1 overload.
+            // Simply put this new overload in the overload map.
+            Map<DT, UnaryOperator<OT, DT, DC>> overloads = unaries.get(operatorTag).get();
+            newUnaries = unaries.put(operatorTag, overloads.put(dataTag, op));
+        } else {
+            newUnaries = unaries.put(operatorTag, HashMap.of(dataTag, op));
+        }
+
+        return new OperatorSet<>(newUnaries, binaries);
+    }
+
+    public OperatorSet<OT, DT, DC> withBinaryOperator(DT dataTag1, DT dataTag2, BinaryOperator<OT, DT, DC> op) {
+        Objects.requireNonNull(dataTag1);
+        Objects.requireNonNull(dataTag2);
+        Objects.requireNonNull(op);
+
+        OT operatorTag = op.getTag();
+
+        Map<OT, Map<DT, Map<DT, BinaryOperator<OT, DT, DC>>>> newBinaries;
+
+        if (binaries.containsKey(operatorTag)) {
+            Map<DT, Map<DT, BinaryOperator<OT, DT, DC>>> overloads1 = binaries.get(operatorTag).get();
+
+            if (overloads1.containsKey(dataTag1)) {
+                Map<DT, BinaryOperator<OT, DT, DC>> overloads2 = overloads1.get(dataTag1).get();
+                newBinaries = binaries.put(operatorTag, overloads1.put(dataTag1, overloads2.put(dataTag2, op)));
+            } else {
+                newBinaries = binaries.put(operatorTag, overloads1.put(dataTag1, HashMap.of(dataTag2, op)));
+            }
+        } else {
+            newBinaries = binaries.put(operatorTag, HashMap.of(dataTag1, HashMap.of(dataTag2, op)));
+        }
+
+        return new OperatorSet<>(unaries, newBinaries);
     }
 }
