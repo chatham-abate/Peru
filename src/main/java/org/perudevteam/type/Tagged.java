@@ -14,7 +14,7 @@ public abstract class Tagged<TG extends Enum<TG>> {
         tag = tt;
     }
 
-    public TG getTypeTag() {
+    public TG getTag() {
         return tag;
     }
 }
