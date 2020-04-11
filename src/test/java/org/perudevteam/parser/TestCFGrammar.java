@@ -1,5 +1,6 @@
 package org.perudevteam.parser;
 
+import io.vavr.CheckedFunction2;
 import io.vavr.Function2;
 import io.vavr.Tuple2;
 import io.vavr.collection.*;
@@ -178,15 +179,16 @@ public class TestCFGrammar {
     private static final Seq<Either<NT, T>> A_RULE1 = List.of(
         right(T.E)
     );
+
     private static final AttrProduction<NT, T, String> A_PROD1 =
             new AttrProduction<NT, T, String>(NT.A, A_RULE1) {
         @Override
-        protected String buildResultUnsafe(Seq<? extends String> children) {
+        protected String buildResultUnchecked(Seq<String> children) {
             return "";
         }
     };
 
-    private static final Map<T, Function2<String, Tokenized<T>, String>> TERM_RES_GENS1 = HashMap.of(
+    private static final Map<T, CheckedFunction2<String, Tokenized<T>, String>> TERM_RES_GENS1 = HashMap.of(
         T.E, (l, d) -> l
     );
 
@@ -196,7 +198,7 @@ public class TestCFGrammar {
     private static final Seq<Either<NT, T>> A_RULE2 = List.of(right(T.H));
     private static final AttrProduction<NT, T, String> A_PROD2 = new AttrProduction<NT, T, String>(NT.A, A_RULE2) {
         @Override
-        protected String buildResultUnsafe(Seq<? extends String> children) {
+        protected String buildResultUnchecked(Seq<String> children) {
             return "";
         }
     };

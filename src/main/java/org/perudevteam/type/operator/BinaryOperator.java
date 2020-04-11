@@ -30,15 +30,7 @@ public abstract class BinaryOperator<OT extends Enum<OT>, DT extends Enum<DT>, D
         return Try.of(() -> apply(i1, i2));
     }
 
-    public Try<DC> tryApply(Try<DC> i1, Try<DC> i2) {
-        if (i1.isFailure()) {
-            return i1;
-        }
-
-        if (i2.isFailure()) {
-            return i2;
-        }
-
-        return tryApply(i1.get(), i2.get());
+    public Try<DC> tryApply(Try<DC> tryI1, Try<DC> tryI2) {
+        return tryI1.flatMap(i1 -> tryI2.mapTry(i2 -> apply(i1, i2)));
     }
 }

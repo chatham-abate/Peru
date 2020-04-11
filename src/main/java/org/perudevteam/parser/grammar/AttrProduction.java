@@ -3,6 +3,7 @@ package org.perudevteam.parser.grammar;
 import io.vavr.Function1;
 import io.vavr.collection.Seq;
 import io.vavr.control.Either;
+import io.vavr.control.Try;
 
 import java.util.Objects;
 
@@ -26,9 +27,9 @@ public abstract class AttrProduction<NT extends Enum<NT>, T extends Enum<T>, R> 
      * These ordered results are then passed into this function to create
      * the result for this production.
      */
-    protected abstract R buildResultUnsafe(Seq<? extends R> children);
+    protected abstract R buildResultUnchecked(Seq<R> children) throws Throwable;
 
-    public R buildResult(Seq<? extends R> children) {
+    public R buildResult(Seq<? extends R> children) throws Throwable {
         Objects.requireNonNull(children);
         children.forEach(Objects::requireNonNull);
 
@@ -36,6 +37,12 @@ public abstract class AttrProduction<NT extends Enum<NT>, T extends Enum<T>, R> 
             throw new IllegalArgumentException("This rule requires " + getRule().length() + " tokens.");
         }
 
-        return buildResultUnsafe(children);
+        Seq<R> childrenNarrow = Seq.narrow(children);
+
+        return buildResultUnchecked(childrenNarrow);
+    }
+
+    public Try<R> tryBuildResult(Seq<? extends R> children) {
+        return Try.of(() -> buildResult(children));
     }
 }

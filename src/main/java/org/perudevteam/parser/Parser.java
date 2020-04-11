@@ -22,13 +22,17 @@ import java.util.Objects;
  */
 @FunctionalInterface
 public interface Parser<T extends Enum<T>, L, D extends Tokenized<T>, R> {
-    Try<R> parseUnchecked(Seq<Tuple2<L, D>> tokens);
+    R parseUnchecked(Seq<Tuple2<L, D>> tokens) throws Throwable;
 
-    default Try<R> parse(Seq<? extends Tuple2<L, D>> tokens) {
+    default R parse(Seq<? extends Tuple2<L, D>> tokens) throws Throwable {
         Objects.requireNonNull(tokens);
         Seq<Tuple2<L, D>> narrowTokens = Seq.narrow(tokens);
         narrowTokens.forEach(Objects::requireNonNull);
 
         return parseUnchecked(narrowTokens);
+    }
+
+    default Try<R> tryParse(Seq<? extends Tuple2<L, D>> tokens) {
+        return Try.of(() -> parse(tokens));
     }
 }

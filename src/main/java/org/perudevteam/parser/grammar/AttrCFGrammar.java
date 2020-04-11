@@ -1,10 +1,13 @@
 package org.perudevteam.parser.grammar;
 
+import io.vavr.CheckedFunction1;
+import io.vavr.CheckedFunction2;
 import io.vavr.Function2;
 import io.vavr.collection.Map;
 import io.vavr.collection.Seq;
 import io.vavr.collection.Set;
 import io.vavr.control.Either;
+import io.vavr.control.Try;
 import org.perudevteam.parser.Tokenized;
 
 import java.util.Objects;
@@ -24,9 +27,10 @@ import java.util.Objects;
 public class AttrCFGrammar<NT extends Enum<NT>, T extends Enum<T>,
         P extends AttrProduction<NT, T, R>, L, D extends Tokenized<T>, R> extends CFGrammar<NT, T, P> {
 
-    private Map<? super T, Function2<L, D, R>> terminalResGenerators;
+    private Map<? super T, CheckedFunction2<L, D, R>> terminalResGenerators;
 
-    public AttrCFGrammar(NT start, Map<? super T, ? extends Function2<L, D, ? extends R>> termResGens, Seq<P> prods) {
+    public AttrCFGrammar(NT start, Map<? super T, ? extends CheckedFunction2<L, D, ? extends R>> termResGens,
+                         Seq<P> prods) {
         super(start, prods);
 
         // None of the generators can be null.
@@ -39,17 +43,24 @@ public class AttrCFGrammar<NT extends Enum<NT>, T extends Enum<T>,
             }
         }
 
-        terminalResGenerators = Map.narrow(termResGens.mapValues(Function2::narrow));
+        terminalResGenerators = Map.narrow(termResGens.mapValues(CheckedFunction2::narrow));
     }
 
     // Direct Constructor with no checks... only used by methods of this class.
     protected AttrCFGrammar(NT start, Map<NT, Set<P>> prodMap, Set<T> termsUsed,
-                            Map<? super T, Function2<L, D, R>> termResGens) {
+                            Map<? super T, CheckedFunction2<L, D, R>> termResGens) {
         super(start, prodMap, termsUsed);
         terminalResGenerators = termResGens;
     }
 
-    public R buildTerminalResult(L lexeme, D data) {
+    public R buildTerminalResultUnchecked(L lexeme, D data) throws Throwable {
+        return terminalResGenerators.get(data.getTokenType()).get().apply(lexeme, data);
+    }
+
+    public R buildTerminalResult(L lexeme, D data) throws Throwable {
+        Objects.requireNonNull(lexeme);
+        Objects.requireNonNull(data);
+
         T terminal = data.getTokenType();
 
         if (!getTerminalsUsed().contains(terminal)) {
@@ -57,6 +68,10 @@ public class AttrCFGrammar<NT extends Enum<NT>, T extends Enum<T>,
         }
 
         return terminalResGenerators.get(terminal).get().apply(lexeme, data);
+    }
+
+    public Try<R> tryBuildTerminalResult(L lexeme, D data) {
+        return Try.of(() -> buildTerminalResult(lexeme, data));
     }
 
     @Override

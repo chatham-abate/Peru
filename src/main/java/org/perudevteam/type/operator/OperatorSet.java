@@ -9,7 +9,8 @@ import java.util.Objects;
 
 public class OperatorSet<OT extends Enum<OT>, DT extends Enum<DT>, DC extends Tagged<DT>> {
 
-    private static final OperatorSet EMPTY = new OperatorSet<>(HashMap.empty(), HashMap.empty());
+    @SuppressWarnings("unchecked")
+    private static final OperatorSet<?, ?, ?> EMPTY = new OperatorSet(HashMap.empty(), HashMap.empty());
 
     @SuppressWarnings("unchecked")
     public static <OT extends Enum<OT>, DT extends Enum<DT>, DC extends Tagged<DT>> OperatorSet<OT, DT, DC> empty() {
@@ -19,32 +20,43 @@ public class OperatorSet<OT extends Enum<OT>, DT extends Enum<DT>, DC extends Ta
     private Map<OT, Map<DT, UnaryOperator<OT, DT, DC>>> unaries;
     private Map<OT, Map<DT, Map<DT, BinaryOperator<OT, DT, DC>>>> binaries;
 
-    private OperatorSet(Map<OT, Map<DT, UnaryOperator<OT, DT, DC>>> uns,
-                        Map<OT, Map<DT, Map<DT, BinaryOperator<OT, DT, DC>>>> bins) {
-        unaries = uns;
-        binaries = bins;
+    private OperatorSet(Map<OT, ? extends Map<DT, ? extends UnaryOperator<OT, DT, DC>>> uns,
+                        Map<OT, ? extends Map<DT, ? extends Map<DT, ? extends BinaryOperator<OT, DT, DC>>>> bins) {
+        unaries = Map.narrow(uns.mapValues(Map::narrow));
+        binaries = Map.narrow(bins.mapValues(m -> Map.narrow(m.mapValues(Map::narrow))));
     }
 
-    public Try<DC> applyUnary(OT unOpTag, DC i) {
+    public DC applyUnary(OT unOpTag, DC i) throws Throwable {
+        Objects.requireNonNull(unOpTag);
+        Objects.requireNonNull(i);
+
         if (!unaries.containsKey(unOpTag)) {
-            return Try.failure(new Exception("Operator set does not contain unary operator "
-                    + unOpTag.name() + "."));
+            throw new Exception("Operator set does not contain unary operator "
+                    + unOpTag.name() + ".");
         }
 
         Map<DT, UnaryOperator<OT, DT, DC>> overloads = unaries.get(unOpTag).get();
         DT dataTag = i.getTag();
 
         if (!overloads.containsKey(dataTag)) {
-            return Try.failure(new Exception("No overload for " + unOpTag.name() + " given " + dataTag.name() + "."));
+            throw new Exception("No overload for " + unOpTag.name() + " given " + dataTag.name() + ".");
         }
 
         return overloads.get(dataTag).get().apply(i);
     }
 
-    public Try<DC> applyBinary(OT binOpTag, DC i1, DC i2) {
+    public Try<DC> tryApplyUnary(OT unOpTag, DC i) {
+        return Try.of(() -> applyUnary(unOpTag, i));
+    }
+
+    public Try<DC> tryApplyUnary(OT unOpTag, Try<DC> tryI) {
+        return tryI.mapTry(i -> applyUnary(unOpTag, i));
+    }
+
+    public DC applyBinary(OT binOpTag, DC i1, DC i2) throws Throwable{
         if (!binaries.containsKey(binOpTag)) {
-            return Try.failure(new Exception("Operator set does not contain binary operator "
-                    + binOpTag.name() + "."));
+            throw new Exception("Operator set does not contain binary operator "
+                    + binOpTag.name() + ".");
         }
 
         Map<DT, Map<DT, BinaryOperator<OT, DT, DC>>> overloads1 = binaries.get(binOpTag).get();
@@ -58,8 +70,16 @@ public class OperatorSet<OT extends Enum<OT>, DT extends Enum<DT>, DC extends Ta
             }
         }
 
-        return Try.failure(new Exception("No overload for " + binOpTag.name() + " given "  + dataTag1.name()
-                + " and " + dataTag2.name() + "."));
+        throw new Exception("No overload for " + binOpTag.name() + " given "  + dataTag1.name()
+                + " and " + dataTag2.name() + ".");
+    }
+
+    public Try<DC> tryApplyBinary(OT binOpTag, DC i1, DC i2) {
+        return Try.of(() -> applyBinary(binOpTag, i1, i2));
+    }
+
+    public Try<DC> tryApplyBinary(OT binOpTag, Try<DC> tryI1, Try<DC> tryI2) {
+        return tryI1.flatMap(i1 -> tryI2.mapTry(i2 -> applyBinary(binOpTag, i1, i2)));
     }
 
     public OperatorSet<OT, DT, DC> withUnaryOperator(DT dataTag, UnaryOperator<OT, DT, DC> op) {

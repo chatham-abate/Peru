@@ -24,7 +24,7 @@ public abstract class UnaryOperator<OT extends Enum<OT>, DT extends Enum<DT>, DC
         return Try.of(() -> apply(i));
     }
 
-    public Try<DC> tryApply(Try<DC> i) {
-        return i.isFailure() ? i : tryApply(i.get());
+    public Try<DC> tryApply(Try<DC> tryI) {
+        return tryI.mapTry(this::apply);
     }
 }

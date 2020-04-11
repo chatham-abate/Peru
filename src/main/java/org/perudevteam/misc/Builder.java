@@ -30,6 +30,8 @@ public interface Builder<I, C, O> {
     }
 
     default Stream<O> buildStream(Seq<I> input, C context) {
+        Objects.requireNonNull(input);
+
         if (input.isEmpty()) {
             return Stream.empty();
         }

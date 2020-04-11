@@ -46,7 +46,7 @@ public abstract class LROneParser<NT extends Enum<NT>, T extends Enum<T>, L, D e
     protected abstract Throwable onError();
 
     @Override
-    public Try<R> parseUnchecked(Seq<Tuple2<L, D>> tokens) {
+    public R parseUnchecked(Seq<Tuple2<L, D>> tokens) throws Throwable {
         List<Integer> stateStack = List.of(0);
         List<R> resultStack = List.empty();
         NT goal = g.getStartSymbol();
@@ -66,7 +66,7 @@ public abstract class LROneParser<NT extends Enum<NT>, T extends Enum<T>, L, D e
 
             // Perform initial error check.
             if (move.isLeft() && move.getLeft() == 0) {
-                return Try.failure(lookaheadOpt.isEmpty() ? onError() : onError(lookaheadOpt.get()));
+                throw lookaheadOpt.isEmpty() ? onError() : onError(lookaheadOpt.get());
             }
 
             if (move.isRight()) {
@@ -87,14 +87,14 @@ public abstract class LROneParser<NT extends Enum<NT>, T extends Enum<T>, L, D e
 
                 // Check for acceptance state.
                 if (resultType.equals(goal) && lookaheadOpt.isEmpty()) {
-                    return Try.success(result);  // ACCEPT State!
+                    return result;  // ACCEPT State!
                 }
 
                 resultStack = resultStack.prepend(result);  // Push result onto result stack.
                 int gotoState = table.gotoShift(stateStack.peek(), resultType);
 
                 if (gotoState == 0) {
-                    return Try.failure(lookaheadOpt.isEmpty() ? onError() : onError(lookaheadOpt.get()));
+                    throw lookaheadOpt.isEmpty() ? onError() : onError(lookaheadOpt.get());
                 }
 
                 // If not an error, simply push our new goto state onto the state stack.

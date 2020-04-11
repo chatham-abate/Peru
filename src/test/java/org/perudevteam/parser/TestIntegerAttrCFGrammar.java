@@ -1,5 +1,6 @@
 package org.perudevteam.parser;
 
+import io.vavr.CheckedFunction2;
 import io.vavr.Function1;
 import io.vavr.Function2;
 import io.vavr.Tuple2;
@@ -81,24 +82,24 @@ public class TestIntegerAttrCFGrammar {
     private static final AttrProduction<NT, T, Integer>
     GOAL_PROD = new AttrProduction<NT, T, Integer>(NT.GOAL, List.of(left(NT.SUM))) {
         @Override
-        protected Integer buildResultUnsafe(Seq<? extends Integer> children) {
+        protected Integer buildResultUnchecked(Seq<Integer> children) {
             return children.get(0);
         }
     },
     SUM_PROD1 = new AttrProduction<NT, T, Integer>(NT.SUM, List.of(left(NT.SUM), right(T.ADDOP), right(T.NUMBER))) {
         @Override
-        protected Integer buildResultUnsafe(Seq<? extends Integer> children) {
+        protected Integer buildResultUnchecked(Seq<Integer> children) {
             return children.get(0) + (children.get(1) * children.get(2));
         }
     },
     SUM_PROD2 = new AttrProduction<NT, T, Integer>(NT.SUM, List.of(right(T.NUMBER))) {
         @Override
-        protected Integer buildResultUnsafe(Seq<? extends Integer> children) {
+        protected Integer buildResultUnchecked(Seq<Integer> children) {
             return children.get(0);
         }
     };
 
-    private static final Map<T, Function2<String, CharData<T>, Integer>> TERM_GENERATORS = HashMap.of(
+    private static final Map<T, CheckedFunction2<String, CharData<T>, Integer>> TERM_GENERATORS = HashMap.of(
             T.NUMBER, (l, d) -> Integer.parseInt(l),
             T.ADDOP, (l, d) -> l.equals("+") ? 1 : -1
     );
@@ -140,7 +141,7 @@ public class TestIntegerAttrCFGrammar {
             Seq<Tuple2<String, CharData<T>>> tokens =
                     LEXER.buildSuccessfulTokenStream(input, CharSimpleContext.INIT_SIMPLE_CONTEXT);
 
-            Try<Integer> result = PARSER.parse(tokens);
+            Try<Integer> result = PARSER.tryParse(tokens);
             assertTrue(result.isSuccess());
             assertEquals(RESULTS.get(i), result.get());
         }
@@ -162,7 +163,7 @@ public class TestIntegerAttrCFGrammar {
             Seq<Tuple2<String, CharData<T>>> errorTokens =
                     LEXER.buildSuccessfulTokenStream(errorInput, CharSimpleContext.INIT_SIMPLE_CONTEXT);
 
-            assertTrue(PARSER.parse(errorTokens).isFailure());
+            assertTrue(PARSER.tryParse(errorTokens).isFailure());
         }
     }
 }
