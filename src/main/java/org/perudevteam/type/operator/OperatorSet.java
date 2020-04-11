@@ -27,7 +27,7 @@ public class OperatorSet<OT extends Enum<OT>, DT extends Enum<DT>, DC extends Ta
 
     public Try<DC> applyUnary(OT unOpTag, DC i) {
         if (!unaries.containsKey(unOpTag)) {
-            return Try.failure(new Exception("Operator set does not contain unary operator : "
+            return Try.failure(new Exception("Operator set does not contain unary operator "
                     + unOpTag.name() + "."));
         }
 
@@ -43,7 +43,7 @@ public class OperatorSet<OT extends Enum<OT>, DT extends Enum<DT>, DC extends Ta
 
     public Try<DC> applyBinary(OT binOpTag, DC i1, DC i2) {
         if (!binaries.containsKey(binOpTag)) {
-            return Try.failure(new Exception("Operator set does nto contain binary operator : "
+            return Try.failure(new Exception("Operator set does not contain binary operator "
                     + binOpTag.name() + "."));
         }
 

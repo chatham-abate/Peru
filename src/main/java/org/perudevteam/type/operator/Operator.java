@@ -1,5 +1,6 @@
 package org.perudevteam.type.operator;
 
+import io.vavr.control.Try;
 import org.perudevteam.type.Tagged;
 
 /**
@@ -11,7 +12,22 @@ import org.perudevteam.type.Tagged;
  */
 public abstract class Operator<OT extends Enum<OT>, DT extends Enum<DT>, DC extends Tagged<DT>>
         extends Tagged<OT>  {
-    public Operator(OT tag) {
+
+    private DT outputTag;
+
+    public Operator(OT tag, DT oTag) {
         super(tag);
+        outputTag = oTag;
     }
+
+    public DT getOutputTag() {
+        return outputTag;
+    }
+
+    protected void validateOutput(DC output) throws Exception {
+        if (!output.getTag().equals(outputTag)) {
+            throw new Exception("Bad Operator, unexpected return type.");
+        }
+    }
+
 }
