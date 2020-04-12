@@ -5,6 +5,9 @@ import io.vavr.collection.Map;
 import io.vavr.collection.Seq;
 import org.perudevteam.type.Tagged;
 
+import java.util.Calendar;
+import java.util.function.Function;
+
 public abstract class BaseValue extends Tagged<BaseType> {
     public static NullPointerException castError(BaseType from, BaseType to) {
         return new NullPointerException("Base Type " + from.name() + " cannot be converted to " + to.name() + ".");
@@ -13,6 +16,12 @@ public abstract class BaseValue extends Tagged<BaseType> {
     public BaseValue(BaseType tag) {
         super(tag);
     }
+
+
+    /*
+     * Casting Functions.
+     */
+
 
     public byte toByte() {
         throw castError(getTag(), BaseType.BYTE);
@@ -78,13 +87,131 @@ public abstract class BaseValue extends Tagged<BaseType> {
     }
 
 
+    /*
+     * Static Constructors.
+     */
+
+
+    public static BaseValue of(byte v) {
+        return new BaseByte(v);
+    }
+
+    public static BaseValue of(short v) {
+        return new BaseShort(v);
+    }
+
+    public static BaseValue of(int v) {
+        return new BaseInt(v);
+    }
+
+    public static BaseValue of(long v) {
+        return new BaseLong(v);
+    }
+
+    public static BaseValue of(float v) {
+        return new BaseFloat(v);
+    }
+
+    public static BaseValue of(double v) {
+        return new BaseDouble(v);
+    }
+
+    public static BaseValue of(char v) {
+        return new BaseCharacter(v);
+    }
+
+    public static BaseValue of(Enum v) {
+        return new BaseEnum(v);
+    }
+
+    public static BaseValue of(boolean v) {
+        return v ? BaseBoolean.TRUE : BaseBoolean.FALSE;
+    }
+
+    public static BaseValue of(String v) {
+        return new BaseString(v);
+    }
+
+    public static BaseValue of(Map<? extends String, ? extends BaseValue> v) {
+        return new BaseMap(v);
+    }
+
+    public static BaseValue of(Seq<? extends BaseValue> v) {
+        return new BaseSequence(v);
+    }
+
+    public static BaseValue of(Function1<? super Seq<BaseValue>, ? extends BaseValue> v) {
+        return new BaseFunction(v);
+    }
+
+
+    /*
+     * Map Functions.
+     */
+
+
+    public BaseValue mapByte(Function1<? super Byte, ? extends Byte> f) {
+        return new BaseByte(f.apply(toByte()));
+    }
+
+    public BaseValue mapShort(Function1<? super Short, ? extends Short> f) {
+        return new BaseShort(f.apply(toShort()));
+    }
+
+    public BaseValue mapInt(Function1<? super Integer, ? extends Integer> f) {
+        return new BaseInt(f.apply(toInt()));
+    }
+
+    public BaseValue mapLong(Function1<? super Long, ? extends Long> f) {
+        return new BaseLong(f.apply(toLong()));
+    }
+
+    public BaseValue mapFloat(Function<? super Float, ? extends Float> f) {
+        return new BaseFloat(f.apply(toFloat()));
+    }
+
+    public BaseValue mapDouble(Function1<? super Double, ? extends Double> f) {
+        return new BaseDouble(f.apply(toDouble()));
+    }
+
+    public BaseValue mapCharacter(Function1<? super Character, ? extends Character> f) {
+        return new BaseCharacter(f.apply(toCharacter()));
+    }
+
+    public BaseValue mapEnum(Function1<? super Enum, ? extends Enum> f) {
+        return of(f.apply(toEnum()));
+    }
+
+    public BaseValue mapBoolean(Function1<? super Boolean, ? extends Boolean> f) {
+        return of(f.apply(toBoolean()));
+    }
+
+    public BaseValue mapString(Function1<? super String, ? extends String> f) {
+        return new BaseString(f.apply(toString()));
+    }
+
+    public BaseValue mapMap(Function1<? super Map<String, BaseValue>, ? extends Map<String, BaseValue>> f) {
+        return new BaseMap(f.apply(toMap()));
+    }
+
+    public BaseValue mapSeq(Function1<? super Seq<BaseValue>, ? extends Seq<BaseValue>> f) {
+        return new BaseSequence(f.apply(toSequence()));
+    }
+
+    public BaseValue mapFunction(Function1<? super Function1<Seq<BaseValue>, BaseValue>,
+            ? extends Function1<Seq<BaseValue>, BaseValue>> f) {
+        return new BaseFunction(f.apply(toFunction()));
+    }
+
 
     /*
      *  Container Classes.
      */
 
 
-
+    /**
+     * Base Byte Class.
+     */
     private static class BaseByte  extends BaseValue {
         private byte value;
 
@@ -129,6 +256,10 @@ public abstract class BaseValue extends Tagged<BaseType> {
         }
     }
 
+
+    /**
+     * Base Short Class.
+     */
     private static class BaseShort extends BaseValue {
         private short value;
 
@@ -168,6 +299,9 @@ public abstract class BaseValue extends Tagged<BaseType> {
         }
     }
 
+    /**
+     * Base Int Class.
+     */
     private static class BaseInt extends BaseValue{
         private int value;
 
@@ -202,6 +336,10 @@ public abstract class BaseValue extends Tagged<BaseType> {
         }
     }
 
+
+    /**
+     * Base Long Class.
+     */
     private static class BaseLong extends BaseValue {
         private long value;
 
@@ -231,6 +369,9 @@ public abstract class BaseValue extends Tagged<BaseType> {
         }
     }
 
+    /**
+     * Base Float Class.
+     */
     private static class BaseFloat extends BaseValue {
         private float value;
         public BaseFloat(float v) {
@@ -254,6 +395,10 @@ public abstract class BaseValue extends Tagged<BaseType> {
         }
     }
 
+
+    /**
+     * Base Double Class.
+     */
     private static class BaseDouble extends BaseValue {
         private double value;
 
@@ -273,6 +418,10 @@ public abstract class BaseValue extends Tagged<BaseType> {
         }
     }
 
+
+    /**
+     * Base Character Class.
+     */
     private static class BaseCharacter extends BaseValue {
         private char value;
         public BaseCharacter(char v) {
@@ -311,6 +460,10 @@ public abstract class BaseValue extends Tagged<BaseType> {
         }
     }
 
+
+    /**
+     * Base Enum Class.
+     */
     private static class BaseEnum  extends BaseValue {
         private Enum value;
         public BaseEnum(Enum v) {
@@ -329,7 +482,14 @@ public abstract class BaseValue extends Tagged<BaseType> {
         }
     }
 
+
+    /**
+     * Base Boolean Class.
+     */
     private static class BaseBoolean extends BaseValue {
+        public static BaseBoolean TRUE = new BaseBoolean(true);
+        public static BaseBoolean FALSE = new BaseBoolean(false);
+
         private boolean value;
         public BaseBoolean(boolean v) {
             super(BaseType.BOOLEAN);
@@ -347,6 +507,10 @@ public abstract class BaseValue extends Tagged<BaseType> {
         }
     }
 
+
+    /**
+     * Base String Class.
+     */
     private static class BaseString extends BaseValue {
         private String value;
         public BaseString(String v) {
@@ -360,15 +524,69 @@ public abstract class BaseValue extends Tagged<BaseType> {
         }
     }
 
-    private static class BaseMap {
 
+    /**
+     * Base Map Class.
+     */
+    private static class BaseMap extends BaseValue {
+        private Map<String, BaseValue> value;
+        public BaseMap(Map<? extends String, ? extends BaseValue> v) {
+            super(BaseType.MAP);
+            value = Map.narrow(v);
+        }
+
+        @Override
+        public Map<String, BaseValue> toMap() {
+            return value;
+        }
+
+        @Override
+        public String toString() {
+            return value.toString();
+        }
     }
 
-    private static class BaseSequence {
 
+    /**
+     * Base Sequence Class.
+     */
+    private static class BaseSequence extends BaseValue {
+        private Seq<BaseValue> value;
+        public BaseSequence(Seq<? extends BaseValue> v) {
+            super(BaseType.SEQUENCE);
+            value = Seq.narrow(v);
+        }
+
+        @Override
+        public Seq<BaseValue> toSequence() {
+            return value;
+        }
+
+        @Override
+        public String toString() {
+            return value.toString();
+        }
     }
 
-    private static class BaseFunction {
 
+    /**
+     * Base Function Class.
+     */
+    private static class BaseFunction extends BaseValue {
+        private Function1<Seq<BaseValue>, BaseValue> value;
+        public BaseFunction(Function1<? super Seq<BaseValue>, ? extends BaseValue> v) {
+            super(BaseType.FUNCTION);
+            value = Function1.narrow(v);
+        }
+
+        @Override
+        public Function1<Seq<BaseValue>, BaseValue> toFunction() {
+            return value;
+        }
+
+        @Override
+        public String toString() {
+            return value.toString();
+        }
     }
 }
