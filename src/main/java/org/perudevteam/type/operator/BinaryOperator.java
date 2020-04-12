@@ -33,4 +33,26 @@ public abstract class BinaryOperator<OT extends Enum<OT>, DT extends Enum<DT>, D
     public Try<DC> tryApply(Try<DC> tryI1, Try<DC> tryI2) {
         return tryI1.flatMap(i1 -> tryI2.mapTry(i2 -> apply(i1, i2)));
     }
+
+    public BinaryOperator<OT, DT, DC> withTag(OT tag) {
+        final BinaryOperator<OT, DT, DC> This = this;
+
+        return new BinaryOperator<OT, DT, DC>(tag, getOutputTag()) {
+            @Override
+            protected DC applyUnchecked(DC i1, DC i2) throws Throwable {
+                return This.applyUnchecked(i1, i2);
+            }
+        };
+    }
+
+    public BinaryOperator<OT, DT, DC> withOutputTag(DT oTag) {
+        final BinaryOperator<OT, DT, DC> This = this;
+
+        return new BinaryOperator<OT, DT, DC>(getTag(), oTag) {
+            @Override
+            protected DC applyUnchecked(DC i1, DC i2) throws Throwable {
+                return This.applyUnchecked(i1, i2);
+            }
+        };
+    }
 }

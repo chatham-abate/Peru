@@ -82,7 +82,7 @@ public class OperatorSet<OT extends Enum<OT>, DT extends Enum<DT>, DC extends Ta
         return tryI1.flatMap(i1 -> tryI2.mapTry(i2 -> applyBinary(binOpTag, i1, i2)));
     }
 
-    public OperatorSet<OT, DT, DC> withUnaryOperator(DT dataTag, UnaryOperator<OT, DT, DC> op) {
+    public OperatorSet<OT, DT, DC> withUnaryOverload(DT dataTag, UnaryOperator<OT, DT, DC> op) {
         Objects.requireNonNull(dataTag);
         Objects.requireNonNull(op);
 
@@ -102,7 +102,7 @@ public class OperatorSet<OT extends Enum<OT>, DT extends Enum<DT>, DC extends Ta
         return new OperatorSet<>(newUnaries, binaries);
     }
 
-    public OperatorSet<OT, DT, DC> withBinaryOperator(DT dataTag1, DT dataTag2, BinaryOperator<OT, DT, DC> op) {
+    public OperatorSet<OT, DT, DC> withBinaryOverload(DT dataTag1, DT dataTag2, BinaryOperator<OT, DT, DC> op) {
         Objects.requireNonNull(dataTag1);
         Objects.requireNonNull(dataTag2);
         Objects.requireNonNull(op);
@@ -125,5 +125,13 @@ public class OperatorSet<OT extends Enum<OT>, DT extends Enum<DT>, DC extends Ta
         }
 
         return new OperatorSet<>(unaries, newBinaries);
+    }
+
+    public OperatorSet<OT, DT, DC> removeBinaryOperator(OT binOpTag) {
+        return new OperatorSet<>(unaries, binaries.remove(binOpTag));
+    }
+
+    public OperatorSet<OT, DT, DC> removeUnaryOperator(OT unOpTag) {
+        return new OperatorSet<>(unaries.remove(unOpTag), binaries);
     }
 }

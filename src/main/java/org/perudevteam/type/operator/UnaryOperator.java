@@ -11,7 +11,7 @@ public abstract class UnaryOperator<OT extends Enum<OT>, DT extends Enum<DT>, DC
         super(tag, oTag);
     }
 
-    public abstract DC applyUnchecked(DC i) throws Throwable;
+    protected abstract DC applyUnchecked(DC i) throws Throwable;
 
     public DC apply(DC i) throws Throwable {
         Objects.requireNonNull(i);
@@ -26,5 +26,27 @@ public abstract class UnaryOperator<OT extends Enum<OT>, DT extends Enum<DT>, DC
 
     public Try<DC> tryApply(Try<DC> tryI) {
         return tryI.mapTry(this::apply);
+    }
+
+    public UnaryOperator<OT, DT, DC> withTag(OT tag) {
+        final UnaryOperator<OT, DT, DC> This = this;
+
+        return new UnaryOperator<OT, DT, DC>(tag, getOutputTag()) {
+            @Override
+            protected DC applyUnchecked(DC i) throws Throwable {
+                return This.applyUnchecked(i);
+            }
+        };
+    }
+
+    public UnaryOperator<OT, DT, DC> withOutputTag(DT oTag) {
+        final UnaryOperator<OT, DT, DC> This = this;
+
+        return new UnaryOperator<OT, DT, DC>(getTag(), oTag) {
+            @Override
+            protected DC applyUnchecked(DC i) throws Throwable {
+                return This.applyUnchecked(i);
+            }
+        };
     }
 }
