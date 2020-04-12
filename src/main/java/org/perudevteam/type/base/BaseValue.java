@@ -255,6 +255,20 @@ public abstract class BaseValue extends Tagged<BaseType> {
         public String toString() {
             return Byte.toString(value);
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            if (!super.equals(o)) return false;
+            BaseByte baseByte = (BaseByte) o;
+            return value == baseByte.value;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), value);
+        }
     }
 
 
@@ -298,6 +312,20 @@ public abstract class BaseValue extends Tagged<BaseType> {
         public String toString() {
             return Short.toString(value);
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            if (!super.equals(o)) return false;
+            BaseShort baseShort = (BaseShort) o;
+            return value == baseShort.value;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), value);
+        }
     }
 
     /**
@@ -335,6 +363,20 @@ public abstract class BaseValue extends Tagged<BaseType> {
         public String toString() {
             return Integer.toString(value);
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            if (!super.equals(o)) return false;
+            BaseInt baseInt = (BaseInt) o;
+            return value == baseInt.value;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), value);
+        }
     }
 
 
@@ -368,6 +410,20 @@ public abstract class BaseValue extends Tagged<BaseType> {
         public String toString() {
             return Long.toString(value);
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            if (!super.equals(o)) return false;
+            BaseLong baseLong = (BaseLong) o;
+            return value == baseLong.value;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), value);
+        }
     }
 
     /**
@@ -394,6 +450,20 @@ public abstract class BaseValue extends Tagged<BaseType> {
         public String toString() {
             return Float.toString(value);
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            if (!super.equals(o)) return false;
+            BaseFloat baseFloat = (BaseFloat) o;
+            return Float.compare(baseFloat.value, value) == 0;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), value);
+        }
     }
 
 
@@ -416,6 +486,20 @@ public abstract class BaseValue extends Tagged<BaseType> {
         @Override
         public String toString() {
             return Double.toString(value);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            if (!super.equals(o)) return false;
+            BaseDouble that = (BaseDouble) o;
+            return Double.compare(that.value, value) == 0;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), value);
         }
     }
 
@@ -459,6 +543,20 @@ public abstract class BaseValue extends Tagged<BaseType> {
         public String toString() {
             return Character.toString(value);
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            if (!super.equals(o)) return false;
+            BaseCharacter that = (BaseCharacter) o;
+            return value == that.value;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), value);
+        }
     }
 
 
@@ -481,6 +579,20 @@ public abstract class BaseValue extends Tagged<BaseType> {
         @Override
         public String toString() {
             return value.name();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            if (!super.equals(o)) return false;
+            BaseEnum baseEnum = (BaseEnum) o;
+            return Objects.equals(value, baseEnum.value);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), value);
         }
     }
 
@@ -507,6 +619,20 @@ public abstract class BaseValue extends Tagged<BaseType> {
         public String toString() {
             return Boolean.toString(value);
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            if (!super.equals(o)) return false;
+            BaseBoolean that = (BaseBoolean) o;
+            return value == that.value;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), value);
+        }
     }
 
 
@@ -524,6 +650,20 @@ public abstract class BaseValue extends Tagged<BaseType> {
         @Override
         public String toString() {
             return value;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            if (!super.equals(o)) return false;
+            BaseString that = (BaseString) o;
+            return value.equals(that.value);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), value);
         }
     }
 
@@ -547,6 +687,20 @@ public abstract class BaseValue extends Tagged<BaseType> {
         @Override
         public String toString() {
             return value.toString();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            if (!super.equals(o)) return false;
+            BaseMap baseMap = (BaseMap) o;
+            return value.equals(baseMap.value);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), value);
         }
     }
 
@@ -572,6 +726,20 @@ public abstract class BaseValue extends Tagged<BaseType> {
         public String toString() {
             return value.toString();
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            if (!super.equals(o)) return false;
+            BaseSequence that = (BaseSequence) o;
+            return value.equals(that.value);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), value);
+        }
     }
 
 
@@ -594,6 +762,20 @@ public abstract class BaseValue extends Tagged<BaseType> {
         @Override
         public String toString() {
             return value.toString();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            if (!super.equals(o)) return false;
+            BaseFunction that = (BaseFunction) o;
+            return value.equals(that.value);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), value);
         }
     }
 }
