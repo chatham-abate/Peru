@@ -10,8 +10,8 @@ import java.util.Objects;
 import java.util.function.Function;
 
 public abstract class BaseValue extends Tagged<BaseType> {
-    public static NullPointerException castError(BaseType from, BaseType to) {
-        return new NullPointerException("Base Type " + from.name() + " cannot be converted to " + to.name() + ".");
+    public static ClassCastException castError(BaseType from, BaseType to) {
+        return new ClassCastException("Base Type " + from.name() + " cannot be converted to " + to.name() + ".");
     }
 
     public BaseValue(BaseType tag) {

@@ -1,6 +1,8 @@
 package org.perudevteam.type.base;
 
+import io.vavr.collection.List;
 import org.perudevteam.type.operator.BinaryOperator;
+import org.perudevteam.type.operator.UnaryOperator;
 
 import static org.perudevteam.type.operator.BinaryOperator.*;
 import static org.perudevteam.type.operator.UnaryOperator.*;
@@ -8,6 +10,18 @@ import static org.perudevteam.type.base.BaseValue.*;
 
 
 public class BaseOperatorUtil {
+
+    @SuppressWarnings("unchecked")
+    public static int compareEnum(BaseValue i1, BaseValue i2) {
+        Enum e1 = i1.toEnum();
+        Enum e2 = i2.toEnum();
+
+        if (e2.getClass() != e2.getClass()) {
+            throw new ClassCastException("Cannot compare ENUMs of different type.");
+        }
+
+        return e2.compareTo(e2);
+    }
 
     /*
      * Preset Operations.
@@ -66,6 +80,150 @@ public class BaseOperatorUtil {
     POWER_FLOAT = binop(BaseOperator.POWER, BaseType.FLOAT,
             (i1, i2) -> ofFloat((float)Math.pow(i1.toDouble(), i2.toDouble()))),
     POWER_DOUBLE = binop(BaseOperator.POWER, BaseType.DOUBLE,
-            (i1, i2) -> ofDouble(Math.pow(i1.toDouble(), i2.toDouble())));
+            (i1, i2) -> ofDouble(Math.pow(i1.toDouble(), i2.toDouble()))),
 
+
+    // Character Plus Operation.
+    PLUS_CHARACTER = binop(BaseOperator.PLUS, BaseType.CHARACTER,
+            (i1, i2) -> ofCharacter((char)(i1.toInt() + i2.toInt()))),
+
+    // String Plus Operation. (Concatenation)
+    PLUS_STRING = binop(BaseOperator.PLUS, BaseType.STRING,
+            (i1, i2) -> ofString(i1.toString() + i2.toString())),
+
+    // Sequence Plus Operation.
+    PLUS_SEQUENCE = binop(BaseOperator.PLUS, BaseType.SEQUENCE,
+            (i1, i2) -> ofSequence(i1.toSequence().appendAll(i2.toSequence()))),
+
+
+    // Boolean Operators.
+    AND_BOOLEAN = binop(BaseOperator.AND, BaseType.BOOLEAN, (i1, i2) -> ofBoolean(i1.toBoolean() && i2.toBoolean())),
+    OR_BOOLEAN = binop(BaseOperator.OR, BaseType.BOOLEAN, (i1, i2) -> ofBoolean(i1.toBoolean() || i2.toBoolean())),
+
+
+    // Arithmetic Less Than Operations.
+    LT_BYTE = binop(BaseOperator.LT, BaseType.BOOLEAN, (i1, i2) -> ofBoolean(i1.toByte() < i2.toByte())),
+    LT_SHORT = binop(BaseOperator.LT, BaseType.BOOLEAN, (i1, i2) -> ofBoolean(i1.toShort() < i2.toShort())),
+    LT_INT = binop(BaseOperator.LT, BaseType.BOOLEAN, (i1, i2) -> ofBoolean(i1.toInt() < i2.toInt())),
+    LT_LONG = binop(BaseOperator.LT, BaseType.BOOLEAN, (i1, i2) -> ofBoolean(i1.toLong() < i2.toLong())),
+    LT_FLOAT = binop(BaseOperator.LT, BaseType.BOOLEAN, (i1, i2) -> ofBoolean(i1.toFloat() < i2.toFloat())),
+    LT_DOUBLE = binop(BaseOperator.LT, BaseType.BOOLEAN, (i1, i2) -> ofBoolean(i1.toDouble() < i2.toDouble())),
+
+    // Arithmetic Greater Than Operations.
+    GT_BYTE = binop(BaseOperator.GT, BaseType.BOOLEAN, (i1, i2) -> ofBoolean(i1.toByte() > i2.toByte())),
+    GT_SHORT = binop(BaseOperator.GT, BaseType.BOOLEAN, (i1, i2) -> ofBoolean(i1.toShort() > i2.toShort())),
+    GT_INT = binop(BaseOperator.GT, BaseType.BOOLEAN, (i1, i2) -> ofBoolean(i1.toInt() > i2.toInt())),
+    GT_LONG = binop(BaseOperator.GT, BaseType.BOOLEAN, (i1, i2) -> ofBoolean(i1.toLong() > i2.toLong())),
+    GT_FLOAT = binop(BaseOperator.GT, BaseType.BOOLEAN, (i1, i2) -> ofBoolean(i1.toFloat() > i2.toFloat())),
+    GT_DOUBLE = binop(BaseOperator.GT, BaseType.BOOLEAN, (i1, i2) -> ofBoolean(i1.toDouble() > i2.toDouble())),
+
+    // Arithmetic Less Than or Equal To Operations.
+    LT_EQ_BYTE = binop(BaseOperator.LT_EQ, BaseType.BOOLEAN, (i1, i2) -> ofBoolean(i1.toByte() <= i2.toByte())),
+    LT_EQ_SHORT = binop(BaseOperator.LT_EQ, BaseType.BOOLEAN, (i1, i2) -> ofBoolean(i1.toShort() <= i2.toShort())),
+    LT_EQ_INT = binop(BaseOperator.LT_EQ, BaseType.BOOLEAN, (i1, i2) -> ofBoolean(i1.toInt() <= i2.toInt())),
+    LT_EQ_LONG = binop(BaseOperator.LT_EQ, BaseType.BOOLEAN, (i1, i2) -> ofBoolean(i1.toLong() <= i2.toLong())),
+    LT_EQ_FLOAT = binop(BaseOperator.LT_EQ, BaseType.BOOLEAN, (i1, i2) -> ofBoolean(i1.toFloat() <= i2.toFloat())),
+    LT_EQ_DOUBLE = binop(BaseOperator.LT_EQ, BaseType.BOOLEAN, (i1, i2) -> ofBoolean(i1.toDouble() <= i2.toDouble())),
+
+    // Arithmetic Greater Than or Equal To Operations.
+    GT_EQ_BYTE = binop(BaseOperator.GT_EQ, BaseType.BOOLEAN, (i1, i2) -> ofBoolean(i1.toByte() >= i2.toByte())),
+    GT_EQ_SHORT = binop(BaseOperator.GT_EQ, BaseType.BOOLEAN, (i1, i2) -> ofBoolean(i1.toShort() >= i2.toShort())),
+    GT_EQ_INT = binop(BaseOperator.GT_EQ, BaseType.BOOLEAN, (i1, i2) -> ofBoolean(i1.toInt() >= i2.toInt())),
+    GT_EQ_LONG = binop(BaseOperator.GT_EQ, BaseType.BOOLEAN, (i1, i2) -> ofBoolean(i1.toLong() >= i2.toLong())),
+    GT_EQ_FLOAT = binop(BaseOperator.GT_EQ, BaseType.BOOLEAN, (i1, i2) -> ofBoolean(i1.toFloat() >= i2.toFloat())),
+    GT_EQ_DOUBLE = binop(BaseOperator.GT_EQ, BaseType.BOOLEAN, (i1, i2) -> ofBoolean(i1.toDouble() >= i2.toDouble())),
+
+    // Arithmetic Equal To Operations.
+    EQ_BYTE = binop(BaseOperator.EQ, BaseType.BOOLEAN, (i1, i2) -> ofBoolean(i1.toByte() == i2.toByte())),
+    EQ_SHORT = binop(BaseOperator.EQ, BaseType.BOOLEAN, (i1, i2) -> ofBoolean(i1.toShort() == i2.toShort())),
+    EQ_INT = binop(BaseOperator.EQ, BaseType.BOOLEAN, (i1, i2) -> ofBoolean(i1.toInt() == i2.toInt())),
+    EQ_LONG = binop(BaseOperator.EQ, BaseType.BOOLEAN, (i1, i2) -> ofBoolean(i1.toLong() == i2.toLong())),
+    EQ_FLOAT = binop(BaseOperator.EQ, BaseType.BOOLEAN, (i1, i2) -> ofBoolean(i1.toFloat() == i2.toFloat())),
+    EQ_DOUBLE = binop(BaseOperator.EQ, BaseType.BOOLEAN, (i1, i2) -> ofBoolean(i1.toDouble() == i2.toDouble())),
+
+
+    // Character Comparisons.
+    LT_CHARACTER = binop(BaseOperator.LT, BaseType.BOOLEAN,
+            (i1, i2) -> ofBoolean(i1.toCharacter() < i2.toCharacter())),
+    GT_CHARACTER = binop(BaseOperator.GT, BaseType.BOOLEAN,
+            (i1, i2) -> ofBoolean(i1.toCharacter() > i2.toCharacter())),
+    LT_EQ_CHARACTER = binop(BaseOperator.LT_EQ, BaseType.BOOLEAN,
+            (i1, i2) -> ofBoolean(i1.toCharacter() <= i2.toCharacter())),
+    GT_EQ_CHARACTER = binop(BaseOperator.GT_EQ, BaseType.BOOLEAN,
+            (i1, i2) -> ofBoolean(i1.toCharacter() >= i2.toCharacter())),
+    EQ_CHARACTER = binop(BaseOperator.EQ, BaseType.BOOLEAN,
+            (i1, i2) -> ofBoolean(i1.toCharacter() == i2.toCharacter())),
+
+    // Enum Comparisons. (Unsafe Comparison)
+    LT_ENUM = binop(BaseOperator.LT, BaseType.BOOLEAN,
+            (i1, i2) -> ofBoolean(compareEnum(i1, i2) < 0)),
+    GT_ENUM = binop(BaseOperator.GT, BaseType.BOOLEAN,
+            (i1, i2) -> ofBoolean(compareEnum(i1, i2) > 0)),
+    LT_EQ_ENUM = binop(BaseOperator.LT_EQ, BaseType.BOOLEAN,
+            (i1, i2) -> ofBoolean(compareEnum(i1, i2) <= 0)),
+    GT_EQ_ENUM = binop(BaseOperator.GT_EQ, BaseType.BOOLEAN,
+            (i1, i2) -> ofBoolean(compareEnum(i1, i2) >= 0)),
+    EQ_ENUM = binop(BaseOperator.EQ, BaseType.BOOLEAN,
+            (i1, i2) -> ofBoolean(i1.toEnum().equals(i2.toEnum()))),
+
+    // String Comparisons.
+    LT_STRING = binop(BaseOperator.LT, BaseType.BOOLEAN,
+            (i1, i2) -> ofBoolean(i1.toString().compareTo(i2.toString()) < 0)),
+    GT_STRING = binop(BaseOperator.GT, BaseType.BOOLEAN,
+            (i1, i2) -> ofBoolean(i1.toString().compareTo(i2.toString()) > 0)),
+    LT_EQ_STRING = binop(BaseOperator.LT_EQ, BaseType.BOOLEAN,
+            (i1, i2) -> ofBoolean(i1.toString().compareTo(i2.toString()) <= 0)),
+    GT_EQ_STRING = binop(BaseOperator.GT_EQ, BaseType.BOOLEAN,
+            (i1, i2) -> ofBoolean(i1.toString().compareTo(i2.toString()) >= 0)),
+    EQ_STRING = binop(BaseOperator.EQ, BaseType.BOOLEAN,
+            (i1, i2) -> ofBoolean(i1.toString().equals(i2.toString()))),
+
+    // Simple Equality for Boolean, Map, Sequence, and Function.
+    EQ_BOOLEAN = binop(BaseOperator.EQ, BaseType.BOOLEAN,
+            (i1, i2) -> ofBoolean(i1.toBoolean() == i2.toBoolean())),
+    EQ_MAP = binop(BaseOperator.EQ, BaseType.BOOLEAN,
+            (i1, i2) -> ofBoolean(i1.toMap().equals(i2.toMap()))),
+    EQ_SEQUENCE = binop(BaseOperator.EQ, BaseType.BOOLEAN,
+            (i1, i2) -> ofBoolean(i1.toSequence().equals(i2.toSequence()))),
+    EQ_FUNCTION = binop(BaseOperator.EQ, BaseType.BOOLEAN,
+            (i1, i2) -> ofBoolean(i1.toFunction().equals(i2.toFunction()))),
+
+
+    // Function Operations.
+    COMPOSE_FUNCTION = binop(BaseOperator.COMPOSE, BaseType.FUNCTION,
+            (i1, i2) -> ofFunction(i1.toFunction()
+                    .compose(args -> List.of(i2.toFunction().apply(args))))),
+    AND_THEN_FUNCTION = binop(BaseOperator.AND_THEN, BaseType.FUNCTION,
+            (i1, i2) -> ofFunction(i2.toFunction()
+                    .compose(args -> List.of(i1.toFunction().apply(args)))));
+
+
+    /*
+     * Now for Unary Operations.
+     * There are only 3.
+     * Unary Plus (Arithmetic)
+     * Unary Minus (Arithmetic)
+     * Not (Boolean)
+     */
+
+    public static final UnaryOperator<BaseOperator, BaseType, BaseValue>
+
+    // Unary Plus Operations.
+    UN_PLUS_BYTE = unop(BaseOperator.PLUS, BaseType.BYTE, (i) -> i),
+    UN_PLUS_SHORT = unop(BaseOperator.PLUS, BaseType.SHORT, (i) -> i),
+    UN_PLUS_INT = unop(BaseOperator.PLUS, BaseType.INT, (i) -> i),
+    UN_PLUS_LONG = unop(BaseOperator.PLUS, BaseType.LONG, (i) -> i),
+    UN_PLUS_FLOAT = unop(BaseOperator.PLUS, BaseType.FLOAT, (i) -> i),
+    UN_PLUS_DOUBLE = unop(BaseOperator.PLUS, BaseType.DOUBLE, (i) -> i),
+
+    // Unary Minus Operations.
+    UN_MINUS_BYTE = unop(BaseOperator.MINUS, BaseType.BYTE, (i) -> i.mapByte(v -> (byte)-v)),
+    UN_MINUS_SHORT = unop(BaseOperator.MINUS, BaseType.SHORT, (i) -> i.mapShort(v -> (short)-v)),
+    UN_MINUS_INT = unop(BaseOperator.MINUS, BaseType.INT, (i) -> i.mapInt(v -> -v)),
+    UN_MINUS_LONG = unop(BaseOperator.MINUS, BaseType.LONG, (i) -> i.mapLong(v -> -v)),
+    UN_MINUS_FLOAT = unop(BaseOperator.MINUS, BaseType.FLOAT, (i) -> i.mapFloat(v -> -v)),
+    UN_MINUS_DOUBLE = unop(BaseOperator.MINUS, BaseType.DOUBLE, (i) -> i.mapDouble(v -> -v)),
+
+    // Boolean Not Operation.
+    NOT_BOOLEAN = unop(BaseOperator.NOT, BaseType.BOOLEAN, (i) -> i.mapBoolean(v -> !v));
 }

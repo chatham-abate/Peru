@@ -26,5 +26,5 @@ public enum BaseOperator {
 
     // Function Operators.
     COMPOSE,
-    ANDTHEN
+    AND_THEN
 }
