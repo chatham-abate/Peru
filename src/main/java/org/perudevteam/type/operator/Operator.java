@@ -3,6 +3,8 @@ package org.perudevteam.type.operator;
 import io.vavr.control.Try;
 import org.perudevteam.type.Tagged;
 
+import java.util.Objects;
+
 /**
  * Abstract Operator.
  *
@@ -17,6 +19,8 @@ public abstract class Operator<OT extends Enum<OT>, DT extends Enum<DT>, DC exte
 
     public Operator(OT tag, DT oTag) {
         super(tag);
+
+        Objects.requireNonNull(oTag);
         outputTag = oTag;
     }
 
@@ -28,6 +32,9 @@ public abstract class Operator<OT extends Enum<OT>, DT extends Enum<DT>, DC exte
         if (!output.getTag().equals(outputTag)) {
             throw new Exception("Bad Operator, unexpected return type.");
         }
+
+        // Output of an operator can never be null.
+        Objects.requireNonNull(output);
     }
 
 }

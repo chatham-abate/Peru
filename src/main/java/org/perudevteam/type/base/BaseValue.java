@@ -6,6 +6,7 @@ import io.vavr.collection.Seq;
 import org.perudevteam.type.Tagged;
 
 import java.util.Calendar;
+import java.util.Objects;
 import java.util.function.Function;
 
 public abstract class BaseValue extends Tagged<BaseType> {
@@ -92,55 +93,55 @@ public abstract class BaseValue extends Tagged<BaseType> {
      */
 
 
-    public static BaseValue of(byte v) {
+    public static BaseValue ofByte(byte v) {
         return new BaseByte(v);
     }
 
-    public static BaseValue of(short v) {
+    public static BaseValue ofShort(short v) {
         return new BaseShort(v);
     }
 
-    public static BaseValue of(int v) {
+    public static BaseValue ofInt(int v) {
         return new BaseInt(v);
     }
 
-    public static BaseValue of(long v) {
+    public static BaseValue ofLong(long v) {
         return new BaseLong(v);
     }
 
-    public static BaseValue of(float v) {
+    public static BaseValue ofFloat(float v) {
         return new BaseFloat(v);
     }
 
-    public static BaseValue of(double v) {
+    public static BaseValue ofDouble(double v) {
         return new BaseDouble(v);
     }
 
-    public static BaseValue of(char v) {
+    public static BaseValue ofCharacter(char v) {
         return new BaseCharacter(v);
     }
 
-    public static BaseValue of(Enum v) {
+    public static BaseValue ofEnum(Enum v) {
         return new BaseEnum(v);
     }
 
-    public static BaseValue of(boolean v) {
+    public static BaseValue ofBoolean(boolean v) {
         return v ? BaseBoolean.TRUE : BaseBoolean.FALSE;
     }
 
-    public static BaseValue of(String v) {
+    public static BaseValue ofString(String v) {
         return new BaseString(v);
     }
 
-    public static BaseValue of(Map<? extends String, ? extends BaseValue> v) {
+    public static BaseValue ofMap(Map<? extends String, ? extends BaseValue> v) {
         return new BaseMap(v);
     }
 
-    public static BaseValue of(Seq<? extends BaseValue> v) {
+    public static BaseValue ofSequence(Seq<? extends BaseValue> v) {
         return new BaseSequence(v);
     }
 
-    public static BaseValue of(Function1<? super Seq<BaseValue>, ? extends BaseValue> v) {
+    public static BaseValue ofFunction(Function1<? super Seq<BaseValue>, ? extends BaseValue> v) {
         return new BaseFunction(v);
     }
 
@@ -179,11 +180,11 @@ public abstract class BaseValue extends Tagged<BaseType> {
     }
 
     public BaseValue mapEnum(Function1<? super Enum, ? extends Enum> f) {
-        return of(f.apply(toEnum()));
+        return new BaseEnum(f.apply(toEnum()));
     }
 
     public BaseValue mapBoolean(Function1<? super Boolean, ? extends Boolean> f) {
-        return of(f.apply(toBoolean()));
+        return ofBoolean(f.apply(toBoolean()));
     }
 
     public BaseValue mapString(Function1<? super String, ? extends String> f) {
@@ -468,6 +469,7 @@ public abstract class BaseValue extends Tagged<BaseType> {
         private Enum value;
         public BaseEnum(Enum v) {
             super(BaseType.ENUM);
+            Objects.requireNonNull(v);
             value = v;
         }
 
@@ -515,6 +517,7 @@ public abstract class BaseValue extends Tagged<BaseType> {
         private String value;
         public BaseString(String v) {
             super(BaseType.STRING);
+            Objects.requireNonNull(v);
             value = v;
         }
 
@@ -532,6 +535,7 @@ public abstract class BaseValue extends Tagged<BaseType> {
         private Map<String, BaseValue> value;
         public BaseMap(Map<? extends String, ? extends BaseValue> v) {
             super(BaseType.MAP);
+            Objects.requireNonNull(v);
             value = Map.narrow(v);
         }
 
@@ -554,6 +558,8 @@ public abstract class BaseValue extends Tagged<BaseType> {
         private Seq<BaseValue> value;
         public BaseSequence(Seq<? extends BaseValue> v) {
             super(BaseType.SEQUENCE);
+            Objects.requireNonNull(v);
+            v.forEach(Objects::requireNonNull);
             value = Seq.narrow(v);
         }
 
@@ -576,6 +582,7 @@ public abstract class BaseValue extends Tagged<BaseType> {
         private Function1<Seq<BaseValue>, BaseValue> value;
         public BaseFunction(Function1<? super Seq<BaseValue>, ? extends BaseValue> v) {
             super(BaseType.FUNCTION);
+            Objects.requireNonNull(v);
             value = Function1.narrow(v);
         }
 

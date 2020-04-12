@@ -1,5 +1,8 @@
 package org.perudevteam.type.operator;
 
+import io.vavr.CheckedFunction2;
+import io.vavr.Function1;
+import io.vavr.Function2;
 import io.vavr.control.Try;
 import org.perudevteam.type.Tagged;
 
@@ -7,7 +10,18 @@ import java.util.Objects;
 
 public abstract class BinaryOperator<OT extends Enum<OT>, DT extends Enum<DT>, DC extends Tagged<DT>>
         extends Operator<OT, DT, DC> {
-    public BinaryOperator(OT tag, DT oTag) {
+
+    public static <OT extends Enum<OT>, DT extends Enum<DT>, DC extends Tagged<DT>> BinaryOperator<OT, DT, DC>
+    binop(OT operatorTag, DT outputTag, CheckedFunction2<? super DC, ? super DC, ? extends DC> op) {
+        return new BinaryOperator<OT, DT, DC>(operatorTag, outputTag) {
+            @Override
+            protected DC applyUnchecked(DC i1, DC i2) throws Throwable {
+                return op.apply(i1, i2);
+            }
+        };
+    }
+
+    protected BinaryOperator(OT tag, DT oTag) {
         super(tag, oTag);
     }
 
