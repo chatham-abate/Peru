@@ -29,13 +29,13 @@ public abstract class Operator<OT extends Enum<OT>, DT extends Enum<DT>, DC exte
     }
 
     protected void validateOutput(DC output) throws Exception {
+        // Output of an operator can never be null.
+        Objects.requireNonNull(output);
+
         if (!output.getTag().equals(outputTag)) {
             throw new ClassCastException("Bad Output, expected " + outputTag.name() + " but found "
                     + output.getTag().name() + ".");
         }
-
-        // Output of an operator can never be null.
-        Objects.requireNonNull(output);
     }
 
 }
