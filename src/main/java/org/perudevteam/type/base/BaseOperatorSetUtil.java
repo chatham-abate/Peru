@@ -12,7 +12,11 @@ public class BaseOperatorSetUtil {
     BYTE_SHORT = List.of(BaseType.BYTE, BaseType.SHORT),
     BYTE_INT = BYTE_SHORT.append(BaseType.INT),
     BYTE_LONG = BYTE_INT.append(BaseType.LONG),
-    BYTE_FLOAT = BYTE_LONG.append(BaseType.FLOAT);
+    BYTE_FLOAT = BYTE_LONG.append(BaseType.FLOAT),
+
+    ALL_EXCEPT_STRING = List.of(BaseType.BYTE, BaseType.SHORT, BaseType.INT, BaseType.LONG,
+            BaseType.FLOAT, BaseType.DOUBLE, BaseType.CHARACTER, BaseType.ENUM, BaseType.BOOLEAN,
+            BaseType.MAP, BaseType.SEQUENCE, BaseType.FUNCTION);
 
     public static final OperatorSet<BaseOperator, BaseType, BaseValue> BASE_OPERATOR_SET =
             OperatorSet.<BaseOperator, BaseType, BaseValue>empty()
@@ -46,9 +50,8 @@ public class BaseOperatorSetUtil {
                     .withUnaryOverloads(BaseType.DOUBLE, DOUBLE_UNOPS)
 
                     // Character Operations.
-                    .withSymmetricBinaryOverloads(BYTE_INT, BaseType.CHARACTER, PLUS_CHARACTER)
-                    .withBinaryOverload(BaseType.CHARACTER, BaseType.CHARACTER, PLUS_CHARACTER)
-                    .withSymmetricBinaryOverloads(BYTE_INT, BaseType.CHARACTER, CHARACTER_COMPS)
+                    .withSymmetricBinaryOverloads(BYTE_INT, BaseType.CHARACTER, CHARACTER_BINOPS)
+                    .withBinaryOverloads(BaseType.CHARACTER, BaseType.CHARACTER, CHARACTER_BINOPS)
 
                     // Enum Operations.
                     .withBinaryOverloads(BaseType.ENUM, BaseType.ENUM, ENUM_COMPS)
@@ -58,6 +61,7 @@ public class BaseOperatorSetUtil {
                     .withUnaryOverload(BaseType.BOOLEAN, NOT_BOOLEAN)
 
                     // String Operations.
+                    .withSymmetricBinaryOverloads(ALL_EXCEPT_STRING, BaseType.STRING, PLUS_STRING)
                     .withBinaryOverloads(BaseType.STRING, BaseType.STRING, STRING_BINOPS)
 
                     // Sequence Operations.

@@ -30,7 +30,8 @@ public abstract class Operator<OT extends Enum<OT>, DT extends Enum<DT>, DC exte
 
     protected void validateOutput(DC output) throws Exception {
         if (!output.getTag().equals(outputTag)) {
-            throw new Exception("Bad Operator, unexpected return type.");
+            throw new ClassCastException("Bad Output, expected " + outputTag.name() + " but found "
+                    + output.getTag().name() + ".");
         }
 
         // Output of an operator can never be null.

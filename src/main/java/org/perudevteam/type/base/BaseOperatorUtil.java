@@ -127,17 +127,9 @@ public class BaseOperatorUtil {
     // Character Operations.
     PLUS_CHARACTER = binop(BaseOperator.PLUS, BaseType.CHARACTER,
             (i1, i2) -> ofCharacter((char)(i1.toInt() + i2.toInt()))),
-    LT_CHARACTER = binop(BaseOperator.LT, BaseType.BOOLEAN,
-            (i1, i2) -> ofBoolean(i1.toCharacter() < i2.toCharacter())),
-    GT_CHARACTER = binop(BaseOperator.GT, BaseType.BOOLEAN,
-            (i1, i2) -> ofBoolean(i1.toCharacter() > i2.toCharacter())),
-    LT_EQ_CHARACTER = binop(BaseOperator.LT_EQ, BaseType.BOOLEAN,
-            (i1, i2) -> ofBoolean(i1.toCharacter() <= i2.toCharacter())),
-    GT_EQ_CHARACTER = binop(BaseOperator.GT_EQ, BaseType.BOOLEAN,
-            (i1, i2) -> ofBoolean(i1.toCharacter() >= i2.toCharacter())),
-    EQ_CHARACTER = binop(BaseOperator.EQ, BaseType.BOOLEAN,
-            (i1, i2) -> ofBoolean(i1.toCharacter() == i2.toCharacter())),
-
+    MINUS_CHARACTER = binop(BaseOperator.MINUS, BaseType.CHARACTER,
+            (i1, i2) -> ofCharacter((char)(i1.toInt() - i2.toInt()))),
+    // Character Comparisons are Identical to Integer Comparisons.
 
     // Enum Operations. (Unsafe Comparison)
     LT_ENUM = binop(BaseOperator.LT, BaseType.BOOLEAN,
@@ -242,7 +234,8 @@ public class BaseOperatorUtil {
             LT_DOUBLE, GT_DOUBLE, LT_EQ_DOUBLE, GT_EQ_DOUBLE, EQ_DOUBLE),
 
     // Character Comparison...
-    CHARACTER_COMPS = List.of(LT_CHARACTER, GT_CHARACTER, LT_EQ_CHARACTER, GT_EQ_CHARACTER, EQ_CHARACTER),
+    CHARACTER_BINOPS = List.of(PLUS_CHARACTER, MINUS_CHARACTER, LT_INT,
+            GT_INT, LT_EQ_INT, GT_EQ_INT, EQ_INT),
 
     // Enum Comparisons...
     ENUM_COMPS = List.of(LT_ENUM, GT_ENUM, LT_EQ_ENUM, GT_EQ_ENUM, EQ_ENUM),

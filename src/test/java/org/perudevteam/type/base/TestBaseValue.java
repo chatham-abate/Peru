@@ -44,10 +44,12 @@ public class TestBaseValue {
      */
     @Test
     void testErrors() {
-        assertThrows(Exception.class, () -> ofInt(1).toByte());
-        assertThrows(Exception.class, () -> ofBoolean(true).toSequence());
-        assertThrows(Exception.class, () -> ofInt(2).mapSeq(s -> s));
+        assertThrows(ClassCastException.class, () -> ofInt(1).toByte());
+        assertThrows(ClassCastException.class, () -> ofBoolean(true).toSequence());
+        assertThrows(ClassCastException.class, () -> ofInt(2).mapSeq(s -> s));
 
         assertThrows(NullPointerException.class, () -> ofInt(2).mapInt(i -> null));
+
+        assertNotEquals(ofInt(1), ofLong(1));
     }
 }

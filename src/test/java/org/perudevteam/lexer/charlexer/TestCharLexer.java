@@ -260,9 +260,9 @@ public class TestCharLexer {
         });
     }
 
-    static final Seq<Character> ERROR_INPUT = List.ofAll("acabcacababc".toCharArray());
+    private static final Seq<Character> ERROR_INPUT = List.ofAll("acabcacababc".toCharArray());
 
-    static final Seq<String> EXPECTED_LEXEMES = List.of(
+    private static final Seq<String> EXPECTED_LEXEMES = List.of(
             "ac",
             "abc",
             "ac",
