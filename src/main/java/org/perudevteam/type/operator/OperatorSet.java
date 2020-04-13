@@ -1,10 +1,13 @@
 package org.perudevteam.type.operator;
 
 import io.vavr.collection.HashMap;
+import io.vavr.collection.List;
 import io.vavr.collection.Map;
+import io.vavr.collection.Seq;
 import io.vavr.control.Try;
 import org.perudevteam.type.Tagged;
 
+import static org.perudevteam.misc.SeqHelpers.*;
 import java.util.Objects;
 
 public class OperatorSet<OT extends Enum<OT>, DT extends Enum<DT>, DC extends Tagged<DT>> {
@@ -53,7 +56,11 @@ public class OperatorSet<OT extends Enum<OT>, DT extends Enum<DT>, DC extends Ta
         return tryI.mapTry(i -> applyUnary(unOpTag, i));
     }
 
-    public DC applyBinary(OT binOpTag, DC i1, DC i2) throws Throwable{
+    public DC applyBinary(OT binOpTag, DC i1, DC i2) throws Throwable {
+        Objects.requireNonNull(binOpTag);
+        Objects.requireNonNull(i1);
+        Objects.requireNonNull(i2);
+
         if (!binaries.containsKey(binOpTag)) {
             throw new Exception("Operator set does not contain binary operator "
                     + binOpTag.name() + ".");
@@ -82,17 +89,11 @@ public class OperatorSet<OT extends Enum<OT>, DT extends Enum<DT>, DC extends Ta
         return tryI1.flatMap(i1 -> tryI2.mapTry(i2 -> applyBinary(binOpTag, i1, i2)));
     }
 
-    public OperatorSet<OT, DT, DC> withUnaryOverload(DT dataTag, UnaryOperator<OT, DT, DC> op) {
-        Objects.requireNonNull(dataTag);
-        Objects.requireNonNull(op);
-
+    private OperatorSet<OT, DT, DC> withUnaryOverloadUnchecked(DT dataTag, UnaryOperator<OT, DT, DC> op) {
         OT operatorTag = op.getTag();
         Map<OT, Map<DT, UnaryOperator<OT, DT, DC>>> newUnaries;
 
         if (unaries.containsKey(operatorTag)) {
-            // If unaries does contain the given operator tag,
-            // we no the given operator must have at least 1 overload.
-            // Simply put this new overload in the overload map.
             Map<DT, UnaryOperator<OT, DT, DC>> overloads = unaries.get(operatorTag).get();
             newUnaries = unaries.put(operatorTag, overloads.put(dataTag, op));
         } else {
@@ -102,11 +103,28 @@ public class OperatorSet<OT extends Enum<OT>, DT extends Enum<DT>, DC extends Ta
         return new OperatorSet<>(newUnaries, binaries);
     }
 
-    public OperatorSet<OT, DT, DC> withBinaryOverload(DT dataTag1, DT dataTag2, BinaryOperator<OT, DT, DC> op) {
-        Objects.requireNonNull(dataTag1);
-        Objects.requireNonNull(dataTag2);
+    public OperatorSet<OT, DT, DC> withUnaryOverload(DT dataTag, UnaryOperator<OT, DT, DC> op) {
+        Objects.requireNonNull(dataTag);
         Objects.requireNonNull(op);
+        return withUnaryOverloadUnchecked(dataTag, op);
+    }
 
+    public OperatorSet<OT, DT, DC> withUnaryOverload(DT dataTag, Seq<UnaryOperator<OT, DT, DC>> ops) {
+        Objects.requireNonNull(dataTag);
+        Objects.requireNonNull(ops);
+        ops.forEach(Objects::requireNonNull);
+
+        OperatorSet<OT, DT, DC> result = this;
+
+        for (UnaryOperator<OT, DT, DC> op: ops) {
+            result = result.withUnaryOverloadUnchecked(dataTag, op);
+        }
+
+        return result;
+    }
+
+    private OperatorSet<OT, DT, DC>
+    withBinaryOverloadUnchecked(DT dataTag1, DT dataTag2, BinaryOperator<OT, DT, DC> op) {
         OT operatorTag = op.getTag();
 
         Map<OT, Map<DT, Map<DT, BinaryOperator<OT, DT, DC>>>> newBinaries;
@@ -125,6 +143,81 @@ public class OperatorSet<OT extends Enum<OT>, DT extends Enum<DT>, DC extends Ta
         }
 
         return new OperatorSet<>(unaries, newBinaries);
+    }
+
+    private OperatorSet<OT, DT, DC>
+    withBinaryOverloadsUnchecked(Seq<DT> dataTags1, Seq<DT> dataTags2, Seq<BinaryOperator<OT, DT, DC>> ops) {
+        OperatorSet<OT, DT, DC> result = this;
+
+        for (BinaryOperator<OT, DT, DC> op: ops) {
+            for (DT dataTag1: dataTags1) {
+                for (DT dataTag2: dataTags2) {
+                    result = result.withBinaryOverloadUnchecked(dataTag1, dataTag2, op);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public OperatorSet<OT, DT, DC> withBinaryOverload(DT dataTag1, DT dataTag2, BinaryOperator<OT, DT, DC> op) {
+        Objects.requireNonNull(dataTag1);
+        Objects.requireNonNull(dataTag2);
+        Objects.requireNonNull(op);
+        return withBinaryOverloadUnchecked(dataTag1, dataTag2, op);
+    }
+
+    public OperatorSet<OT, DT, DC>
+    withBinaryOverloads(Seq<DT> dataTags1, Seq<DT> dataTags2, Seq<BinaryOperator<OT, DT, DC>> ops) {
+        requireAllNonNull(List.of(dataTags1, dataTags2, ops));
+        return withBinaryOverloadsUnchecked(dataTags1, dataTags2, ops);
+    }
+
+    public OperatorSet<OT, DT, DC>
+    withBinaryOverloads(Seq<DT> dataTags1, DT dataTag2, Seq<BinaryOperator<OT, DT, DC>> ops) {
+        return withBinaryOverloads(dataTags1, List.of(dataTag2), ops);
+    }
+
+    public OperatorSet<OT, DT, DC>
+    withBinaryOverloads(DT dataTag1, Seq<DT> dataTags2, Seq<BinaryOperator<OT, DT, DC>> ops) {
+        return withBinaryOverloads(List.of(dataTag1), dataTags2, ops);
+    }
+
+    public OperatorSet<OT, DT, DC>
+    withBinaryOverloads(DT dataTag1, DT dataTag2, Seq<BinaryOperator<OT, DT, DC>> ops) {
+        return withBinaryOverloads(List.of(dataTag1), List.of(dataTag2), ops);
+    }
+
+    public OperatorSet<OT, DT, DC>
+    withSymmetricBinaryOverload(DT dataTag1, DT dataTag2, BinaryOperator<OT, DT, DC> op) {
+        Objects.requireNonNull(dataTag1);
+        Objects.requireNonNull(dataTag2);
+        Objects.requireNonNull(op);
+        return withBinaryOverloadUnchecked(dataTag1, dataTag2, op)
+                .withBinaryOverloadUnchecked(dataTag2, dataTag1, op);
+    }
+
+    public OperatorSet<OT, DT, DC>
+    withSymmetricBinaryOverloads(Seq<DT> dataTags1, Seq<DT> dataTags2, Seq<BinaryOperator<OT, DT, DC>> ops) {
+        requireAllNonNull(List.of(dataTags1, dataTags2, ops));
+
+        return withBinaryOverloadsUnchecked(dataTags1, dataTags2, ops)
+                .withBinaryOverloadsUnchecked(dataTags2, dataTags1, ops);
+    }
+
+    public OperatorSet<OT, DT, DC>
+    withSymmetricBinaryOverloads(Seq<DT> dataTags1, DT dataTag2, Seq<BinaryOperator<OT, DT, DC>> ops) {
+        return withSymmetricBinaryOverloads(dataTags1, List.of(dataTag2), ops);
+    }
+
+    public OperatorSet<OT, DT, DC>
+    withSymmetricBinaryOverloads(DT dataTag1, Seq<DT> dataTags2, Seq<BinaryOperator<OT, DT, DC>> ops) {
+        return withSymmetricBinaryOverloads(List.of(dataTag1), dataTags2, ops);
+    }
+
+    public OperatorSet<OT, DT, DC>
+    withSymmetricBinaryOverloads(DT dataTag1, DT dataTag2, Seq<BinaryOperator<OT, DT, DC>> ops) {
+        return withSymmetricBinaryOverloads(List.of(dataTag1), List.of(dataTag2), ops);
     }
 
     public OperatorSet<OT, DT, DC> removeBinaryOperator(OT binOpTag) {

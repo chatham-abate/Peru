@@ -1,6 +1,7 @@
 package org.perudevteam.type.base;
 
 import io.vavr.collection.List;
+import io.vavr.collection.Seq;
 import org.perudevteam.type.operator.BinaryOperator;
 import org.perudevteam.type.operator.UnaryOperator;
 
@@ -226,4 +227,45 @@ public class BaseOperatorUtil {
 
     // Boolean Not Operation.
     NOT_BOOLEAN = unop(BaseOperator.NOT, BaseType.BOOLEAN, (i) -> i.mapBoolean(v -> !v));
+
+
+    // Lists of Binary Operators.
+    public static final Seq<BinaryOperator<BaseOperator, BaseType, BaseValue>>
+    BYTE_BINOPS = List.of(PLUS_BYTE, MINUS_BYTE, TIMES_BYTE, OVER_BYTE, POWER_BYTE,
+            LT_BYTE, GT_BYTE, LT_EQ_BYTE, GT_EQ_BYTE, EQ_BYTE),
+    SHORT_BINOPS = List.of(PLUS_SHORT, MINUS_SHORT, TIMES_SHORT, OVER_SHORT, POWER_SHORT,
+            LT_SHORT, GT_SHORT, LT_EQ_SHORT, GT_EQ_SHORT, EQ_SHORT),
+    INT_BINOPS = List.of(PLUS_INT, MINUS_INT, TIMES_INT, OVER_INT, POWER_INT,
+            LT_INT, GT_INT, LT_EQ_INT, GT_EQ_INT, EQ_INT),
+    LONG_BINOPS = List.of(PLUS_LONG, MINUS_LONG, TIMES_LONG, OVER_LONG, POWER_LONG,
+            LT_LONG, GT_LONG, LT_EQ_LONG, GT_EQ_LONG, EQ_LONG),
+    FLOAT_BINOPS = List.of(PLUS_FLOAT, MINUS_FLOAT, TIMES_FLOAT, OVER_FLOAT, POWER_FLOAT,
+            LT_FLOAT, GT_FLOAT, LT_EQ_FLOAT, GT_EQ_FLOAT, EQ_FLOAT),
+    DOUBLE_BINOPS = List.of(PLUS_DOUBLE, MINUS_DOUBLE, TIMES_DOUBLE, OVER_DOUBLE, POWER_DOUBLE,
+            LT_DOUBLE, GT_DOUBLE, LT_EQ_DOUBLE, GT_EQ_DOUBLE, EQ_DOUBLE),
+
+    // Character Comparison...
+    CHARACTER_COMPS = List.of(LT_CHARACTER, GT_CHARACTER, LT_EQ_CHARACTER, GT_EQ_CHARACTER, EQ_CHARACTER),
+
+    // Enum Comparisons...
+    ENUM_COMPS = List.of(LT_ENUM, GT_ENUM, LT_EQ_ENUM, GT_EQ_ENUM, EQ_ENUM),
+
+    // String Binops...
+    STRING_BINOPS = List.of(PLUS_STRING, LT_STRING, GT_STRING, LT_EQ_STRING, GT_EQ_STRING, EQ_STRING),
+
+    // Boolean Binops...
+    BOOLEAN_BINOPS = List.of(AND_BOOLEAN, OR_BOOLEAN),
+
+    // Function Binops...
+    FUNCTION_BINOPS = List.of(AND_THEN_FUNCTION, COMPOSE_FUNCTION);
+
+
+    // Lists of Unary Operators.
+    public static final Seq<UnaryOperator<BaseOperator, BaseType, BaseValue>>
+    BYTE_UNOPS = List.of(UN_MINUS_BYTE, UN_PLUS_BYTE),
+    SHORT_UNOPS = List.of(UN_MINUS_SHORT, UN_PLUS_SHORT),
+    INT_UNOPS = List.of(UN_MINUS_INT, UN_PLUS_INT),
+    LONG_UNOPS = List.of(UN_MINUS_LONG, UN_PLUS_LONG),
+    FLOAT_UNOPS = List.of(UN_MINUS_FLOAT, UN_PLUS_FLOAT),
+    DOUBLE_UNOPS = List.of(UN_MINUS_DOUBLE, UN_PLUS_DOUBLE);
 }

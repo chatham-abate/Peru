@@ -35,6 +35,13 @@ public class SeqHelpers {
         }
     }
 
+    public static void requireAllNonNull(Seq<? extends Seq<?>> objSeqs) {
+        for (Seq<?> seq: objSeqs) {
+            Objects.requireNonNull(seq);
+            seq.forEach(Objects::requireNonNull);
+        }
+    }
+
     /**
      * Generate a grid string representation for the given grid of strings.
      * NOTE, this works best with arrays. With normal lists, this will be slow.
