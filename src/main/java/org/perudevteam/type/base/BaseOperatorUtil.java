@@ -83,25 +83,6 @@ public class BaseOperatorUtil {
     POWER_DOUBLE = binop(BaseOperator.POWER, BaseType.DOUBLE,
             (i1, i2) -> ofDouble(Math.pow(i1.toDouble(), i2.toDouble()))),
 
-
-    // Character Plus Operation.
-    PLUS_CHARACTER = binop(BaseOperator.PLUS, BaseType.CHARACTER,
-            (i1, i2) -> ofCharacter((char)(i1.toInt() + i2.toInt()))),
-
-    // String Plus Operation. (Concatenation)
-    PLUS_STRING = binop(BaseOperator.PLUS, BaseType.STRING,
-            (i1, i2) -> ofString(i1.toString() + i2.toString())),
-
-    // Sequence Plus Operation.
-    PLUS_SEQUENCE = binop(BaseOperator.PLUS, BaseType.SEQUENCE,
-            (i1, i2) -> ofSequence(i1.toSequence().appendAll(i2.toSequence()))),
-
-
-    // Boolean Operators.
-    AND_BOOLEAN = binop(BaseOperator.AND, BaseType.BOOLEAN, (i1, i2) -> ofBoolean(i1.toBoolean() && i2.toBoolean())),
-    OR_BOOLEAN = binop(BaseOperator.OR, BaseType.BOOLEAN, (i1, i2) -> ofBoolean(i1.toBoolean() || i2.toBoolean())),
-
-
     // Arithmetic Less Than Operations.
     LT_BYTE = binop(BaseOperator.LT, BaseType.BOOLEAN, (i1, i2) -> ofBoolean(i1.toByte() < i2.toByte())),
     LT_SHORT = binop(BaseOperator.LT, BaseType.BOOLEAN, (i1, i2) -> ofBoolean(i1.toShort() < i2.toShort())),
@@ -143,7 +124,9 @@ public class BaseOperatorUtil {
     EQ_DOUBLE = binop(BaseOperator.EQ, BaseType.BOOLEAN, (i1, i2) -> ofBoolean(i1.toDouble() == i2.toDouble())),
 
 
-    // Character Comparisons.
+    // Character Operations.
+    PLUS_CHARACTER = binop(BaseOperator.PLUS, BaseType.CHARACTER,
+            (i1, i2) -> ofCharacter((char)(i1.toInt() + i2.toInt()))),
     LT_CHARACTER = binop(BaseOperator.LT, BaseType.BOOLEAN,
             (i1, i2) -> ofBoolean(i1.toCharacter() < i2.toCharacter())),
     GT_CHARACTER = binop(BaseOperator.GT, BaseType.BOOLEAN,
@@ -155,7 +138,8 @@ public class BaseOperatorUtil {
     EQ_CHARACTER = binop(BaseOperator.EQ, BaseType.BOOLEAN,
             (i1, i2) -> ofBoolean(i1.toCharacter() == i2.toCharacter())),
 
-    // Enum Comparisons. (Unsafe Comparison)
+
+    // Enum Operations. (Unsafe Comparison)
     LT_ENUM = binop(BaseOperator.LT, BaseType.BOOLEAN,
             (i1, i2) -> ofBoolean(compareEnum(i1, i2) < 0)),
     GT_ENUM = binop(BaseOperator.GT, BaseType.BOOLEAN,
@@ -167,7 +151,17 @@ public class BaseOperatorUtil {
     EQ_ENUM = binop(BaseOperator.EQ, BaseType.BOOLEAN,
             (i1, i2) -> ofBoolean(i1.toEnum().equals(i2.toEnum()))),
 
-    // String Comparisons.
+
+    // Boolean Operators.
+    AND_BOOLEAN = binop(BaseOperator.AND, BaseType.BOOLEAN, (i1, i2) -> ofBoolean(i1.toBoolean() && i2.toBoolean())),
+    OR_BOOLEAN = binop(BaseOperator.OR, BaseType.BOOLEAN, (i1, i2) -> ofBoolean(i1.toBoolean() || i2.toBoolean())),
+    EQ_BOOLEAN = binop(BaseOperator.EQ, BaseType.BOOLEAN,
+            (i1, i2) -> ofBoolean(i1.toBoolean() == i2.toBoolean())),
+
+
+    // String Operations.
+    PLUS_STRING = binop(BaseOperator.PLUS, BaseType.STRING,
+            (i1, i2) -> ofString(i1.toString() + i2.toString())),
     LT_STRING = binop(BaseOperator.LT, BaseType.BOOLEAN,
             (i1, i2) -> ofBoolean(i1.toString().compareTo(i2.toString()) < 0)),
     GT_STRING = binop(BaseOperator.GT, BaseType.BOOLEAN,
@@ -179,18 +173,21 @@ public class BaseOperatorUtil {
     EQ_STRING = binop(BaseOperator.EQ, BaseType.BOOLEAN,
             (i1, i2) -> ofBoolean(i1.toString().equals(i2.toString()))),
 
-    // Simple Equality for Boolean, Map, Sequence, and Function.
-    EQ_BOOLEAN = binop(BaseOperator.EQ, BaseType.BOOLEAN,
-            (i1, i2) -> ofBoolean(i1.toBoolean() == i2.toBoolean())),
+    // Map Operations.
     EQ_MAP = binop(BaseOperator.EQ, BaseType.BOOLEAN,
             (i1, i2) -> ofBoolean(i1.toMap().equals(i2.toMap()))),
+
+
+    // Sequence Operations.
+    PLUS_SEQUENCE = binop(BaseOperator.PLUS, BaseType.SEQUENCE,
+            (i1, i2) -> ofSequence(i1.toSequence().appendAll(i2.toSequence()))),
     EQ_SEQUENCE = binop(BaseOperator.EQ, BaseType.BOOLEAN,
             (i1, i2) -> ofBoolean(i1.toSequence().equals(i2.toSequence()))),
-    EQ_FUNCTION = binop(BaseOperator.EQ, BaseType.BOOLEAN,
-            (i1, i2) -> ofBoolean(i1.toFunction().equals(i2.toFunction()))),
 
 
     // Function Operations.
+    EQ_FUNCTION = binop(BaseOperator.EQ, BaseType.BOOLEAN,
+            (i1, i2) -> ofBoolean(i1.toFunction().equals(i2.toFunction()))),
     COMPOSE_FUNCTION = binop(BaseOperator.COMPOSE, BaseType.FUNCTION,
             (i1, i2) -> ofFunction(i1.toFunction()
                     .compose(args -> List.of(i2.toFunction().apply(args))))),
@@ -250,14 +247,14 @@ public class BaseOperatorUtil {
     // Enum Comparisons...
     ENUM_COMPS = List.of(LT_ENUM, GT_ENUM, LT_EQ_ENUM, GT_EQ_ENUM, EQ_ENUM),
 
+    // Boolean Binops...
+    BOOLEAN_BINOPS = List.of(AND_BOOLEAN, OR_BOOLEAN, EQ_BOOLEAN),
+
     // String Binops...
     STRING_BINOPS = List.of(PLUS_STRING, LT_STRING, GT_STRING, LT_EQ_STRING, GT_EQ_STRING, EQ_STRING),
 
-    // Boolean Binops...
-    BOOLEAN_BINOPS = List.of(AND_BOOLEAN, OR_BOOLEAN),
-
     // Function Binops...
-    FUNCTION_BINOPS = List.of(AND_THEN_FUNCTION, COMPOSE_FUNCTION);
+    FUNCTION_BINOPS = List.of(AND_THEN_FUNCTION, COMPOSE_FUNCTION, EQ_FUNCTION);
 
 
     // Lists of Unary Operators.

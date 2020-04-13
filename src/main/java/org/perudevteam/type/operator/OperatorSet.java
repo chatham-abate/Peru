@@ -109,7 +109,7 @@ public class OperatorSet<OT extends Enum<OT>, DT extends Enum<DT>, DC extends Ta
         return withUnaryOverloadUnchecked(dataTag, op);
     }
 
-    public OperatorSet<OT, DT, DC> withUnaryOverload(DT dataTag, Seq<UnaryOperator<OT, DT, DC>> ops) {
+    public OperatorSet<OT, DT, DC> withUnaryOverloads(DT dataTag, Seq<UnaryOperator<OT, DT, DC>> ops) {
         Objects.requireNonNull(dataTag);
         Objects.requireNonNull(ops);
         ops.forEach(Objects::requireNonNull);
@@ -189,6 +189,16 @@ public class OperatorSet<OT extends Enum<OT>, DT extends Enum<DT>, DC extends Ta
     }
 
     public OperatorSet<OT, DT, DC>
+    withBinaryOverloads(Seq<DT> dataTags1, DT dataTag2, BinaryOperator<OT, DT, DC> op) {
+        return withBinaryOverloads(dataTags1, List.of(dataTag2), List.of(op));
+    }
+
+    public OperatorSet<OT, DT, DC>
+    withBinaryOverloads(DT dataTag1, Seq<DT> dataTags2, BinaryOperator<OT, DT, DC> op) {
+        return withBinaryOverloads(List.of(dataTag1), dataTags2, List.of(op));
+    }
+
+    public OperatorSet<OT, DT, DC>
     withSymmetricBinaryOverload(DT dataTag1, DT dataTag2, BinaryOperator<OT, DT, DC> op) {
         Objects.requireNonNull(dataTag1);
         Objects.requireNonNull(dataTag2);
@@ -218,6 +228,16 @@ public class OperatorSet<OT extends Enum<OT>, DT extends Enum<DT>, DC extends Ta
     public OperatorSet<OT, DT, DC>
     withSymmetricBinaryOverloads(DT dataTag1, DT dataTag2, Seq<BinaryOperator<OT, DT, DC>> ops) {
         return withSymmetricBinaryOverloads(List.of(dataTag1), List.of(dataTag2), ops);
+    }
+
+    public OperatorSet<OT, DT, DC>
+    withSymmetricBinaryOverloads(Seq<DT> dataTags1, DT dataTag2, BinaryOperator<OT, DT, DC> op) {
+        return withSymmetricBinaryOverloads(dataTags1, List.of(dataTag2), List.of(op));
+    }
+
+    public OperatorSet<OT, DT, DC>
+    withSymmetricBinaryOverloads(DT dataTag1, Seq<DT> dataTags2, BinaryOperator<OT, DT, DC> op) {
+        return withSymmetricBinaryOverloads(List.of(dataTag1), dataTags2, List.of(op));
     }
 
     public OperatorSet<OT, DT, DC> removeBinaryOperator(OT binOpTag) {
