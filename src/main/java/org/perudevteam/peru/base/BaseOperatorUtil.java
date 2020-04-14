@@ -1,4 +1,4 @@
-package org.perudevteam.type.base;
+package org.perudevteam.peru.base;
 
 import io.vavr.collection.List;
 import io.vavr.collection.Seq;
@@ -7,7 +7,7 @@ import org.perudevteam.type.operator.UnaryOperator;
 
 import static org.perudevteam.type.operator.BinaryOperator.*;
 import static org.perudevteam.type.operator.UnaryOperator.*;
-import static org.perudevteam.type.base.BaseValue.*;
+import static org.perudevteam.peru.base.BaseValue.*;
 
 
 public class BaseOperatorUtil {

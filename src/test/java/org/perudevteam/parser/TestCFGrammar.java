@@ -1,13 +1,12 @@
 package org.perudevteam.parser;
 
 import io.vavr.CheckedFunction2;
-import io.vavr.Function2;
 import io.vavr.Tuple2;
 import io.vavr.collection.*;
 import io.vavr.control.Either;
 import org.junit.jupiter.api.Test;
-import org.perudevteam.parser.grammar.AttrCFGrammar;
-import org.perudevteam.parser.grammar.AttrProduction;
+import org.perudevteam.parser.grammar.SemanticCFGrammar;
+import org.perudevteam.parser.grammar.SemanticProduction;
 import org.perudevteam.parser.grammar.CFGrammar;
 import org.perudevteam.parser.grammar.Production;
 import org.perudevteam.parser.lrone.FirstSets;
@@ -180,8 +179,8 @@ public class TestCFGrammar {
         right(T.E)
     );
 
-    private static final AttrProduction<NT, T, String> A_PROD1 =
-            new AttrProduction<NT, T, String>(NT.A, A_RULE1) {
+    private static final SemanticProduction<NT, T, String> A_PROD1 =
+            new SemanticProduction<NT, T, String>(NT.A, A_RULE1) {
         @Override
         protected String buildResultUnchecked(Seq<String> children) {
             return "";
@@ -192,11 +191,11 @@ public class TestCFGrammar {
         T.E, (l, d) -> l
     );
 
-    private static final AttrCFGrammar<NT, T, AttrProduction<NT, T, String>, String, Tokenized<T>, String> A_G1 =
-            new AttrCFGrammar<>(NT.A, TERM_RES_GENS1, List.of(A_PROD1));
+    private static final SemanticCFGrammar<NT, T, SemanticProduction<NT, T, String>, String, Tokenized<T>, String> A_G1 =
+            new SemanticCFGrammar<>(NT.A, TERM_RES_GENS1, List.of(A_PROD1));
 
     private static final Seq<Either<NT, T>> A_RULE2 = List.of(right(T.H));
-    private static final AttrProduction<NT, T, String> A_PROD2 = new AttrProduction<NT, T, String>(NT.A, A_RULE2) {
+    private static final SemanticProduction<NT, T, String> A_PROD2 = new SemanticProduction<NT, T, String>(NT.A, A_RULE2) {
         @Override
         protected String buildResultUnchecked(Seq<String> children) {
             return "";

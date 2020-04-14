@@ -5,11 +5,10 @@ import io.vavr.collection.List;
 import io.vavr.collection.Seq;
 import io.vavr.control.Either;
 import io.vavr.control.Option;
-import io.vavr.control.Try;
 import org.perudevteam.parser.Tokenized;
 import org.perudevteam.parser.Parser;
-import org.perudevteam.parser.grammar.AttrCFGrammar;
-import org.perudevteam.parser.grammar.AttrProduction;
+import org.perudevteam.parser.grammar.SemanticCFGrammar;
+import org.perudevteam.parser.grammar.SemanticProduction;
 
 import java.util.Objects;
 
@@ -25,13 +24,13 @@ import java.util.Objects;
 public abstract class LROneParser<NT extends Enum<NT>, T extends Enum<T>, L, D extends Tokenized<T>, R>
         implements Parser<T, L, D, R> {
 
-    private AttrCFGrammar<NT, T, AttrProduction<NT, T, R>, L, D, R> g;
-    private LROneTable<NT, T, AttrProduction<NT, T, R>> table;
+    private SemanticCFGrammar<NT, T, SemanticProduction<NT, T, R>, L, D, R> g;
+    private LROneTable<NT, T, SemanticProduction<NT, T, R>> table;
 
     @SuppressWarnings("unchecked")
-    public LROneParser(AttrCFGrammar<NT, T, ? extends AttrProduction<NT, T, R>, L, D, R> grammar) {
+    public LROneParser(SemanticCFGrammar<NT, T, ? extends SemanticProduction<NT, T, R>, L, D, R> grammar) {
         Objects.requireNonNull(grammar);
-        g = (AttrCFGrammar<NT, T, AttrProduction<NT, T, R>, L, D, R>) grammar;
+        g = (SemanticCFGrammar<NT, T, SemanticProduction<NT, T, R>, L, D, R>) grammar;
         table = new LROneTable<>(g);    // Build LR(1) table.
     }
 
@@ -60,7 +59,7 @@ public abstract class LROneParser<NT extends Enum<NT>, T extends Enum<T>, L, D e
             // Get current state.
             int state = stateStack.peek();
             Option<Tuple2<L, D>> lookaheadOpt = tokensLeft.headOption();
-            Either<Integer, AttrProduction<NT, T, R>> move =
+            Either<Integer, SemanticProduction<NT, T, R>> move =
                     lookaheadOpt.map(lkh -> table.actionMove(state, lkh._2.getTokenType()))
                             .getOrElse(table.actionMove(state));
 
@@ -71,7 +70,7 @@ public abstract class LROneParser<NT extends Enum<NT>, T extends Enum<T>, L, D e
 
             if (move.isRight()) {
                 // Reduction or Accept.
-                AttrProduction<NT, T, R> production = move.get();
+                SemanticProduction<NT, T, R> production = move.get();
                 int childrenSize = production.getRule().size();
 
                 Seq<R> childResults = List.empty();

@@ -15,9 +15,9 @@ import java.util.Objects;
  * @param <T> the terminal enum type of the production.
  * @param <R> The result which can be generated using this production.
  */
-public abstract class AttrProduction<NT extends Enum<NT>, T extends Enum<T>, R> extends Production<NT, T> {
+public abstract class SemanticProduction<NT extends Enum<NT>, T extends Enum<T>, R> extends Production<NT, T> {
 
-    public AttrProduction(NT s, Seq<? extends Either<NT, T>> r) {
+    public SemanticProduction(NT s, Seq<? extends Either<NT, T>> r) {
         super(s, r);
     }
 

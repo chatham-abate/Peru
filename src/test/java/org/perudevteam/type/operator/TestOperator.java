@@ -4,11 +4,9 @@ import static org.perudevteam.type.operator.UnaryOperator.*;
 import static org.perudevteam.type.operator.BinaryOperator.*;
 
 import org.junit.jupiter.api.Test;
-import org.perudevteam.type.base.BaseOperator;
-import org.perudevteam.type.base.BaseType;
-import org.perudevteam.type.base.BaseValue;
-import org.perudevteam.type.operator.BinaryOperator;
-import org.perudevteam.type.operator.UnaryOperator;
+import org.perudevteam.peru.base.BaseOperator;
+import org.perudevteam.peru.base.BaseType;
+import org.perudevteam.peru.base.BaseValue;
 
 import static org.junit.jupiter.api.Assertions.*;
 

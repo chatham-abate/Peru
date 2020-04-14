@@ -1,12 +1,10 @@
-package org.perudevteam.type.base;
+package org.perudevteam.peru.base;
 
-import io.vavr.Function0;
 import io.vavr.Function1;
 import io.vavr.collection.Map;
 import io.vavr.collection.Seq;
 import org.perudevteam.type.Tagged;
 
-import java.util.Calendar;
 import java.util.Objects;
 import java.util.function.Function;
 

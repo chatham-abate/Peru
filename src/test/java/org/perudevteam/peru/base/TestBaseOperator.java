@@ -1,14 +1,11 @@
-package org.perudevteam.type.base;
+package org.perudevteam.peru.base;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import io.vavr.collection.List;
-import io.vavr.collection.Seq;
 import org.junit.jupiter.api.Test;
 
-import org.perudevteam.type.base.BaseValue;
-import static org.perudevteam.type.base.BaseValue.*;
-import static org.perudevteam.type.base.BaseOperatorUtil.*;
+import static org.perudevteam.peru.base.BaseValue.*;
+import static org.perudevteam.peru.base.BaseOperatorUtil.*;
 
 public class TestBaseOperator {
 

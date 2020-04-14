@@ -1,4 +1,4 @@
-package org.perudevteam.type.base;
+package org.perudevteam.peru.base;
 
 /**
  * Out of the box Operator Types for Base Types.

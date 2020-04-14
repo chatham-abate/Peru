@@ -1,4 +1,4 @@
-package org.perudevteam.type.base;
+package org.perudevteam.peru.base;
 
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -12,12 +12,13 @@ import io.vavr.collection.List;
 import io.vavr.collection.Seq;
 import io.vavr.control.Try;
 import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
+import org.perudevteam.peru.base.BaseOperator;
+import org.perudevteam.peru.base.BaseValue;
 
-import static org.perudevteam.type.base.BaseOperatorSetUtil.*;
-import static org.perudevteam.type.base.BaseValue.*;
-import static org.perudevteam.type.base.BaseOperator.*;
+import static org.perudevteam.peru.base.BaseOperatorSetUtil.*;
+import static org.perudevteam.peru.base.BaseValue.*;
+import static org.perudevteam.peru.base.BaseOperator.*;
 
 public class TestBaseOperatorSet {
 

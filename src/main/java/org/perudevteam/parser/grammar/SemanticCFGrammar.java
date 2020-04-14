@@ -1,8 +1,6 @@
 package org.perudevteam.parser.grammar;
 
-import io.vavr.CheckedFunction1;
 import io.vavr.CheckedFunction2;
-import io.vavr.Function2;
 import io.vavr.collection.Map;
 import io.vavr.collection.Seq;
 import io.vavr.collection.Set;
@@ -24,13 +22,13 @@ import java.util.Objects;
  * @param <D> The Data type of the tokens.
  * @param <R> Result Type.
  */
-public class AttrCFGrammar<NT extends Enum<NT>, T extends Enum<T>,
-        P extends AttrProduction<NT, T, R>, L, D extends Tokenized<T>, R> extends CFGrammar<NT, T, P> {
+public class SemanticCFGrammar<NT extends Enum<NT>, T extends Enum<T>,
+        P extends SemanticProduction<NT, T, R>, L, D extends Tokenized<T>, R> extends CFGrammar<NT, T, P> {
 
     private Map<? super T, CheckedFunction2<L, D, R>> terminalResGenerators;
 
-    public AttrCFGrammar(NT start, Map<? super T, ? extends CheckedFunction2<L, D, ? extends R>> termResGens,
-                         Seq<P> prods) {
+    public SemanticCFGrammar(NT start, Map<? super T, ? extends CheckedFunction2<L, D, ? extends R>> termResGens,
+                             Seq<P> prods) {
         super(start, prods);
 
         // None of the generators can be null.
@@ -47,8 +45,8 @@ public class AttrCFGrammar<NT extends Enum<NT>, T extends Enum<T>,
     }
 
     // Direct Constructor with no checks... only used by methods of this class.
-    protected AttrCFGrammar(NT start, Map<NT, Set<P>> prodMap, Set<T> termsUsed,
-                            Map<? super T, CheckedFunction2<L, D, R>> termResGens) {
+    protected SemanticCFGrammar(NT start, Map<NT, Set<P>> prodMap, Set<T> termsUsed,
+                                Map<? super T, CheckedFunction2<L, D, R>> termResGens) {
         super(start, prodMap, termsUsed);
         terminalResGenerators = termResGens;
     }
@@ -75,7 +73,7 @@ public class AttrCFGrammar<NT extends Enum<NT>, T extends Enum<T>,
     }
 
     @Override
-    public AttrCFGrammar<NT, T, P, L, D, R> withProduction(P p) {
+    public SemanticCFGrammar<NT, T, P, L, D, R> withProduction(P p) {
         // Same as CFGrammar, except all terminals used by this production must
         // have entries in the terminal result generators map.
 
@@ -93,7 +91,7 @@ public class AttrCFGrammar<NT extends Enum<NT>, T extends Enum<T>,
             throw new IllegalArgumentException("Given rule has terminals without result generators.");
         }
 
-        return new AttrCFGrammar<>(getStartSymbol(), newProdMap,
+        return new SemanticCFGrammar<>(getStartSymbol(), newProdMap,
                 getTerminalsUsed().addAll(rightSymbols), terminalResGenerators);
     }
 }

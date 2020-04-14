@@ -1,10 +1,10 @@
-package org.perudevteam.type.base;
+package org.perudevteam.peru.base;
 
 import io.vavr.collection.List;
 import io.vavr.collection.Seq;
 import org.perudevteam.type.operator.OperatorSet;
 
-import static org.perudevteam.type.base.BaseOperatorUtil.*;
+import static org.perudevteam.peru.base.BaseOperatorUtil.*;
 
 public class BaseOperatorSetUtil {
 

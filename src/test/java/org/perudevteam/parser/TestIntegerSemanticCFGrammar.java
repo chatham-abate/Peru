@@ -2,7 +2,6 @@ package org.perudevteam.parser;
 
 import io.vavr.CheckedFunction2;
 import io.vavr.Function1;
-import io.vavr.Function2;
 import io.vavr.Tuple2;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.List;
@@ -14,8 +13,8 @@ import org.perudevteam.lexer.charlexer.CharData;
 import org.perudevteam.lexer.charlexer.CharSimpleContext;
 import org.perudevteam.lexer.charlexer.CharSimpleDLexer;
 import org.perudevteam.misc.LineException;
-import org.perudevteam.parser.grammar.AttrCFGrammar;
-import org.perudevteam.parser.grammar.AttrProduction;
+import org.perudevteam.parser.grammar.SemanticCFGrammar;
+import org.perudevteam.parser.grammar.SemanticProduction;
 import org.perudevteam.parser.lrone.LROneParser;
 import org.perudevteam.statemachine.DFStateMachine;
 import org.perudevteam.statemachine.DStateMachine;
@@ -27,7 +26,7 @@ import static io.vavr.control.Either.*;
  * Tests for parsing a simple language.
  * The language is for simply adding and subtracting natural numbers, returning an integer.
  */
-public class TestIntegerAttrCFGrammar {
+public class TestIntegerSemanticCFGrammar {
 
     enum CL {
         DIGIT,
@@ -79,20 +78,20 @@ public class TestIntegerAttrCFGrammar {
         SUM
     }
 
-    private static final AttrProduction<NT, T, Integer>
-    GOAL_PROD = new AttrProduction<NT, T, Integer>(NT.GOAL, List.of(left(NT.SUM))) {
+    private static final SemanticProduction<NT, T, Integer>
+    GOAL_PROD = new SemanticProduction<NT, T, Integer>(NT.GOAL, List.of(left(NT.SUM))) {
         @Override
         protected Integer buildResultUnchecked(Seq<Integer> children) {
             return children.get(0);
         }
     },
-    SUM_PROD1 = new AttrProduction<NT, T, Integer>(NT.SUM, List.of(left(NT.SUM), right(T.ADDOP), right(T.NUMBER))) {
+    SUM_PROD1 = new SemanticProduction<NT, T, Integer>(NT.SUM, List.of(left(NT.SUM), right(T.ADDOP), right(T.NUMBER))) {
         @Override
         protected Integer buildResultUnchecked(Seq<Integer> children) {
             return children.get(0) + (children.get(1) * children.get(2));
         }
     },
-    SUM_PROD2 = new AttrProduction<NT, T, Integer>(NT.SUM, List.of(right(T.NUMBER))) {
+    SUM_PROD2 = new SemanticProduction<NT, T, Integer>(NT.SUM, List.of(right(T.NUMBER))) {
         @Override
         protected Integer buildResultUnchecked(Seq<Integer> children) {
             return children.get(0);
@@ -104,8 +103,8 @@ public class TestIntegerAttrCFGrammar {
             T.ADDOP, (l, d) -> l.equals("+") ? 1 : -1
     );
 
-    private static final AttrCFGrammar<NT, T, AttrProduction<NT, T, Integer>, String, CharData<T>, Integer>
-            G = new AttrCFGrammar<>(NT.GOAL, TERM_GENERATORS, List.of(GOAL_PROD, SUM_PROD1, SUM_PROD2));
+    private static final SemanticCFGrammar<NT, T, SemanticProduction<NT, T, Integer>, String, CharData<T>, Integer>
+            G = new SemanticCFGrammar<>(NT.GOAL, TERM_GENERATORS, List.of(GOAL_PROD, SUM_PROD1, SUM_PROD2));
 
     private static final LROneParser<NT, T, String, CharData<T>, Integer>
             PARSER = new LROneParser<NT, T, String, CharData<T>, Integer>(G) {
