@@ -1,6 +1,7 @@
 package org.perudevteam.parser.lrone;
 
 import io.vavr.Tuple2;
+import io.vavr.collection.Array;
 import io.vavr.collection.List;
 import io.vavr.collection.Seq;
 import io.vavr.control.Either;
@@ -81,7 +82,7 @@ public abstract class LROneParser<NT extends Enum<NT>, T extends Enum<T>, L, D e
                     stateStack = stateStack.tail();     // Pop old states.
                 }
 
-                R result = production.buildResult(childResults);
+                R result = production.buildResult(Array.ofAll(childResults));
                 NT resultType = production.getSource();
 
                 // Check for acceptance state.
