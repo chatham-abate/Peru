@@ -37,7 +37,9 @@ public class TestBaseOperatorSet {
             Tuple.of(PLUS, ofCharacter('a'), ofByte((byte)1), ofCharacter('b')),
             Tuple.of(EQ, ofSequence(List.empty()), ofSequence(List.of(ofInt(1))), ofBoolean(false)),
             Tuple.of(PLUS, ofInt(1), ofString("a"), ofString("1a")),
-            Tuple.of(MINUS, ofCharacter('B'), ofInt(1), ofCharacter('A'))
+            Tuple.of(MINUS, ofCharacter('B'), ofInt(1), ofCharacter('A')),
+            Tuple.of(MODULO, ofInt(10), ofInt(3), ofInt(1)),
+            Tuple.of(MODULO, ofDouble(10), ofInt(3), ofDouble(1))
     );
 
     @TestFactory

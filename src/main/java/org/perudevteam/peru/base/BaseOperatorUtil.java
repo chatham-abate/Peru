@@ -69,6 +69,14 @@ public class BaseOperatorUtil {
     OVER_FLOAT = binop(BaseOperator.OVER, BaseType.FLOAT, (i1, i2) -> ofFloat(i1.toFloat() / i2.toFloat())),
     OVER_DOUBLE = binop(BaseOperator.OVER, BaseType.DOUBLE, (i1, i2) -> ofDouble(i1.toDouble() / i2.toDouble())),
 
+    // Arithmetic Modulo Operations.
+    MODULO_BYTE = binop(BaseOperator.MODULO, BaseType.BYTE, (i1, i2) -> ofByte((byte)(i1.toByte() % i2.toByte()))),
+    MODULO_SHORT = binop(BaseOperator.MODULO, BaseType.SHORT, (i1, i2) -> ofShort((short)(i1.toShort() % i2.toShort()))),
+    MODULO_INT = binop(BaseOperator.MODULO, BaseType.INT, (i1, i2) -> ofInt(i1.toInt() % i2.toInt())),
+    MODULO_LONG = binop(BaseOperator.MODULO, BaseType.LONG, (i1, i2) -> ofLong(i1.toLong() % i2.toLong())),
+    MODULO_FLOAT = binop(BaseOperator.MODULO, BaseType.FLOAT, (i1, i2) -> ofFloat(i1.toFloat() % i2.toFloat())),
+    MODULO_DOUBLE = binop(BaseOperator.MODULO, BaseType.DOUBLE, (i1, i2) -> ofDouble(i1.toDouble() % i2.toDouble())),
+
     // Arithmetic Power Operations.
     POWER_BYTE = binop(BaseOperator.POWER, BaseType.BYTE,
             (i1, i2) -> ofByte((byte)(Math.pow(i1.toDouble(), i2.toDouble())))),
@@ -220,17 +228,17 @@ public class BaseOperatorUtil {
 
     // Lists of Binary Operators.
     public static final Seq<BinaryOperator<BaseOperator, BaseType, BaseValue>>
-    BYTE_BINOPS = List.of(PLUS_BYTE, MINUS_BYTE, TIMES_BYTE, OVER_BYTE, POWER_BYTE,
+    BYTE_BINOPS = List.of(PLUS_BYTE, MINUS_BYTE, TIMES_BYTE, OVER_BYTE, MODULO_BYTE, POWER_BYTE,
             LT_BYTE, GT_BYTE, LT_EQ_BYTE, GT_EQ_BYTE, EQ_BYTE),
-    SHORT_BINOPS = List.of(PLUS_SHORT, MINUS_SHORT, TIMES_SHORT, OVER_SHORT, POWER_SHORT,
+    SHORT_BINOPS = List.of(PLUS_SHORT, MINUS_SHORT, TIMES_SHORT, OVER_SHORT, MODULO_SHORT, POWER_SHORT,
             LT_SHORT, GT_SHORT, LT_EQ_SHORT, GT_EQ_SHORT, EQ_SHORT),
-    INT_BINOPS = List.of(PLUS_INT, MINUS_INT, TIMES_INT, OVER_INT, POWER_INT,
+    INT_BINOPS = List.of(PLUS_INT, MINUS_INT, TIMES_INT, OVER_INT, MODULO_INT, POWER_INT,
             LT_INT, GT_INT, LT_EQ_INT, GT_EQ_INT, EQ_INT),
-    LONG_BINOPS = List.of(PLUS_LONG, MINUS_LONG, TIMES_LONG, OVER_LONG, POWER_LONG,
+    LONG_BINOPS = List.of(PLUS_LONG, MINUS_LONG, TIMES_LONG, OVER_LONG, MODULO_LONG, POWER_LONG,
             LT_LONG, GT_LONG, LT_EQ_LONG, GT_EQ_LONG, EQ_LONG),
-    FLOAT_BINOPS = List.of(PLUS_FLOAT, MINUS_FLOAT, TIMES_FLOAT, OVER_FLOAT, POWER_FLOAT,
+    FLOAT_BINOPS = List.of(PLUS_FLOAT, MINUS_FLOAT, TIMES_FLOAT, OVER_FLOAT, MODULO_FLOAT, POWER_FLOAT,
             LT_FLOAT, GT_FLOAT, LT_EQ_FLOAT, GT_EQ_FLOAT, EQ_FLOAT),
-    DOUBLE_BINOPS = List.of(PLUS_DOUBLE, MINUS_DOUBLE, TIMES_DOUBLE, OVER_DOUBLE, POWER_DOUBLE,
+    DOUBLE_BINOPS = List.of(PLUS_DOUBLE, MINUS_DOUBLE, TIMES_DOUBLE, OVER_DOUBLE, MODULO_DOUBLE, POWER_DOUBLE,
             LT_DOUBLE, GT_DOUBLE, LT_EQ_DOUBLE, GT_EQ_DOUBLE, EQ_DOUBLE),
 
     // Character Comparison...

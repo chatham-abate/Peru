@@ -10,6 +10,7 @@ public enum BaseOperator {
     MINUS,
     TIMES,
     OVER,
+    MODULO,
     POWER,      // i.e. Exponents.
 
     // Boolean Operators.
