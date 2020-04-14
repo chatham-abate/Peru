@@ -18,20 +18,20 @@ public abstract class ASTProduction<NT extends Enum<NT>, T extends Enum<T>>
         extends SemanticProduction<NT, T, AST> {
 
     // Try of (env', seq of results)
-    public static Try<Tuple2<Map<String, BaseValue>, Seq<BaseResult>>>
+    public static Try<Tuple2<Map<String, BaseValue>, Seq<ASTResult>>>
     tryExtractOrderedResultsUnchecked(Map<String, BaseValue> env, Seq<AST> children) {
         Map<String, BaseValue> envPrime = env;
-        Seq<BaseResult> results = List.empty();
+        Seq<ASTResult> results = List.empty();
 
         for (int i = 0; i < children.length(); i++) {
-            Try<Tuple2<Map<String, BaseValue>, BaseResult>> resultTupleTry =
+            Try<Tuple2<Map<String, BaseValue>, ASTResult>> resultTupleTry =
                     children.get(i).tryExecuteUnchecked(envPrime);
 
             if (resultTupleTry.isFailure()) {
                 return Try.failure(resultTupleTry.getCause());
             }
 
-            Tuple2<Map<String, BaseValue>, BaseResult> resultTuple = resultTupleTry.get();
+            Tuple2<Map<String, BaseValue>, ASTResult> resultTuple = resultTupleTry.get();
 
             envPrime = resultTuple._1;
             results = results.append(resultTuple._2);
@@ -40,7 +40,7 @@ public abstract class ASTProduction<NT extends Enum<NT>, T extends Enum<T>>
         return Try.success(Tuple.of(envPrime, Array.ofAll(results)));
     }
 
-    public static Try<Tuple2<Map<String, BaseValue>, Seq<BaseResult>>>
+    public static Try<Tuple2<Map<String, BaseValue>, Seq<ASTResult>>>
     tryExtractOrderedResult(Map<? extends String, ? extends BaseValue> env, Seq<? extends AST> children) {
         Objects.requireNonNull(env);
         env.values().forEach(Objects::requireNonNull);

@@ -10,13 +10,13 @@ import java.util.Objects;
 
 @FunctionalInterface
 public interface AST  {
-    Tuple2<Map<String, BaseValue>, BaseResult> executeUnchecked(Map<String, BaseValue> env) throws LineException;
+    Tuple2<Map<String, BaseValue>, ASTResult> executeUnchecked(Map<String, BaseValue> env) throws LineException;
 
-    default Try<Tuple2<Map<String, BaseValue>, BaseResult>> tryExecuteUnchecked(Map<String, BaseValue> env) {
+    default Try<Tuple2<Map<String, BaseValue>, ASTResult>> tryExecuteUnchecked(Map<String, BaseValue> env) {
         return Try.of(() -> executeUnchecked(env));
     }
 
-    default Tuple2<Map<String, BaseValue>, BaseResult> execute(Map<? extends String, ? extends BaseValue> env)
+    default Tuple2<Map<String, BaseValue>, ASTResult> execute(Map<? extends String, ? extends BaseValue> env)
             throws LineException {
         Objects.requireNonNull(env);
         env.values().forEach(Objects::requireNonNull);
@@ -24,7 +24,7 @@ public interface AST  {
         return executeUnchecked(Map.narrow(env));
     }
 
-    default Try<Tuple2<Map<String, BaseValue>, BaseResult>> tryExecute(Map<? extends String, ? extends BaseValue> env) {
+    default Try<Tuple2<Map<String, BaseValue>, ASTResult>> tryExecute(Map<? extends String, ? extends BaseValue> env) {
         return Try.of(() -> execute(env));
     }
 
