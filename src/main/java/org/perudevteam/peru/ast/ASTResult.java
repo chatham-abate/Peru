@@ -1,10 +1,11 @@
 package org.perudevteam.peru.ast;
 
+import org.perudevteam.misc.Positioned;
 import org.perudevteam.peru.base.BaseValue;
 
 import java.util.Objects;
 
-public interface ASTResult {
+public interface ASTResult extends Positioned {
 
     static ASTResult empty() {
         return EMPTY;
@@ -14,12 +15,20 @@ public interface ASTResult {
         return EMPTY.withPosition(l, lp);
     }
 
+    static ASTResult positioned(Positioned d) {
+        return EMPTY.withPosition(d.getLine(), d.getLinePosition());
+    }
+
     static ASTResult valued(BaseValue val) {
         return EMPTY.withValue(val);
     }
 
     static ASTResult fullResult(int l, int lp, BaseValue val) {
         return valued(val).withPosition(l, lp);
+    }
+
+    static ASTResult fullResult(Positioned d, BaseValue val) {
+        return valued(val).withPosition(d.getLine(), d.getLinePosition());
     }
 
     static boolean samePositions(ASTResult r1, ASTResult r2) {
@@ -90,10 +99,12 @@ public interface ASTResult {
         return true;
     }
 
+    @Override
     default int getLine() {
         throw new NullPointerException("AST Result holds no line.");
     }
 
+    @Override
     default int getLinePosition() {
         throw new NullPointerException("AST Result holds no line position.");
     }

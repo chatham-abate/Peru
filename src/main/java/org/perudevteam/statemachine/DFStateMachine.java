@@ -16,8 +16,8 @@ public class DFStateMachine<I, O> implements DStateMachine<I, O>, FStateMachine<
         return new DFStateMachine<>(Array.fill(states, HashMap.empty()), HashMap.empty());
     }
 
-    private Array<Map<I, Integer>> transitionTable;
-    private Map<Integer, O> acceptingStates;
+    private final Array<Map<I, Integer>> transitionTable;
+    private final Map<Integer, O> acceptingStates;
 
     private DFStateMachine(Array<? extends Map<I, ? extends Integer>> tt, Map<Integer, O> as) {
         transitionTable = Array.narrow(tt.map(Map::narrow));
@@ -45,7 +45,7 @@ public class DFStateMachine<I, O> implements DStateMachine<I, O>, FStateMachine<
     }
 
     @Override
-    public DFStateMachine<I, O> withEdges(Seq<Integer> froms, int to, Seq<I> ins) {
+    public DFStateMachine<I, O> withEdges(Seq<Integer> froms, Seq<Integer> tos, Seq<I> ins) {
         Objects.requireNonNull(ins);
         ins.forEach(Objects::requireNonNull);
 
@@ -58,8 +58,10 @@ public class DFStateMachine<I, O> implements DStateMachine<I, O>, FStateMachine<
         DFStateMachine<I, O> dsm = this;
 
         for (int from: froms) {
-            for (I in: ins) {
-                dsm = dsm.withEdgeUnsafe(from, to, in);
+            for (int to: tos) {
+                for (I in: ins) {
+                    dsm = dsm.withEdgeUnsafe(from, to, in);
+                }
             }
         }
 
@@ -89,5 +91,16 @@ public class DFStateMachine<I, O> implements DStateMachine<I, O>, FStateMachine<
     public DFStateMachine<I, O> withAcceptingState(int st, O output) {
         validateState(st);
         return new DFStateMachine<>(transitionTable, acceptingStates.put(st, output));
+    }
+
+    @Override
+    public DFStateMachine<I, O> withAcceptingStates(Seq<Integer> states, O output) {
+        DFStateMachine<I, O> result = this;
+
+        for (int st: states) {
+            result = result.withAcceptingState(st, output);
+        }
+
+        return result;
     }
 }

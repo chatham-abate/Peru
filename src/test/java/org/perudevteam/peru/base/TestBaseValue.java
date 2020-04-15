@@ -34,7 +34,7 @@ public class TestBaseValue {
         assertEquals(4, func.toFunction().apply(List.of(ofInt(1))).toInt());
 
         BaseValue seq = ofSequence(List.of(integer1, integer2));
-        seq = seq.mapSeq(s -> s.map(e -> e.mapInt(i -> i * 2)));
+        seq = seq.mapSequence(s -> s.map(e -> e.mapInt(i -> i * 2)));
         assertEquals(List.of(20, 40), seq.toSequence().map(BaseValue::toInt));
     }
 
@@ -45,7 +45,7 @@ public class TestBaseValue {
     void testErrors() {
         assertThrows(ClassCastException.class, () -> ofInt(1).toByte());
         assertThrows(ClassCastException.class, () -> ofBoolean(true).toSequence());
-        assertThrows(ClassCastException.class, () -> ofInt(2).mapSeq(s -> s));
+        assertThrows(ClassCastException.class, () -> ofInt(2).mapSequence(s -> s));
 
         assertThrows(NullPointerException.class, () -> ofInt(2).mapInt(i -> null));
 

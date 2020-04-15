@@ -1,5 +1,6 @@
 package org.perudevteam.statemachine;
 
+import io.vavr.collection.Seq;
 import io.vavr.control.Option;
 
 import java.util.Objects;
@@ -35,4 +36,6 @@ public interface StateMachine<O> {
     }
 
     StateMachine<O> withAcceptingState(int st, O output);
+
+    StateMachine<O> withAcceptingStates(Seq<Integer> states, O output);
 }

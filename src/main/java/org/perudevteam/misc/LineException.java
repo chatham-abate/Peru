@@ -5,10 +5,10 @@ import org.perudevteam.lexer.charlexer.CharData;
 import java.util.Objects;
 
 public class LineException extends Exception {
-    private int line;
-    private int linePosition;
+    private final int line;
+    private final int linePosition;
 
-    public LineException(CharData d, String msg) {
+    public LineException(Positioned d, String msg) {
         super(msg);
         Objects.requireNonNull(d);
         line = d.getLine();

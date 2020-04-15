@@ -195,7 +195,7 @@ public abstract class BaseValue extends Tagged<BaseType> {
         return new BaseMap(f.apply(toMap()));
     }
 
-    public BaseValue mapSeq(Function1<? super Seq<BaseValue>, ? extends Seq<BaseValue>> f) {
+    public BaseValue mapSequence(Function1<? super Seq<BaseValue>, ? extends Seq<BaseValue>> f) {
         return new BaseSequence(f.apply(toSequence()));
     }
 

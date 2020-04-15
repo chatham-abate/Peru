@@ -1,10 +1,11 @@
 package org.perudevteam.lexer.charlexer;
 
+import org.perudevteam.misc.Positioned;
 import org.perudevteam.parser.Tokenized;
 
 import java.util.Objects;
 
-public class CharData<T extends Enum<T>> implements Tokenized<T> {
+public class CharData<T extends Enum<T>> implements Tokenized<T>, Positioned {
     private T type;
 
     private int line;
