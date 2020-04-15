@@ -49,20 +49,20 @@ public class TestIntegerSemanticCFGrammar {
             .withAcceptingState(2, c -> new CharData<>(T.ADDOP, c));
 
     // Lexer
-    private static final CharSimpleDLexer<CL, T> LEXER = new CharSimpleDLexer<CL, T>(DFSM) {
-        @Override
-        protected CL inputClass(Character input) {
-            if ('0' <= input && input <= '9') {
-                return CL.DIGIT;
-            }
+    private static final CharSimpleDLexer<CL, T> LEXER = CharSimpleDLexer.charSimpleDLexer(
+            DFSM, (input) -> {
+                if ('0' <= input && input <= '9') {
+                    return CL.DIGIT;
+                }
 
-            if (input == '+' || input == '-') {
-                return CL.ADDOP;
-            }
+                if (input == '+' || input == '-') {
+                    return CL.ADDOP;
+                }
 
-            return CL.OTHER;
-        }
-    };
+                return CL.OTHER;
+            }
+    );
+
 
     // Manual Lexer Test.
     // @Test

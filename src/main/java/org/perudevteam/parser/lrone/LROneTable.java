@@ -17,13 +17,13 @@ import java.util.Objects;
  * @param <P> The type of production being stored in the table's reduce states.
  */
 public class LROneTable<NT extends Enum<NT>, T extends Enum<T>, P extends Production<NT, T>> {
-    private Array<Array<Integer>> gotoTable;
-    private Array<Array<Either<Integer, P>>> actionTable;
+    private final Array<Array<Integer>> gotoTable;
+    private final Array<Array<Either<Integer, P>>> actionTable;
 
-    private Array<Set<LROneItem<NT, T, P>>> cc;
+    private final Array<Set<LROneItem<NT, T, P>>> cc;
 
-    private Map<NT, Integer> nonTerminalMap;
-    private Map<T, Integer> terminalMap;
+    private final Map<NT, Integer> nonTerminalMap;
+    private final Map<T, Integer> terminalMap;
 
     public LROneTable(CFGrammar<NT, T, P> g) {
         Objects.requireNonNull(g);  // The given grammar cannot be null.
@@ -47,17 +47,20 @@ public class LROneTable<NT extends Enum<NT>, T extends Enum<T>, P extends Produc
         }
 
         // First give all non-terminals and terminals indices for the tables.
-        nonTerminalMap = HashMap.empty();
-        terminalMap = HashMap.empty();
+        Map<T, Integer> terminalMapTemp = HashMap.empty();
+        Map<NT, Integer> nonTerminalMapTemp = HashMap.empty();
 
         int i = 1;  // The 0 column in the action table is saved for eof.
-        for (T t: terminals) terminalMap = terminalMap.put(t, i++);
+        for (T t: terminals) terminalMapTemp = terminalMapTemp.put(t, i++);
         i = 0;
         for (NT nt: nonTerminals) {
             if (nt != goal) {
-                nonTerminalMap = nonTerminalMap.put(nt, i++);
+                nonTerminalMapTemp = nonTerminalMapTemp.put(nt, i++);
             }
         }
+
+        terminalMap = terminalMapTemp;
+        nonTerminalMap = nonTerminalMapTemp;
 
         // Now initial CC setup.
         Set<LROneItem<NT, T, P>> cc0 = prodMap.get(goal).get().map(p -> new LROneItem<>(0, p));

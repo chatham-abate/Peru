@@ -25,7 +25,7 @@ import java.util.Objects;
 public class SemanticCFGrammar<NT extends Enum<NT>, T extends Enum<T>,
         P extends SemanticProduction<NT, T, R>, L, D extends Tokenized<T>, R> extends CFGrammar<NT, T, P> {
 
-    private Map<? super T, CheckedFunction2<L, D, R>> terminalResGenerators;
+    private final Map<? super T, CheckedFunction2<L, D, R>> terminalResGenerators;
 
     public SemanticCFGrammar(NT start, Map<? super T, ? extends CheckedFunction2<L, D, ? extends R>> termResGens,
                              Seq<P> prods) {

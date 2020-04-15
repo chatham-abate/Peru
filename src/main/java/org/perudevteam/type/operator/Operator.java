@@ -15,7 +15,7 @@ import java.util.Objects;
 public abstract class Operator<OT extends Enum<OT>, DT extends Enum<DT>, DC extends Tagged<DT>>
         extends Tagged<OT>  {
 
-    private DT outputTag;
+    private final DT outputTag;
 
     public Operator(OT tag, DT oTag) {
         super(tag);

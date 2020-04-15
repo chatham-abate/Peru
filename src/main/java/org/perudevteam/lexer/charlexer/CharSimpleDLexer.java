@@ -9,7 +9,19 @@ import org.perudevteam.statemachine.DStateMachine;
 public abstract class CharSimpleDLexer<CL, T extends Enum<T>> extends
         SimpleDLexer<Character, CL, String, CharData<T>, CharSimpleContext> {
 
-    public CharSimpleDLexer(DStateMachine<? super CL,
+    public static <CL, T extends Enum<T>> CharSimpleDLexer<CL, T> charSimpleDLexer(
+            DStateMachine<? super CL, ? extends Function1<? super CharSimpleContext, ? extends CharData<T>>> d,
+            Function1<? super Character, ? extends CL> getClass
+    ) {
+        return new CharSimpleDLexer<CL, T>(d) {
+            @Override
+            protected CL inputClass(Character input) {
+                return getClass.apply(input);
+            }
+        };
+    }
+
+    protected CharSimpleDLexer(DStateMachine<? super CL,
             ? extends Function1<? super CharSimpleContext, ? extends CharData<T>>> d) {
         super("", d);
     }

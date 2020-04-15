@@ -14,10 +14,10 @@ import java.util.Objects;
  */
 public class CFGrammar<NT extends Enum<NT>, T extends Enum<T>, P extends Production<NT, T>> {
 
-    private NT startSymbol;
-    private Map<NT, Set<P>> productionMap;
+    private final NT startSymbol;
+    private final Map<NT, Set<P>> productionMap;
 
-    private Set<T> terminalsUsed;
+    private final Set<T> terminalsUsed;
     // Non-Terminals Used = productionMap.KeySet();
 
     /**

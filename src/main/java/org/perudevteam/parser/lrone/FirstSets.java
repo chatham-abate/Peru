@@ -48,8 +48,8 @@ public class FirstSets<NT extends Enum<NT>, T extends Enum<T>> {
         }
     }
 
-    private Map<NT, Set<T>> nonTerminalFirsts;
-    private Set<NT> mayBeEmpty;
+    private final Map<NT, Set<T>> nonTerminalFirsts;
+    private final Set<NT> mayBeEmpty;
 
     public FirstSets(CFGrammar<NT, T, ? extends Production<NT, T>> g) {
         Objects.requireNonNull(g);  // Grammar cannot be null.

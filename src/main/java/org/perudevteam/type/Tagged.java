@@ -10,7 +10,7 @@ import java.util.Objects;
  * @param <TG> Tag enum.
  */
 public abstract class Tagged<TG extends Enum<TG>> {
-    private TG tag;
+    private final TG tag;
 
     public Tagged(TG tt) {
         Objects.requireNonNull(tt);

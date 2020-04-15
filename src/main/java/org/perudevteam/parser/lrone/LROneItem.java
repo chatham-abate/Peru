@@ -80,9 +80,9 @@ public class LROneItem <NT extends Enum<NT>, T extends Enum<T>, P extends Produc
      * LR(1) Item Class.
      */
 
-    private int cursor;
-    private P production;
-    private Option<T> suffix;
+    private final int cursor;
+    private final P production;
+    private final Option<T> suffix;
 
     public LROneItem(int c, P p, T s) {
         this(c, p, Option.some(s));

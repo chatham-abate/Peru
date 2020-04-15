@@ -8,12 +8,38 @@ import org.perudevteam.statemachine.DStateMachine;
 
 public abstract class CharLinearDLexer<CL, T extends Enum<T>>
         extends LinearDLexer<Character, CL, String, CharData<T>, CharLinearContext> {
-    public CharLinearDLexer(int mra,
+
+    public static <CL, T extends Enum<T>> CharLinearDLexer<CL, T> charLinearDLexer(
+            int mra,
+            DStateMachine<? super CL, ? extends Function1<? super CharLinearContext, ? extends CharData<T>>> d,
+            Function1<? super Character, ? extends CL> getClass
+    ) {
+        return new CharLinearDLexer<CL, T>(mra, d) {
+            @Override
+            protected CL inputClass(Character input) {
+                return getClass.apply(input);
+            }
+        };
+    }
+
+    public static <CL, T extends Enum<T>> CharLinearDLexer<CL, T> charLinearDLexer(
+            DStateMachine<? super CL, ? extends Function1<? super CharLinearContext, ? extends CharData<T>>> d,
+            Function1<? super Character, ? extends CL> getClass
+    ) {
+        return new CharLinearDLexer<CL, T>(d) {
+            @Override
+            protected CL inputClass(Character input) {
+                return getClass.apply(input);
+            }
+        };
+    }
+
+    protected CharLinearDLexer(int mra,
             DStateMachine<? super CL, ? extends Function1<? super CharLinearContext, ? extends CharData<T>>> d) {
         super(mra, "", d);
     }
 
-    public CharLinearDLexer(
+    protected CharLinearDLexer(
             DStateMachine<? super CL, ? extends Function1<? super CharLinearContext, ? extends CharData<T>>> d) {
         super("", d);
     }

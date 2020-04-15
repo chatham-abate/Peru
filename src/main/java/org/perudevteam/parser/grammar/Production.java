@@ -7,11 +7,11 @@ import java.util.Objects;
 
 // Functional Production Representation. (Uses Eithers instead of plain Enums).
 public class Production<NT extends Enum<NT>, T extends Enum<T>> {
-    private NT source;
+    private final NT source;
 
     // Each member of the rule sequence will either be a terminal, or
     // a non-terminal.
-    private Seq<Either<NT, T>> rule;
+    private final Seq<Either<NT, T>> rule;
 
     public Production(NT s, Seq<? extends Either<NT, T>> r) {
         Objects.requireNonNull(s);

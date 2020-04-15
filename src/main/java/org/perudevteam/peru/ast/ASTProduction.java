@@ -62,7 +62,7 @@ public abstract class ASTProduction<NT extends Enum<NT>, T extends Enum<T>>
         };
     }
 
-    public ASTProduction(NT s, Seq<? extends Either<NT, T>> r) {
+    private ASTProduction(NT s, Seq<? extends Either<NT, T>> r) {
         super(s, r);
     }
 }

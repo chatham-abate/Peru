@@ -16,7 +16,7 @@ public abstract class LinearDLexer<I, CL, L, D, C extends LinearContext<C>>
         extends DLexer<I, CL, L, D, C> {
 
     private static final int MAX_ROLLBACK_SIZE = 35;
-    private int maxRollbackAmount;
+    private final int maxRollbackAmount;
 
     public LinearDLexer(L initLex, DStateMachine<? super CL, ? extends Function1<? super C, ? extends D>> d) {
         this(MAX_ROLLBACK_SIZE, initLex, d);

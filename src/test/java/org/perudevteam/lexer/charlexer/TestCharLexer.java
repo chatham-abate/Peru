@@ -7,16 +7,15 @@ import io.vavr.collection.*;
 import io.vavr.control.Try;
 import org.junit.jupiter.api.Test;
 import org.perudevteam.lexer.DLexer;
-import org.perudevteam.misc.Builder;
-import org.perudevteam.misc.LineException;
 import org.perudevteam.statemachine.DFStateMachine;
 import org.perudevteam.statemachine.DStateMachine;
 
 import org.perudevteam.misc.SeqHelpers;
 
-import java.util.Objects;
-
 import static org.junit.jupiter.api.Assertions.*;
+
+import static org.perudevteam.lexer.charlexer.CharLinearDLexer.*;
+import static org.perudevteam.lexer.charlexer.CharSimpleDLexer.*;
 
 public class TestCharLexer {
 
@@ -65,37 +64,33 @@ public class TestCharLexer {
      * Lexers for Language 1.
      */
 
-    private static final CharSimpleDLexer<CharType1, TokenType1> LEXER_SIMPLE1 =
-            new CharSimpleDLexer<CharType1, TokenType1>(DFSM_SIMPLE1) {
-        @Override
-        protected CharType1 inputClass(Character input) {
-            if (Character.isWhitespace(input)) {
-                return CharType1.SPACE;
-            } else if ('0' <= input && input <= '9') {
-                return CharType1.NUMBER;
-            } else if (input == '.') {
-                return CharType1.DOT;
+    private static final CharSimpleDLexer<CharType1, TokenType1> LEXER_SIMPLE1 = charSimpleDLexer(DFSM_SIMPLE1,
+            (input) -> {
+                if (Character.isWhitespace(input)) {
+                    return CharType1.SPACE;
+                } else if ('0' <= input && input <= '9') {
+                    return CharType1.NUMBER;
+                } else if (input == '.') {
+                    return CharType1.DOT;
+                }
+
+                return CharType1.OTHER;
             }
+    );
 
-            return CharType1.OTHER;
-        }
-    };
+    private static final CharLinearDLexer<CharType1, TokenType1> LEXER_LINEAR1 = charLinearDLexer(DFSM_SIMPLE1,
+            (input) -> {
+                if (Character.isWhitespace(input)) {
+                    return CharType1.SPACE;
+                } else if ('0' <= input && input <= '9') {
+                    return CharType1.NUMBER;
+                } else if (input == '.') {
+                    return CharType1.DOT;
+                }
 
-    private static final CharLinearDLexer<CharType1, TokenType1> LEXER_LINEAR1 =
-            new CharLinearDLexer<CharType1, TokenType1>(DFSM_SIMPLE1) {
-        @Override
-        protected CharType1 inputClass(Character input) {
-            if (Character.isWhitespace(input)) {
-                return CharType1.SPACE;
-            } else if ('0' <= input && input <= '9') {
-                return CharType1.NUMBER;
-            } else if (input == '.') {
-                return CharType1.DOT;
+                return CharType1.OTHER;
             }
-
-            return CharType1.OTHER;
-        }
-    };
+    );
 
     /*
      * Language 2.
@@ -118,7 +113,7 @@ public class TestCharLexer {
      */
 
     private static final DFStateMachine<CharType2, Function1<CharSimpleContext, CharData<TokenType2>>>
-            DSFM_SIMPLE2 = DFStateMachine.<CharType2, Function1<CharSimpleContext, CharData<TokenType2>>>emptyDFSM(6)
+            DFSM_SIMPLE2 = DFStateMachine.<CharType2, Function1<CharSimpleContext, CharData<TokenType2>>>emptyDFSM(6)
             .withEdge(0, 1, CharType2.A)
             .withEdge(1, 2, CharType2.B)
             .withEdge(2, 3, CharType2.A)
@@ -142,22 +137,14 @@ public class TestCharLexer {
     );
 
     // Simple Lexer on DSFM2.
-    private static final CharSimpleDLexer<CharType2, TokenType2> LEXER_SIMPLE2 =
-            new CharSimpleDLexer<CharType2, TokenType2>(DSFM_SIMPLE2) {
-        @Override
-        protected CharType2 inputClass(Character input) {
-            return CHAR_MAP2.getOrElse(input, CharType2.OTHER);
-        }
-    };
+    private static final CharSimpleDLexer<CharType2, TokenType2> LEXER_SIMPLE2 = charSimpleDLexer(
+            DFSM_SIMPLE2, (input) -> CHAR_MAP2.getOrElse(input, CharType2.OTHER)
+    );
 
     // Linear Lexer on DSFM2
-    private static final CharLinearDLexer<CharType2, TokenType2> LEXER_LINEAR2 =
-            new CharLinearDLexer<CharType2, TokenType2>(DSFM_SIMPLE2) {
-        @Override
-        protected CharType2 inputClass(Character input) {
-            return CHAR_MAP2.getOrElse(input, CharType2.OTHER);
-        }
-    };
+    private static final CharLinearDLexer<CharType2, TokenType2> LEXER_LINEAR2 = charLinearDLexer(
+            DFSM_SIMPLE2, (input) -> CHAR_MAP2.getOrElse(input, CharType2.OTHER)
+    );
 
     /*
      * Finally Tests!
@@ -271,8 +258,6 @@ public class TestCharLexer {
 
     @Test
     void testLanguage2Recovery() {
-        LEXER_SIMPLE2.buildStream(ERROR_INPUT, CharSimpleContext.INIT_SIMPLE_CONTEXT).forEach(System.out::println);
-
         Seq<String> simpleLexemes = LEXER_SIMPLE2.buildStream(ERROR_INPUT, CharSimpleContext.INIT_SIMPLE_CONTEXT)
                 .map(tuple -> tuple._1);
 

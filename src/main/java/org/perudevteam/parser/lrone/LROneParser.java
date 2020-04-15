@@ -1,5 +1,7 @@
 package org.perudevteam.parser.lrone;
 
+import io.vavr.Function0;
+import io.vavr.Function1;
 import io.vavr.Tuple2;
 import io.vavr.collection.Array;
 import io.vavr.collection.List;
@@ -25,11 +27,30 @@ import java.util.Objects;
 public abstract class LROneParser<NT extends Enum<NT>, T extends Enum<T>, L, D extends Tokenized<T>, R>
         implements Parser<T, L, D, R> {
 
-    private SemanticCFGrammar<NT, T, SemanticProduction<NT, T, R>, L, D, R> g;
-    private LROneTable<NT, T, SemanticProduction<NT, T, R>> table;
+    public static <NT extends Enum<NT>, T extends Enum<T>, L, D extends Tokenized<T>, R>
+    LROneParser<NT, T, L, D, R> lrOneParser(
+            SemanticCFGrammar<NT, T, ? extends SemanticProduction<NT, T, R>, L, D, R> grammar,
+            Function1<? super Tuple2<L, D>, ? extends Throwable> onMidError,
+            Function0<? extends Throwable> onEofError
+    ) {
+        return new LROneParser<NT, T, L, D, R>(grammar) {
+            @Override
+            protected Throwable onError(Tuple2<L, D> lookAhead) {
+                return onMidError.apply(lookAhead);
+            }
+
+            @Override
+            protected Throwable onError() {
+                return onEofError.apply();
+            }
+        };
+    }
+
+    private final SemanticCFGrammar<NT, T, SemanticProduction<NT, T, R>, L, D, R> g;
+    private final LROneTable<NT, T, SemanticProduction<NT, T, R>> table;
 
     @SuppressWarnings("unchecked")
-    public LROneParser(SemanticCFGrammar<NT, T, ? extends SemanticProduction<NT, T, R>, L, D, R> grammar) {
+    protected LROneParser(SemanticCFGrammar<NT, T, ? extends SemanticProduction<NT, T, R>, L, D, R> grammar) {
         Objects.requireNonNull(grammar);
         g = (SemanticCFGrammar<NT, T, SemanticProduction<NT, T, R>, L, D, R>) grammar;
         table = new LROneTable<>(g);    // Build LR(1) table.
