@@ -9,24 +9,14 @@ import java.util.Objects;
 // Finite Automaton Class
 abstract class FA<I, IC, O> {
 
-
     // We also need accepting states here.
     // Both NFA and DFA have a finite number of accepting states.
     private final Map<Integer, O> acceptingStates;
     private final Set<IC> inputAlphabet;
 
-    // Unchecked constructor.
-    public FA(Map<? extends Integer, O> as, Set<IC> ia) {
-        this(as, ia, true);
-    }
-
     public FA(Map<? extends Integer, O> as, Set<IC> ia, boolean withCheck) {
         if (withCheck) {
             Objects.requireNonNull(as);
-
-            if (as.isEmpty()) {
-                throw new IllegalArgumentException("FA requires at least one accepting state.");
-            }
 
             for (Tuple2<? extends Integer, O> keyValue: as) {
                 Objects.requireNonNull(keyValue._2);    // No null values in the map.
@@ -34,7 +24,6 @@ abstract class FA<I, IC, O> {
                 validateState(keyValue._1);     // No out of bounds states.
             }
 
-            // Validate input class set, and create input class index.
             Objects.requireNonNull(ia);
             if (ia.isEmpty()) {
                 throw new IllegalArgumentException("FA requires at least one input class.");
@@ -61,6 +50,13 @@ abstract class FA<I, IC, O> {
     }
 
     protected abstract IC getInputClassUnchecked(I input);
+
+    protected IC getInputClass(I input) {
+        Objects.requireNonNull(input);
+        IC inputClass = getInputClassUnchecked(input);
+        validateInputClass(inputClass);
+        return inputClass;
+    }
 
     public Set<IC> getInputAlphabet() {
         return inputAlphabet;

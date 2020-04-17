@@ -3,20 +3,34 @@ package org.perudevteam.fa;
 import io.vavr.Function1;
 import io.vavr.Tuple2;
 import io.vavr.collection.Array;
+import io.vavr.collection.HashMap;
 import io.vavr.collection.Map;
 import io.vavr.collection.Set;
 import org.perudevteam.misc.SeqHelpers;
 
 import java.util.Objects;
+import java.util.function.Function;
 
 public abstract class DFA<I, IC, O> extends FA<I, IC, O> {
 
-    private final Array<Map<IC, Integer>> transitionTable;
-
-    public DFA(Map<? extends Integer, O> as, Set<IC> ia,
-               Array<? extends Map<IC, ? extends Integer>> tt) {
-        this(as, ia, tt, true);
+    public static <I, IC, O> DFA<I, IC, O> dfa(int numberOfStates, Set<IC> ia,
+                                               Function1<? super I, ? extends IC> getInputClass) {
+        return dfa(HashMap.empty(), ia, Array.fill(numberOfStates, HashMap.empty()), getInputClass);
     }
+
+    public static <I, IC, O> DFA<I, IC, O> dfa(Map<? extends Integer, O> as, Set<IC> ia,
+                                               Array<? extends Map<IC, ? extends Integer>> tt,
+                                               Function1<? super I, ? extends IC> getInputClass) {
+        Objects.requireNonNull(getInputClass);
+        return new DFA<I, IC, O>(as, ia, tt, true) {
+            @Override
+            protected IC getInputClassUnchecked(I input) {
+                return getInputClass.apply(input);
+            }
+        };
+    }
+
+    private final Array<Map<IC, Integer>> transitionTable;
 
     private DFA(Map<? extends Integer, O> as, Set<IC> ia,
                 Array<? extends Map<IC, ? extends Integer>> tt, boolean withCheck) {
@@ -48,10 +62,33 @@ public abstract class DFA<I, IC, O> extends FA<I, IC, O> {
         transitionTable = Array.narrow(tt.map(Map::narrow));
     }
 
-
     @Override
     protected int getNumberOfStates() {
         return transitionTable.length();
+    }
+
+    public boolean hasTransition(int from, I input) {
+        IC inputClass = getInputClass(input);
+        validateState(from);
+        return transitionTable.get(from).containsKey(inputClass);
+    }
+
+    public boolean hasTransitionFromClass(int from, IC inputClass) {
+        validateInputClass(inputClass);
+        validateState(from);
+        return transitionTable.get(from).containsKey(inputClass);
+    }
+
+    public int getTransition(int from, I input) {
+        IC inputClass = getInputClass(input);
+        validateState(from);
+        return transitionTable.get(from).get(inputClass).get();
+    }
+
+    public int getTransitionFromClass(int from, IC inputClass) {
+        validateInputClass(inputClass);
+        validateState(from);
+        return transitionTable.get(from).get(inputClass).get();
     }
 
     @Override
