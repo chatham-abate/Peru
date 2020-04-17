@@ -70,6 +70,10 @@ Here the order for which to interpret the Peru Regex rules listed above.
 <CharClassInner>   =:: <CharClassInner> <CharClassToken>
                      | <CharClassToken>
 <CharClass>        =:: "[" <CharClassInner> "]"
-                     | "[" "^" <CharClassInner> "]"     
+                     | "[" "^" <CharClassInner> "]"   
+
+
+
+<Group>            =::   
  
 ```
