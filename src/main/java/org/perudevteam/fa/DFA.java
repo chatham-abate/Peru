@@ -1,5 +1,7 @@
 package org.perudevteam.fa;
 
+import io.vavr.Function1;
+import io.vavr.Tuple2;
 import io.vavr.collection.Array;
 import io.vavr.collection.Map;
 import io.vavr.collection.Set;
@@ -9,38 +11,43 @@ import java.util.Objects;
 
 public abstract class DFA<I, IC, O> extends FA<I, IC, O> {
 
-    private final Array<Array<Integer>> transitionTable;
+    private final Array<Map<IC, Integer>> transitionTable;
 
-    private DFA(Map<? extends Integer, O> as, Set<IC> ics, Array<? extends Array<? extends Integer>> tt) {
-        super(as, ics);
+    public DFA(Map<? extends Integer, O> as, Set<IC> ia,
+               Array<? extends Map<IC, ? extends Integer>> tt) {
+        this(as, ia, tt, true);
+    }
 
-        SeqHelpers.validateTable(tt);
+    private DFA(Map<? extends Integer, O> as, Set<IC> ia,
+                Array<? extends Map<IC, ? extends Integer>> tt, boolean withCheck) {
+        super(as, ia, withCheck);
 
-        if (tt.isEmpty()) {
-            throw new IllegalArgumentException("DFA requires at least one state.");
-        }
+        if (withCheck) {
+            Objects.requireNonNull(tt);
+            if (tt.isEmpty()) {
+                throw new IllegalArgumentException("Transition table needs at least 1 row.");
+            }
 
-        for (Array<? extends Integer> row: tt) {
-            for (Integer cell: row) {
-                if (cell != -1) {
-                    validateState(cell);
+            for (Map<IC, ? extends Integer> row: tt) {
+                Objects.requireNonNull(row);
+
+                for (Tuple2<IC, ? extends Integer> cell: row) {
+                    IC inputClass = cell._1;
+                    Integer transitionState = cell._2;
+
+                    if (!getInputAlphabet().contains(inputClass)) {
+                        throw new IllegalArgumentException("Unknown input class found in transition table" +
+                                inputClass.toString() + ".");
+                    }
+
+                    validateState(transitionState);
                 }
             }
         }
 
-        // Confirm correct number of columns.
-        if (tt.get(0).length() != getNumberOfInputClasses()) {
-            throw new IllegalArgumentException("Malformed transition table.");
-        }
-
-        transitionTable = Array.narrow(tt.map(Array::narrow));
+        transitionTable = Array.narrow(tt.map(Map::narrow));
     }
 
-    // Unchecked.
-    private DFA(Map<IC, Integer> ici, Map<Integer, O> as, Array<Array<Integer>> tt) {
-        super(ici, as);
-        transitionTable = tt;
-    }
 
     @Override
     protected int getNumberOfStates() {
@@ -53,11 +60,10 @@ public abstract class DFA<I, IC, O> extends FA<I, IC, O> {
         validateState(to);
         validateInputClass(inputClass);
 
-        int col = getInputClassIndex().get(inputClass).get();
         final DFA<I, IC, O> thisDFA = this;
 
-        return new DFA<I, IC, O>(getInputClassIndex(), getAcceptingStates(),
-                transitionTable.update(from, row -> row.update(col, to))) {
+        return new DFA<I, IC, O>(getAcceptingStates(), getInputAlphabet(),
+                transitionTable.update(from, row -> row.put(inputClass, to)), false) {
             @Override
             protected IC getInputClassUnchecked(I input) {
                 return thisDFA.getInputClassUnchecked(input);
@@ -72,8 +78,8 @@ public abstract class DFA<I, IC, O> extends FA<I, IC, O> {
 
         final DFA<I, IC, O> thisDFA = this;
 
-        return new DFA<I, IC, O>(getInputClassIndex(), getAcceptingStates().put(state, output),
-                transitionTable) {
+        return new DFA<I, IC, O>(getAcceptingStates().put(state, output), getInputAlphabet(),
+                transitionTable, false) {
             @Override
             protected IC getInputClassUnchecked(I input) {
                 return thisDFA.getInputClassUnchecked(input);
