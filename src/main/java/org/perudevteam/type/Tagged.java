@@ -1,6 +1,7 @@
 package org.perudevteam.type;
 
 import java.util.Objects;
+import org.perudevteam.fa.*;
 
 /**
  * Here is a Tagged abstract class... right now can apply to both

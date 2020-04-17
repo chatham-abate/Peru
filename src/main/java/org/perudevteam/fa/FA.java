@@ -1,5 +1,6 @@
 package org.perudevteam.fa;
 
+import io.vavr.Tuple2;
 import io.vavr.collection.*;
 import io.vavr.control.Option;
 
@@ -16,25 +17,41 @@ abstract class FA<I, IC, O> {
     public FA(Map<? extends Integer, O> as, Set<IC> ics) {
         // Validate Accepting states.
         Objects.requireNonNull(as);
-        for (Integer acceptingState: as.keySet()) {
-            Objects.requireNonNull(acceptingState);
-            // Only valid states can be help in the accepting states keyset.
-            validateState(acceptingState);
+
+        if (as.isEmpty()) {
+            throw new IllegalArgumentException("FA requires at least one accepting state.");
         }
+
+        for (Tuple2<? extends Integer, O> keyValue: as) {
+            Objects.requireNonNull(keyValue._2);    // No null values in the map.
+            Objects.requireNonNull(keyValue._1);
+            validateState(keyValue._1);     // No out of bounds states.
+        }
+
         acceptingStates = Map.narrow(as);
 
         // Validate input class set, and create input class index.
         Objects.requireNonNull(ics);
-        ics.forEach(Objects::requireNonNull);
+
+        if (ics.isEmpty()) {
+            throw new IllegalArgumentException("FA requires at least one input class.");
+        }
 
         int count = 0;
         Map<IC, Integer> tempIndex = HashMap.empty();
         for (IC inputClass: ics) {
+            Objects.requireNonNull(ics);
             tempIndex = tempIndex.put(inputClass, count);
             count++;
         }
 
         inputClassIndex = tempIndex;
+    }
+
+    // Unchecked constructor.
+    public FA(Map<IC, Integer> ici, Map<Integer, O> as) {
+        inputClassIndex = ici;
+        acceptingStates = as;
     }
 
     protected abstract int getNumberOfStates();
@@ -45,15 +62,31 @@ abstract class FA<I, IC, O> {
         }
     }
 
+    protected void validateInputClass(IC inputClass) {
+        if (!inputClassIndex.containsKey(inputClass)) {
+            throw new IllegalArgumentException("Bad input class given " + inputClass + ".");
+        }
+    }
+
     protected abstract IC getInputClassUnchecked(I input);
 
     protected int getInputClassIndex(I input) {
         Objects.requireNonNull(input); // Null Check.
         IC inputClass = getInputClassUnchecked(input);
-        if (!inputClassIndex.containsKey(inputClass)) {
-            throw new IllegalArgumentException("Bad input class returned " + inputClass + ".");
-        }
+        validateInputClass(inputClass);
         return inputClassIndex.get(inputClass).get();
+    }
+
+    protected Map<IC, Integer> getInputClassIndex() {
+        return inputClassIndex;
+    }
+
+    public int getNumberOfInputClasses() {
+        return inputClassIndex.keySet().length();
+    }
+
+    protected Map<Integer, O> getAcceptingStates() {
+        return acceptingStates;
     }
 
     public boolean isAccepting(int state) {
@@ -64,4 +97,8 @@ abstract class FA<I, IC, O> {
     public O getOutput(int state) {
         return acceptingStates.get(state).get();
     }
+
+    public abstract FA<I, IC, O> withSingleTransition(int from, int to, IC inputClass);
+
+    public abstract FA<I, IC, O> withAcceptingState(int state, O output);
 }

@@ -169,7 +169,7 @@ public class OperatorSet<OT extends Enum<OT>, DT extends Enum<DT>, DC extends Ta
 
     public OperatorSet<OT, DT, DC>
     withBinaryOverloads(Seq<DT> dataTags1, Seq<DT> dataTags2, Seq<BinaryOperator<OT, DT, DC>> ops) {
-        requireAllNonNull(List.of(dataTags1, dataTags2, ops));
+        validateTable(List.of(dataTags1, dataTags2, ops));
         return withBinaryOverloadsUnchecked(dataTags1, dataTags2, ops);
     }
 
@@ -209,7 +209,7 @@ public class OperatorSet<OT extends Enum<OT>, DT extends Enum<DT>, DC extends Ta
 
     public OperatorSet<OT, DT, DC>
     withSymmetricBinaryOverloads(Seq<DT> dataTags1, Seq<DT> dataTags2, Seq<BinaryOperator<OT, DT, DC>> ops) {
-        requireAllNonNull(List.of(dataTags1, dataTags2, ops));
+        validateTable(List.of(dataTags1, dataTags2, ops));
 
         return withBinaryOverloadsUnchecked(dataTags1, dataTags2, ops)
                 .withBinaryOverloadsUnchecked(dataTags2, dataTags1, ops);
