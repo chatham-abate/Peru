@@ -6,17 +6,19 @@ import io.vavr.collection.*;
 import io.vavr.control.Option;
 import java.util.Objects;
 
-public abstract class DFA<I, IC, O> extends FA<I, IC, O> {
-    public static <I, IC, O> DFA<I, IC, O> dfa(int numberOfStates, Set<IC> ia,
-                                               Function1<? super I, ? extends IC> getInputClass) {
+public abstract class DFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
+    public static <I, IC, O> DFAutomaton<I, IC, O> dfa(int numberOfStates,
+                                                       Set<? extends IC> ia,
+                                                       final  Function1<? super I, ? extends IC> getInputClass) {
         return dfa(HashMap.empty(), ia, Array.fill(numberOfStates, HashMap.empty()), getInputClass);
     }
 
-    public static <I, IC, O> DFA<I, IC, O> dfa(Map<? extends Integer, O> as, Set<IC> ia,
-                                               Array<? extends Map<IC, ? extends Integer>> tt,
-                                               Function1<? super I, ? extends IC> getInputClass) {
+    public static <I, IC, O> DFAutomaton<I, IC, O> dfa(Map<? extends Integer, ? extends O> as,
+                                                       Set<? extends IC> ia,
+                                                       Array<? extends Map<? extends IC, ? extends Integer>> tt,
+                                                       final Function1<? super I, ? extends IC> getInputClass) {
         Objects.requireNonNull(getInputClass);
-        return new DFA<I, IC, O>(as, ia, tt, true) {
+        return new DFAutomaton<I, IC, O>(as, ia, tt, true) {
             @Override
             protected IC getInputClassUnchecked(I input) {
                 return getInputClass.apply(input);
@@ -26,8 +28,9 @@ public abstract class DFA<I, IC, O> extends FA<I, IC, O> {
 
     private final Array<Map<IC, Integer>> transitionTable;
 
-    public DFA(Map<? extends Integer, O> as, Set<IC> ia,
-                Array<? extends Map<IC, ? extends Integer>> tt, boolean withCheck) {
+    public DFAutomaton(Map<? extends Integer, ? extends O> as,
+                       Set<? extends IC> ia,
+                       Array<? extends Map<? extends IC, ? extends Integer>> tt, boolean withCheck) {
         super(as, ia, withCheck);
 
         if (withCheck) {
@@ -36,10 +39,10 @@ public abstract class DFA<I, IC, O> extends FA<I, IC, O> {
                 throw new IllegalArgumentException("Transition table needs at least 1 row.");
             }
 
-            for (Map<IC, ? extends Integer> row: tt) {
+            for (Map<? extends IC, ? extends Integer> row: tt) {
                 Objects.requireNonNull(row);
 
-                for (Tuple2<IC, ? extends Integer> cell: row) {
+                for (Tuple2<? extends IC, ? extends Integer> cell: row) {
                     IC inputClass = cell._1;
                     Integer transitionState = cell._2;
 
@@ -102,14 +105,14 @@ public abstract class DFA<I, IC, O> extends FA<I, IC, O> {
     }
 
     @Override
-    public DFA<I, IC, O> withSingleTransition(int from, int to, IC inputClass) {
+    public DFAutomaton<I, IC, O> withSingleTransition(int from, int to, IC inputClass) {
         validateState(from);
         validateState(to);
         validateInputClass(inputClass);
 
-        final DFA<I, IC, O> thisDFA = this;
+        final DFAutomaton<I, IC, O> thisDFA = this;
 
-        return new DFA<I, IC, O>(getAcceptingStates(), getInputAlphabet(),
+        return new DFAutomaton<I, IC, O>(getAcceptingStates(), getInputAlphabet(),
                 transitionTable.update(from, row -> row.put(inputClass, to)), false) {
             @Override
             protected IC getInputClassUnchecked(I input) {
@@ -119,13 +122,13 @@ public abstract class DFA<I, IC, O> extends FA<I, IC, O> {
     }
 
     @Override
-    public DFA<I, IC, O> withAcceptingState(int state, O output) {
+    public DFAutomaton<I, IC, O> withAcceptingState(int state, O output) {
         validateState(state);
         Objects.requireNonNull(output);
 
-        final DFA<I, IC, O> thisDFA = this;
+        final DFAutomaton<I, IC, O> thisDFA = this;
 
-        return new DFA<I, IC, O>(getAcceptingStates().put(state, output), getInputAlphabet(),
+        return new DFAutomaton<I, IC, O>(getAcceptingStates().put(state, output), getInputAlphabet(),
                 transitionTable, false) {
             @Override
             protected IC getInputClassUnchecked(I input) {

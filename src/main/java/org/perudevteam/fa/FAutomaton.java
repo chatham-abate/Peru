@@ -2,23 +2,22 @@ package org.perudevteam.fa;
 
 import io.vavr.Tuple2;
 import io.vavr.collection.*;
-import io.vavr.control.Option;
 
 import java.util.Objects;
 
 // Finite Automaton Class
-abstract class FA<I, IC, O> {
+abstract class FAutomaton<I, IC, O> {
 
     // We also need accepting states here.
     // Both NFA and DFA have a finite number of accepting states.
     private final Map<Integer, O> acceptingStates;
     private final Set<IC> inputAlphabet;
 
-    public FA(Map<? extends Integer, O> as, Set<IC> ia, boolean withCheck) {
+    public FAutomaton(Map<? extends Integer, ? extends O> as, Set<? extends IC> ia, boolean withCheck) {
         if (withCheck) {
             Objects.requireNonNull(as);
 
-            for (Tuple2<? extends Integer, O> keyValue: as) {
+            for (Tuple2<? extends Integer, ? extends O> keyValue: as) {
                 Objects.requireNonNull(keyValue._2);    // No null values in the map.
                 Objects.requireNonNull(keyValue._1);
             }
@@ -34,7 +33,7 @@ abstract class FA<I, IC, O> {
         // We don't know if they are valid or not.
         // This is up to child classes to check based on how they specifically handle state validation.
         acceptingStates = Map.narrow(as);
-        inputAlphabet = ia;
+        inputAlphabet = Set.narrow(ia);
     }
 
     protected abstract int getNumberOfStates();
@@ -77,7 +76,7 @@ abstract class FA<I, IC, O> {
         return acceptingStates.get(state).get();
     }
 
-    public abstract FA<I, IC, O> withSingleTransition(int from, int to, IC inputClass);
+    public abstract FAutomaton<I, IC, O> withSingleTransition(int from, int to, IC inputClass);
 
-    public abstract FA<I, IC, O> withAcceptingState(int state, O output);
+    public abstract FAutomaton<I, IC, O> withAcceptingState(int state, O output);
 }

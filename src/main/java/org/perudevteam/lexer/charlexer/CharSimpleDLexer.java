@@ -1,16 +1,15 @@
 package org.perudevteam.lexer.charlexer;
 
 import io.vavr.Function1;
-import io.vavr.Tuple2;
-import org.perudevteam.fa.DFA;
+import org.perudevteam.fa.DFAutomaton;
 import org.perudevteam.lexer.SimpleDLexer;
 import org.perudevteam.misc.LineException;
 
 public class CharSimpleDLexer<T extends Enum<T>> extends
         SimpleDLexer<Character, String, CharData<T>, CharSimpleContext> {
 
-    public CharSimpleDLexer(DFA<? super Character, ?,
-                ? extends Function1<? super CharSimpleContext, ? extends CharData<T>>> d) {
+    public CharSimpleDLexer(DFAutomaton<? super Character, ?,
+                    ? extends Function1<? super CharSimpleContext, ? extends CharData<T>>> d) {
         super("", d);
     }
 

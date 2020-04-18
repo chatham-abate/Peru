@@ -5,12 +5,11 @@ import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import io.vavr.Tuple3;
 import io.vavr.collection.HashMap;
-import io.vavr.collection.List;
 import io.vavr.collection.Map;
 import io.vavr.collection.Seq;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
-import org.perudevteam.fa.DFA;
+import org.perudevteam.fa.DFAutomaton;
 
 public abstract class LinearDLexer<I, L, D, C extends LinearContext<C>>
         extends DLexer<I, L, D, C> {
@@ -18,12 +17,12 @@ public abstract class LinearDLexer<I, L, D, C extends LinearContext<C>>
     private static final int MAX_ROLLBACK_SIZE = 35;
     private final int maxRollbackAmount;
 
-    public LinearDLexer(L initLex, DFA<? super I, ?, ? extends Function1<? super C, ? extends D>> d) {
+    public LinearDLexer(L initLex, DFAutomaton<? super I, ?, ? extends Function1<? super C, ? extends D>> d) {
         this(MAX_ROLLBACK_SIZE, initLex, d);
     }
 
     public LinearDLexer(int mra, L initLex,
-                        DFA<? super I, ?, ? extends Function1<? super C, ? extends D>> d) {
+                        DFAutomaton<? super I, ?, ? extends Function1<? super C, ? extends D>> d) {
         super(initLex, d);
 
         if (mra < 0) {
@@ -49,7 +48,7 @@ public abstract class LinearDLexer<I, L, D, C extends LinearContext<C>>
         Seq<I> lastTail = null;
         int lastAbsolutePosition = algoContext.getAbsolutePosition();
 
-        DFA<I, ?, Function1<C, D>> dfa = getDFA();
+        DFAutomaton<I, ?, Function1<C, D>> dfa = getDFA();
 
         // While not on an error state or pre error state and position, continue.
         int state;

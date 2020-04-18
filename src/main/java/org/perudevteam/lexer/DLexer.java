@@ -1,12 +1,11 @@
 package org.perudevteam.lexer;
 
 import io.vavr.Function1;
-import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import io.vavr.collection.Seq;
 import io.vavr.collection.Stream;
 import io.vavr.control.Try;
-import org.perudevteam.fa.DFA;
+import org.perudevteam.fa.DFAutomaton;
 import org.perudevteam.misc.Builder;
 
 import java.util.Objects;
@@ -39,7 +38,7 @@ import java.util.Objects;
  */
 public abstract class DLexer<I, L, D, C> implements Builder<I, C, Tuple2<L, Try<D>>> {
     private final L initialLexeme;
-    private final DFA<I, ?, Function1<C, D>> dfa;
+    private final DFAutomaton<I, ?, Function1<C, D>> dfa;
 
     /**
      * DLexer Constructor. This requires an initial lexeme as well as a deterministic state
@@ -50,12 +49,12 @@ public abstract class DLexer<I, L, D, C> implements Builder<I, C, Tuple2<L, Try<
      */
     @SuppressWarnings("unchecked")
     public DLexer(L initLex,
-                  DFA<? super I, ?, ? extends Function1<? super C, ? extends D>> d) {
+                  DFAutomaton<? super I, ?, ? extends Function1<? super C, ? extends D>> d) {
         Objects.requireNonNull(initLex);
         Objects.requireNonNull(d);
 
         initialLexeme = initLex;
-        dfa = (DFA<I, ?, Function1<C, D>>) d;
+        dfa = (DFAutomaton<I, ?, Function1<C, D>>) d;
     }
 
     /**
@@ -92,7 +91,7 @@ public abstract class DLexer<I, L, D, C> implements Builder<I, C, Tuple2<L, Try<
         return initialLexeme;
     }
 
-    protected DFA<I, ?, Function1<C, D>> getDFA() {
+    protected DFAutomaton<I, ?, Function1<C, D>> getDFA() {
         return dfa;
     }
 

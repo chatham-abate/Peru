@@ -7,11 +7,11 @@ import io.vavr.Tuple3;
 import io.vavr.collection.Seq;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
-import org.perudevteam.fa.DFA;
+import org.perudevteam.fa.DFAutomaton;
 
 public abstract class SimpleDLexer<I, L, D, C> extends DLexer<I, L, D, C> {
     public SimpleDLexer(L initLex,
-                        DFA<? super I, ?, ? extends Function1<? super C, ? extends D>> d) {
+                        DFAutomaton<? super I, ?, ? extends Function1<? super C, ? extends D>> d) {
         super(initLex, d);
     }
 
@@ -27,7 +27,7 @@ public abstract class SimpleDLexer<I, L, D, C> extends DLexer<I, L, D, C> {
         Tuple2<L, Try<D>> lastToken = null;
         Seq<I> lastTail = null;
 
-        DFA<I, ?, Function1<C, D>> dfa = getDFA();
+        DFAutomaton<I, ?, Function1<C, D>> dfa = getDFA();
 
         while(!stateOp.isEmpty()) {
             int state = stateOp.get();

@@ -1,8 +1,7 @@
 package org.perudevteam.lexer.charlexer;
 
 import io.vavr.Function1;
-import io.vavr.Tuple2;
-import org.perudevteam.fa.DFA;
+import org.perudevteam.fa.DFAutomaton;
 import org.perudevteam.lexer.LinearDLexer;
 import org.perudevteam.misc.LineException;
 
@@ -10,12 +9,12 @@ public class CharLinearDLexer<T extends Enum<T>>
         extends LinearDLexer<Character, String, CharData<T>, CharLinearContext> {
 
     protected CharLinearDLexer(int mra,
-            DFA<? super Character,?, ? extends Function1<? super CharLinearContext, ? extends CharData<T>>> d) {
+            DFAutomaton<? super Character,?, ? extends Function1<? super CharLinearContext, ? extends CharData<T>>> d) {
         super(mra, "", d);
     }
 
     protected CharLinearDLexer(
-            DFA<? super Character, ?, ? extends Function1<? super CharLinearContext, ? extends CharData<T>>> d) {
+            DFAutomaton<? super Character, ?, ? extends Function1<? super CharLinearContext, ? extends CharData<T>>> d) {
         super("", d);
     }
 

@@ -6,7 +6,7 @@ import io.vavr.Tuple2;
 import io.vavr.collection.*;
 import io.vavr.control.Try;
 import org.junit.jupiter.api.Test;
-import org.perudevteam.fa.DFA;
+import org.perudevteam.fa.DFAutomaton;
 import org.perudevteam.lexer.charlexer.CharData;
 import org.perudevteam.lexer.charlexer.CharSimpleContext;
 import org.perudevteam.lexer.charlexer.CharSimpleDLexer;
@@ -35,8 +35,8 @@ public class TestIntegerSemanticCFGrammar {
     }
 
 
-    private static final DFA<Character, CL, Function1<CharSimpleContext, CharData<T>>>
-            DFA_1 = DFA.<Character, CL, Function1<CharSimpleContext, CharData<T>>>
+    private static final DFAutomaton<Character, CL, Function1<CharSimpleContext, CharData<T>>>
+            DFA_1 = DFAutomaton.<Character, CL, Function1<CharSimpleContext, CharData<T>>>
             dfa(3, HashSet.of(CL.values()), (input) -> {
         if ('0' <= input && input <= '9') {
             return CL.DIGIT;
