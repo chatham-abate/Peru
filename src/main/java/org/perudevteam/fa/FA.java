@@ -21,7 +21,6 @@ abstract class FA<I, IC, O> {
             for (Tuple2<? extends Integer, O> keyValue: as) {
                 Objects.requireNonNull(keyValue._2);    // No null values in the map.
                 Objects.requireNonNull(keyValue._1);
-                validateState(keyValue._1);     // No out of bounds states.
             }
 
             Objects.requireNonNull(ia);

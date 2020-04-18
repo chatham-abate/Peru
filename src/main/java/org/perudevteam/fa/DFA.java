@@ -54,12 +54,17 @@ public abstract class DFA<I, IC, O> extends FA<I, IC, O> {
                                 inputClass.toString() + ".");
                     }
 
-                    validateState(transitionState);
+                    if (transitionState < 0 || tt.length() <= transitionState) {
+                        throw new IndexOutOfBoundsException("Bad transition state found.");
+                    }
                 }
             }
         }
 
         transitionTable = Array.narrow(tt.map(Map::narrow));
+
+        // Now that the transition table is set, we can validate the accepting states map.
+        getAcceptingStates().keySet().forEach(this::validateState);
     }
 
     @Override

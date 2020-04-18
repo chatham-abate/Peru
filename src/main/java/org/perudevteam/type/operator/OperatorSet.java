@@ -13,15 +13,15 @@ import java.util.Objects;
 public class OperatorSet<OT extends Enum<OT>, DT extends Enum<DT>, DC extends Tagged<DT>> {
 
     @SuppressWarnings("unchecked")
-    private static final OperatorSet<?, ?, ?> EMPTY = new OperatorSet(HashMap.empty(), HashMap.empty());
+    private static final OperatorSet<?, ?, ?> EMPTY = new OperatorSet<>(HashMap.empty(), HashMap.empty());
 
     @SuppressWarnings("unchecked")
     public static <OT extends Enum<OT>, DT extends Enum<DT>, DC extends Tagged<DT>> OperatorSet<OT, DT, DC> empty() {
         return (OperatorSet<OT, DT, DC>) EMPTY;
     }
 
-    private Map<OT, Map<DT, UnaryOperator<OT, DT, DC>>> unaries;
-    private Map<OT, Map<DT, Map<DT, BinaryOperator<OT, DT, DC>>>> binaries;
+    private final Map<OT, Map<DT, UnaryOperator<OT, DT, DC>>> unaries;
+    private final Map<OT, Map<DT, Map<DT, BinaryOperator<OT, DT, DC>>>> binaries;
 
     private OperatorSet(Map<OT, ? extends Map<DT, ? extends UnaryOperator<OT, DT, DC>>> uns,
                         Map<OT, ? extends Map<DT, ? extends Map<DT, ? extends BinaryOperator<OT, DT, DC>>>> bins) {
@@ -169,7 +169,7 @@ public class OperatorSet<OT extends Enum<OT>, DT extends Enum<DT>, DC extends Ta
 
     public OperatorSet<OT, DT, DC>
     withBinaryOverloads(Seq<DT> dataTags1, Seq<DT> dataTags2, Seq<BinaryOperator<OT, DT, DC>> ops) {
-        validateTable(List.of(dataTags1, dataTags2, ops));
+        validateNestedSeq(List.of(dataTags1, dataTags2, ops));
         return withBinaryOverloadsUnchecked(dataTags1, dataTags2, ops);
     }
 
@@ -209,7 +209,7 @@ public class OperatorSet<OT extends Enum<OT>, DT extends Enum<DT>, DC extends Ta
 
     public OperatorSet<OT, DT, DC>
     withSymmetricBinaryOverloads(Seq<DT> dataTags1, Seq<DT> dataTags2, Seq<BinaryOperator<OT, DT, DC>> ops) {
-        validateTable(List.of(dataTags1, dataTags2, ops));
+        validateNestedSeq(List.of(dataTags1, dataTags2, ops));
 
         return withBinaryOverloadsUnchecked(dataTags1, dataTags2, ops)
                 .withBinaryOverloadsUnchecked(dataTags2, dataTags1, ops);

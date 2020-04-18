@@ -35,18 +35,11 @@ public final class SeqHelpers {
         }
     }
 
-    public static void validateTable(Seq<? extends Seq<?>> table) {
-        Objects.requireNonNull(table);
-        int rowSize = -1;
-        for (Seq<?> row: table) {
+    public static void validateNestedSeq(Seq<? extends Seq<?>> nestedSeq) {
+        Objects.requireNonNull(nestedSeq);
+        for (Seq<?> row: nestedSeq) {
             Objects.requireNonNull(row);
             row.forEach(Objects::requireNonNull);
-
-            if (rowSize == -1) {
-                rowSize = row.length();
-            } else if (row.length() != rowSize) {
-                throw new IllegalArgumentException("Table does not have consistent row length.");
-            }
         }
     }
 

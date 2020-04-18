@@ -10,18 +10,22 @@ import static org.perudevteam.type.operator.UnaryOperator.*;
 import static org.perudevteam.peru.base.BaseValue.*;
 
 
-public class BaseOperatorUtil {
+public final class BaseOperatorUtil {
+
+    private BaseOperatorUtil() {
+        // Class should never be initialized.
+    }
 
     @SuppressWarnings("unchecked")
     public static int compareEnum(BaseValue i1, BaseValue i2) {
         Enum e1 = i1.toEnum();
         Enum e2 = i2.toEnum();
 
-        if (e2.getClass() != e2.getClass()) {
+        if (e1.getClass() != e2.getClass()) {
             throw new ClassCastException("Cannot compare ENUMs of different type.");
         }
 
-        return e2.compareTo(e2);
+        return e1.compareTo(e2);
     }
 
     /*

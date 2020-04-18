@@ -18,7 +18,5 @@ public class TestASTResult {
         assertEquals(empty(), empty());
         assertEquals(fullResult(1,2, ofInt(10)), fullResult(1,2 , ofInt(10)));
         assertNotEquals(positioned(1, 2), fullResult(1, 2, ofInt(10)));
-
-        System.out.println(positioned(1, 3));
     }
 }

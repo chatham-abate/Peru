@@ -6,7 +6,11 @@ import org.perudevteam.type.operator.OperatorSet;
 
 import static org.perudevteam.peru.base.BaseOperatorUtil.*;
 
-public class BaseOperatorSetUtil {
+public final class BaseOperatorSetUtil {
+
+    private BaseOperatorSetUtil() {
+        // Class should never be initialized.
+    }
 
     public static final Seq<BaseType>
     BYTE_SHORT = List.of(BaseType.BYTE, BaseType.SHORT),

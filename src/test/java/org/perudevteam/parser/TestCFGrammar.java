@@ -31,21 +31,10 @@ public class TestCFGrammar {
 
     @Test
     void testProductionErrors() {
-        assertThrows(NullPointerException.class, () -> {
-            new Production<>(NT.A, null);
-        });
-
-        assertThrows(NullPointerException.class, () -> {
-            new Production<>(NT.A, List.of(null, right(T.F)));
-        });
-
-        assertThrows(NullPointerException.class, () -> {
-            new Production<NT, T>(NT.A, List.of(left(null)));
-        });
-
-        assertThrows(NullPointerException.class, () -> {
-            new Production<NT, T>(NT.A, List.of(right(null)));
-        });
+        assertThrows(NullPointerException.class, () -> new Production<>(NT.A, null));
+        assertThrows(NullPointerException.class, () -> new Production<>(NT.A, List.of(null, right(T.F))));
+        assertThrows(NullPointerException.class, () -> new Production<NT, T>(NT.A, List.of(left(null))));
+        assertThrows(NullPointerException.class, () -> new Production<NT, T>(NT.A, List.of(right(null))));
     }
 
     @Test
@@ -65,13 +54,8 @@ public class TestCFGrammar {
         assertNotEquals(prod, prod3);
         assertNotEquals(prod2, prod3);
 
-        assertThrows(NullPointerException.class, () -> {
-            prod.withRule(null);
-        });
-
-        assertThrows(NullPointerException.class, () -> {
-           prod.withSource(null);
-        });
+        assertThrows(NullPointerException.class, () -> prod.withRule(null));
+        assertThrows(NullPointerException.class, () -> prod.withSource(null));
     }
 
     /*
@@ -92,13 +76,8 @@ public class TestCFGrammar {
                 left(NT.B), right(T.F), left(NT.C), left(NT.A)
         ));
 
-        assertThrows(IllegalArgumentException.class, () -> {
-           new CFGrammar<>(NT.C, List.of(prod1, prod2));
-        });
-
-        assertThrows(IllegalArgumentException.class, () -> {
-           new CFGrammar<>(NT.C, List.of(prod3, prod2));
-        });
+        assertThrows(IllegalArgumentException.class, () -> new CFGrammar<>(NT.C, List.of(prod1, prod2)));
+        assertThrows(IllegalArgumentException.class, () -> new CFGrammar<>(NT.C, List.of(prod3, prod2)));
 
         Production<NT, T> prod4 = new Production<>(NT.A, List.of(
                 left(NT.B), right(T.E)
@@ -108,11 +87,9 @@ public class TestCFGrammar {
                 left(NT.A), right(T.E)
         ));
 
-        assertThrows(IllegalArgumentException.class, () -> {
-            new CFGrammar<>(NT.A, List.of(prod4));
-        });
+        assertThrows(IllegalArgumentException.class, () -> new CFGrammar<>(NT.A, List.of(prod4)));
 
-        CFGrammar g = new CFGrammar<>(NT.A, List.of(prod4, prod5));
+        CFGrammar<NT, T, Production<NT, T>> g = new CFGrammar<>(NT.A, List.of(prod4, prod5));
         assertEquals(HashSet.of(NT.B, NT.A), g.getNonTerminalsUsed());
         assertEquals(HashSet.of(T.E), g.getTerminalsUsed());
     }
@@ -128,7 +105,7 @@ public class TestCFGrammar {
     private static final FirstSets<NT, T> F1 = new FirstSets<>(G1);
 
     private static final Production<NT, T>
-            PROD1 = new Production<NT, T>(NT.A, List.of(left(NT.B), left(NT.C))),       // A -> BC
+            PROD1 = new Production<>(NT.A, List.of(left(NT.B), left(NT.C))),       // A -> BC
             PROD2 = new Production<>(NT.B, List.of(right(T.E))),                        // B -> e
             PROD3 = new Production<>(NT.C, List.of(right(T.F))),                        // C -> f
             PROD4 = new Production<>(NT.B, List.empty()),                               // B ->
@@ -203,11 +180,9 @@ public class TestCFGrammar {
     };
 
     @Test
-    void testAttrGrammarBasics() {
+    void testSemanticGrammarErrors() {
         // Test adding a production with unseen terminals throws an error.
-        assertThrows(IllegalArgumentException.class, () -> {
-           A_G1.withProduction(A_PROD2);
-        });
+        assertThrows(IllegalArgumentException.class, () -> A_G1.withProduction(A_PROD2));
     }
 }
 
