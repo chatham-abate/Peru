@@ -43,24 +43,25 @@ public abstract class DFA<I, IC, O> extends FA<I, IC, O> {
                     IC inputClass = cell._1;
                     Integer transitionState = cell._2;
 
-                    if (!getInputAlphabet().contains(inputClass)) {
-                        throw new IllegalArgumentException("Unknown input class found in transition table" +
-                                inputClass.toString() + ".");
-                    }
+                    Objects.requireNonNull(inputClass);
+                    Objects.requireNonNull(transitionState);
+
+                    validateInputClass(inputClass);
 
                     if (transitionState < 0 || tt.length() <= transitionState) {
                         throw new IndexOutOfBoundsException("Bad transition state found.");
                     }
                 }
             }
+
+            for (int acceptingState: getAcceptingStates().keySet()) {
+                if (acceptingState < 0 || tt.length() <= acceptingState) {
+                    throw new IndexOutOfBoundsException("Bad accepting state found.");
+                }
+            }
         }
 
         transitionTable = Array.narrow(tt.map(Map::narrow));
-
-        // Now that the transition table is set, we can validate the accepting states map.
-        if (withCheck) {
-            getAcceptingStates().keySet().forEach(this::validateState);
-        }
     }
 
     @Override
@@ -81,9 +82,7 @@ public abstract class DFA<I, IC, O> extends FA<I, IC, O> {
     }
 
     public int getTransition(int from, I input) {
-        IC inputClass = getInputClass(input);
-        validateState(from);
-        return transitionTable.get(from).get(inputClass).get();
+        return getTransitionAsOption(from, input).get();
     }
 
     public Option<Integer> getTransitionAsOption(int from, I input) {
@@ -93,9 +92,7 @@ public abstract class DFA<I, IC, O> extends FA<I, IC, O> {
     }
 
     public int getTransitionFromClass(int from, IC inputClass) {
-        validateInputClass(inputClass);
-        validateState(from);
-        return transitionTable.get(from).get(inputClass).get();
+        return getTransitionFromClassAsOption(from, inputClass).get();
     }
 
     public Option<Integer> getTransitionFromClassAsOption(int from, IC inputClass) {

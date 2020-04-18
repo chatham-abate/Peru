@@ -30,6 +30,9 @@ abstract class FA<I, IC, O> {
             ia.forEach(Objects::requireNonNull);
         }
 
+        // **NOTE** The states inside the accepting states Map are yet to be checked.
+        // We don't know if they are valid or not.
+        // This is up to child classes to check based on how they specifically handle state validation.
         acceptingStates = Map.narrow(as);
         inputAlphabet = ia;
     }
