@@ -5,7 +5,6 @@ import io.vavr.Tuple2;
 import org.perudevteam.fa.DFA;
 import org.perudevteam.lexer.SimpleDLexer;
 import org.perudevteam.misc.LineException;
-import org.perudevteam.statemachine.DStateMachine;
 
 public class CharSimpleDLexer<T extends Enum<T>> extends
         SimpleDLexer<Character, String, CharData<T>, CharSimpleContext> {

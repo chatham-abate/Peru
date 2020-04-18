@@ -14,9 +14,6 @@ import org.perudevteam.misc.LineException;
 import org.perudevteam.parser.grammar.SemanticCFGrammar;
 import org.perudevteam.parser.grammar.SemanticProduction;
 import org.perudevteam.parser.lrone.LROneParser;
-import org.perudevteam.statemachine.DFStateMachine;
-import org.perudevteam.statemachine.DStateMachine;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static io.vavr.control.Either.*;
 

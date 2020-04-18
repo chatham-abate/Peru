@@ -8,7 +8,6 @@ import io.vavr.collection.Stream;
 import io.vavr.control.Try;
 import org.perudevteam.fa.DFA;
 import org.perudevteam.misc.Builder;
-import org.perudevteam.statemachine.DStateMachine;
 
 import java.util.Objects;
 

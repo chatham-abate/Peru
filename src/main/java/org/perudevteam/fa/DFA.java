@@ -4,11 +4,7 @@ import io.vavr.Function1;
 import io.vavr.Tuple2;
 import io.vavr.collection.*;
 import io.vavr.control.Option;
-import io.vavr.control.Try;
-import org.perudevteam.misc.SeqHelpers;
-
 import java.util.Objects;
-import java.util.function.Function;
 
 public abstract class DFA<I, IC, O> extends FA<I, IC, O> {
     public static <I, IC, O> DFA<I, IC, O> dfa(int numberOfStates, Set<IC> ia,
@@ -30,7 +26,7 @@ public abstract class DFA<I, IC, O> extends FA<I, IC, O> {
 
     private final Array<Map<IC, Integer>> transitionTable;
 
-    private DFA(Map<? extends Integer, O> as, Set<IC> ia,
+    public DFA(Map<? extends Integer, O> as, Set<IC> ia,
                 Array<? extends Map<IC, ? extends Integer>> tt, boolean withCheck) {
         super(as, ia, withCheck);
 
@@ -62,7 +58,9 @@ public abstract class DFA<I, IC, O> extends FA<I, IC, O> {
         transitionTable = Array.narrow(tt.map(Map::narrow));
 
         // Now that the transition table is set, we can validate the accepting states map.
-        getAcceptingStates().keySet().forEach(this::validateState);
+        if (withCheck) {
+            getAcceptingStates().keySet().forEach(this::validateState);
+        }
     }
 
     @Override

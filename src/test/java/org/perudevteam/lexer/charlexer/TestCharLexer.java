@@ -8,7 +8,6 @@ import io.vavr.control.Try;
 import org.junit.jupiter.api.Test;
 import org.perudevteam.fa.DFA;
 import org.perudevteam.lexer.DLexer;
-import org.perudevteam.statemachine.DFStateMachine;
 
 import org.perudevteam.misc.SeqHelpers;
 

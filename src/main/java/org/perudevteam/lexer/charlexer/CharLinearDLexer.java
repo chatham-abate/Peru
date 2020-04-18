@@ -5,7 +5,6 @@ import io.vavr.Tuple2;
 import org.perudevteam.fa.DFA;
 import org.perudevteam.lexer.LinearDLexer;
 import org.perudevteam.misc.LineException;
-import org.perudevteam.statemachine.DStateMachine;
 
 public class CharLinearDLexer<T extends Enum<T>>
         extends LinearDLexer<Character, String, CharData<T>, CharLinearContext> {

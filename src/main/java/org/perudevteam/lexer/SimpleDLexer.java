@@ -8,7 +8,6 @@ import io.vavr.collection.Seq;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
 import org.perudevteam.fa.DFA;
-import org.perudevteam.statemachine.DStateMachine;
 
 public abstract class SimpleDLexer<I, L, D, C> extends DLexer<I, L, D, C> {
     public SimpleDLexer(L initLex,
