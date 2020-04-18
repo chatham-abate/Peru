@@ -15,8 +15,8 @@ public class CharLinearContext extends CharSimpleContext implements LinearContex
     public static final CharLinearContext INIT_LINEAR_CONTEXT =
             new CharLinearContext(HashMap.empty(), 0, PositionData.INIT_POSITION, PositionData.INIT_POSITION);
 
-    private int absolutePosition;
-    private Map<Integer, Set<Integer>> failMap;
+    private final int absolutePosition;
+    private final Map<Integer, Set<Integer>> failMap;
 
     public CharLinearContext(Map<Integer, ? extends Set<? extends Integer>> fm,
                              int ap, PositionData l, PositionData lp) {

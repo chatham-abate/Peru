@@ -2,45 +2,21 @@ package org.perudevteam.lexer.charlexer;
 
 import io.vavr.Function1;
 import io.vavr.Tuple2;
+import org.perudevteam.fa.DFA;
 import org.perudevteam.lexer.LinearDLexer;
 import org.perudevteam.misc.LineException;
 import org.perudevteam.statemachine.DStateMachine;
 
-public abstract class CharLinearDLexer<CL, T extends Enum<T>>
-        extends LinearDLexer<Character, CL, String, CharData<T>, CharLinearContext> {
-
-    public static <CL, T extends Enum<T>> CharLinearDLexer<CL, T> charLinearDLexer(
-            int mra,
-            DStateMachine<? super CL, ? extends Function1<? super CharLinearContext, ? extends CharData<T>>> d,
-            Function1<? super Character, ? extends CL> getClass
-    ) {
-        return new CharLinearDLexer<CL, T>(mra, d) {
-            @Override
-            protected CL inputClass(Character input) {
-                return getClass.apply(input);
-            }
-        };
-    }
-
-    public static <CL, T extends Enum<T>> CharLinearDLexer<CL, T> charLinearDLexer(
-            DStateMachine<? super CL, ? extends Function1<? super CharLinearContext, ? extends CharData<T>>> d,
-            Function1<? super Character, ? extends CL> getClass
-    ) {
-        return new CharLinearDLexer<CL, T>(d) {
-            @Override
-            protected CL inputClass(Character input) {
-                return getClass.apply(input);
-            }
-        };
-    }
+public class CharLinearDLexer<T extends Enum<T>>
+        extends LinearDLexer<Character, String, CharData<T>, CharLinearContext> {
 
     protected CharLinearDLexer(int mra,
-            DStateMachine<? super CL, ? extends Function1<? super CharLinearContext, ? extends CharData<T>>> d) {
+            DFA<? super Character,?, ? extends Function1<? super CharLinearContext, ? extends CharData<T>>> d) {
         super(mra, "", d);
     }
 
     protected CharLinearDLexer(
-            DStateMachine<? super CL, ? extends Function1<? super CharLinearContext, ? extends CharData<T>>> d) {
+            DFA<? super Character, ?, ? extends Function1<? super CharLinearContext, ? extends CharData<T>>> d) {
         super("", d);
     }
 

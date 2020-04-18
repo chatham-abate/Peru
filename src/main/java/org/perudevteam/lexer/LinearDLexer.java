@@ -10,20 +10,21 @@ import io.vavr.collection.Map;
 import io.vavr.collection.Seq;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
+import org.perudevteam.fa.DFA;
 import org.perudevteam.statemachine.DStateMachine;
 
-public abstract class LinearDLexer<I, CL, L, D, C extends LinearContext<C>>
-        extends DLexer<I, CL, L, D, C> {
+public abstract class LinearDLexer<I, L, D, C extends LinearContext<C>>
+        extends DLexer<I, L, D, C> {
 
     private static final int MAX_ROLLBACK_SIZE = 35;
     private final int maxRollbackAmount;
 
-    public LinearDLexer(L initLex, DStateMachine<? super CL, ? extends Function1<? super C, ? extends D>> d) {
+    public LinearDLexer(L initLex, DFA<? super I, ?, ? extends Function1<? super C, ? extends D>> d) {
         this(MAX_ROLLBACK_SIZE, initLex, d);
     }
 
     public LinearDLexer(int mra, L initLex,
-                DStateMachine<? super CL, ? extends Function1<? super C, ? extends D>> d) {
+                        DFA<? super I, ?, ? extends Function1<? super C, ? extends D>> d) {
         super(initLex, d);
 
         if (mra < 0) {
@@ -34,12 +35,12 @@ public abstract class LinearDLexer<I, CL, L, D, C extends LinearContext<C>>
     }
 
     @Override
-    public Tuple3<Tuple2<L, Try<D>>, C, Seq<I>> buildUnchecked(Seq<I> input, C context) {
+    public Tuple3<Tuple2<L, Try<D>>, C, Seq<I>> buildUnchecked(Seq<? extends I> input, C context) {
         // Rollback stack in form (position, state).
         // Starting at the given position, and state 0.
         Map<Integer, Integer> rollbackStack = HashMap.empty();
 
-        Seq<I> tail = input;
+        Seq<I> tail = Seq.narrow(input);
         C algoContext = context;
 
         L lexeme = getInitialLexeme();
@@ -49,15 +50,14 @@ public abstract class LinearDLexer<I, CL, L, D, C extends LinearContext<C>>
         Seq<I> lastTail = null;
         int lastAbsolutePosition = algoContext.getAbsolutePosition();
 
-        DStateMachine<CL, Function1<C, D>> dsm = getDSM();
+        DFA<I, ?, Function1<C, D>> dfa = getDFA();
 
         // While not on an error state or pre error state and position, continue.
         int state;
-        while (!stateOp.isEmpty() && !algoContext.isPreError(algoContext.getAbsolutePosition(), state = stateOp.get())) {
-            Option<Function1<C, D>> dataBuilderOp = dsm.getOutput(state);
-
-            if (!dataBuilderOp.isEmpty()) {
-                Function1<C, D> dataBuilder = dataBuilderOp.get();
+        while (!stateOp.isEmpty() &&
+                !algoContext.isPreError(algoContext.getAbsolutePosition(), state = stateOp.get())) {
+            if (dfa.isAccepting(state)) {
+                Function1<C, D> dataBuilder = dfa.getOutput(state);
                 D data = dataBuilder.apply(algoContext);
                 lastToken = Tuple.of(lexeme, Try.success(data));
                 lastTail = tail;
@@ -84,7 +84,7 @@ public abstract class LinearDLexer<I, CL, L, D, C extends LinearContext<C>>
 
             tail = tail.tail();
 
-            stateOp = dsm.getNextState(state, inputClass(symbol));
+            stateOp = dfa.getTransitionAsOption(state, symbol);
         }
 
         /*

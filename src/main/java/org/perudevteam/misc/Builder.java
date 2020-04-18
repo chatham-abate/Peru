@@ -30,7 +30,7 @@ public interface Builder<I, C, O> {
      * @return A <b>Tuple3</b> containing the output, the new context, and a sequence of
      * the inputs not used.
      */
-    Tuple3<O, C, Seq<I>> buildUnchecked(Seq<I> input, C context);
+    Tuple3<O, C, Seq<I>> buildUnchecked(Seq<? extends I> input, C context);
 
     /**
      * The builder function with null checks on the input sequence and context.
@@ -42,7 +42,7 @@ public interface Builder<I, C, O> {
      * @return A <b>Tuple3</b> containing the output, the new context, and a sequence of
      * the inputs not used.
      */
-    default Tuple3<O, C, Seq<I>> build(Seq<I> input, C context) {
+    default Tuple3<O, C, Seq<I>> build(Seq<? extends I> input, C context) {
         Objects.requireNonNull(input);
         input.forEach(Objects::requireNonNull);
         Objects.requireNonNull(context);
@@ -63,7 +63,7 @@ public interface Builder<I, C, O> {
      * @param context The initial context.
      * @return A <b>Stream</b> of the outputs created.
      */
-    default Stream<O> buildStream(Seq<I> input, C context) {
+    default Stream<O> buildStream(Seq<? extends I> input, C context) {
         Objects.requireNonNull(input);
 
         if (input.isEmpty()) {

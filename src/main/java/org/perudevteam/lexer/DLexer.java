@@ -6,6 +6,7 @@ import io.vavr.Tuple2;
 import io.vavr.collection.Seq;
 import io.vavr.collection.Stream;
 import io.vavr.control.Try;
+import org.perudevteam.fa.DFA;
 import org.perudevteam.misc.Builder;
 import org.perudevteam.statemachine.DStateMachine;
 
@@ -37,9 +38,9 @@ import java.util.Objects;
  * @param <D> Data Type.
  * @param <C> Context Type.
  */
-public abstract class DLexer<I, CL, L, D, C> implements Builder<I, C, Tuple2<L, Try<D>>> {
+public abstract class DLexer<I, L, D, C> implements Builder<I, C, Tuple2<L, Try<D>>> {
     private final L initialLexeme;
-    private final DStateMachine<CL, Function1<C, D>> dsm;
+    private final DFA<I, ?, Function1<C, D>> dfa;
 
     /**
      * DLexer Constructor. This requires an initial lexeme as well as a deterministic state
@@ -50,12 +51,12 @@ public abstract class DLexer<I, CL, L, D, C> implements Builder<I, C, Tuple2<L, 
      */
     @SuppressWarnings("unchecked")
     public DLexer(L initLex,
-                  DStateMachine<? super CL, ? extends Function1<? super C, ? extends D>> d) {
+                  DFA<? super I, ?, ? extends Function1<? super C, ? extends D>> d) {
         Objects.requireNonNull(initLex);
         Objects.requireNonNull(d);
 
         initialLexeme = initLex;
-        dsm = (DStateMachine<CL, Function1<C, D>>) d;
+        dfa = (DFA<I, ?, Function1<C, D>>) d;
     }
 
     /**
@@ -68,7 +69,7 @@ public abstract class DLexer<I, CL, L, D, C> implements Builder<I, C, Tuple2<L, 
      * of its <b>Try</b>. Thus, each token returned will be a <b>Tuple2</b> containing a lexeme of type <b>L</b>
      * and a data of type <b>D</b>.
      */
-    public Stream<Tuple2<L, D>> buildSuccessfulTokenStream(Seq<I> input, C context) {
+    public Stream<Tuple2<L, D>> buildSuccessfulTokenStream(Seq<? extends I> input, C context) {
         return buildStream(input, context).map(tuple -> tuple.map2(Try::get));
     }
 
@@ -79,7 +80,7 @@ public abstract class DLexer<I, CL, L, D, C> implements Builder<I, C, Tuple2<L, 
      * @param context The context.
      * @return The <b>Stream</b> of tokens lexed.
      */
-    public Stream<Tuple2<L, D>> buildOnlySuccessfulTokenStream(Seq<I> input, C context) {
+    public Stream<Tuple2<L, D>> buildOnlySuccessfulTokenStream(Seq<? extends I> input, C context) {
         return buildStream(input, context).filter(tuple -> tuple._2.isSuccess())
                 .map(tuple -> tuple.map2(Try::get));
     }
@@ -92,12 +93,8 @@ public abstract class DLexer<I, CL, L, D, C> implements Builder<I, C, Tuple2<L, 
         return initialLexeme;
     }
 
-    /**
-     * Get the deterministic state machine used by this lexer.
-     * @return The <b>DStateMachine</b>.
-     */
-    protected DStateMachine<CL, Function1<C, D>> getDSM() {
-        return dsm;
+    protected DFA<I, ?, Function1<C, D>> getDFA() {
+        return dfa;
     }
 
     /**
@@ -115,9 +112,6 @@ public abstract class DLexer<I, CL, L, D, C> implements Builder<I, C, Tuple2<L, 
      * @return The new lexeme of type <b>L</b>.
      */
     protected abstract L combineInput(L lexeme, I input);
-
-
-    protected abstract CL inputClass(I input);
 
     protected abstract C onToken(L lexeme, D data, C context);
 

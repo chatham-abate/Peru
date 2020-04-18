@@ -2,27 +2,16 @@ package org.perudevteam.lexer.charlexer;
 
 import io.vavr.Function1;
 import io.vavr.Tuple2;
+import org.perudevteam.fa.DFA;
 import org.perudevteam.lexer.SimpleDLexer;
 import org.perudevteam.misc.LineException;
 import org.perudevteam.statemachine.DStateMachine;
 
-public abstract class CharSimpleDLexer<CL, T extends Enum<T>> extends
-        SimpleDLexer<Character, CL, String, CharData<T>, CharSimpleContext> {
+public class CharSimpleDLexer<T extends Enum<T>> extends
+        SimpleDLexer<Character, String, CharData<T>, CharSimpleContext> {
 
-    public static <CL, T extends Enum<T>> CharSimpleDLexer<CL, T> charSimpleDLexer(
-            DStateMachine<? super CL, ? extends Function1<? super CharSimpleContext, ? extends CharData<T>>> d,
-            Function1<? super Character, ? extends CL> getClass
-    ) {
-        return new CharSimpleDLexer<CL, T>(d) {
-            @Override
-            protected CL inputClass(Character input) {
-                return getClass.apply(input);
-            }
-        };
-    }
-
-    protected CharSimpleDLexer(DStateMachine<? super CL,
-            ? extends Function1<? super CharSimpleContext, ? extends CharData<T>>> d) {
+    public CharSimpleDLexer(DFA<? super Character, ?,
+                ? extends Function1<? super CharSimpleContext, ? extends CharData<T>>> d) {
         super("", d);
     }
 

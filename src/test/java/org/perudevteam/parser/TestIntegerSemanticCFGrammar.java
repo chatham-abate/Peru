@@ -3,12 +3,10 @@ package org.perudevteam.parser;
 import io.vavr.CheckedFunction2;
 import io.vavr.Function1;
 import io.vavr.Tuple2;
-import io.vavr.collection.HashMap;
-import io.vavr.collection.List;
-import io.vavr.collection.Map;
-import io.vavr.collection.Seq;
+import io.vavr.collection.*;
 import io.vavr.control.Try;
 import org.junit.jupiter.api.Test;
+import org.perudevteam.fa.DFA;
 import org.perudevteam.lexer.charlexer.CharData;
 import org.perudevteam.lexer.charlexer.CharSimpleContext;
 import org.perudevteam.lexer.charlexer.CharSimpleDLexer;
@@ -39,29 +37,28 @@ public class TestIntegerSemanticCFGrammar {
         ADDOP
     }
 
-    // DSFM
-    private static final DStateMachine<CL, Function1<CharSimpleContext, CharData<T>>>
-            DFSM = DFStateMachine.<CL, Function1<CharSimpleContext, CharData<T>>>emptyDFSM(3)
-            .withEdge(0, 1, CL.DIGIT)
-            .withEdge(1, 1, CL.DIGIT)
-            .withEdge(0, 2, CL.ADDOP)
+
+    private static final DFA<Character, CL, Function1<CharSimpleContext, CharData<T>>>
+            DFA_1 = DFA.<Character, CL, Function1<CharSimpleContext, CharData<T>>>
+            dfa(3, HashSet.of(CL.values()), (input) -> {
+        if ('0' <= input && input <= '9') {
+            return CL.DIGIT;
+        }
+
+        if (input == '+' || input == '-') {
+            return CL.ADDOP;
+        }
+
+        return CL.OTHER;
+    })
+            .withSingleTransition(0, 1, CL.DIGIT)
+            .withSingleTransition(1, 1, CL.DIGIT)
+            .withSingleTransition(0, 2, CL.ADDOP)
             .withAcceptingState(1, c -> new CharData<>(T.NUMBER, c))
             .withAcceptingState(2, c -> new CharData<>(T.ADDOP, c));
 
     // Lexer
-    private static final CharSimpleDLexer<CL, T> LEXER = CharSimpleDLexer.charSimpleDLexer(
-            DFSM, (input) -> {
-                if ('0' <= input && input <= '9') {
-                    return CL.DIGIT;
-                }
-
-                if (input == '+' || input == '-') {
-                    return CL.ADDOP;
-                }
-
-                return CL.OTHER;
-            }
-    );
+    private static final CharSimpleDLexer<T> LEXER = new CharSimpleDLexer<>(DFA_1);
 
 
     // Manual Lexer Test.

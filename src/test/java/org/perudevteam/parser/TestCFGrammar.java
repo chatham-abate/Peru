@@ -105,7 +105,7 @@ public class TestCFGrammar {
     private static final FirstSets<NT, T> F1 = new FirstSets<>(G1);
 
     private static final Production<NT, T>
-            PROD1 = new Production<>(NT.A, List.of(left(NT.B), left(NT.C))),       // A -> BC
+            PROD1 = new Production<NT, T>(NT.A, List.of(left(NT.B), left(NT.C))),       // A -> BC
             PROD2 = new Production<>(NT.B, List.of(right(T.E))),                        // B -> e
             PROD3 = new Production<>(NT.C, List.of(right(T.F))),                        // C -> f
             PROD4 = new Production<>(NT.B, List.empty()),                               // B ->

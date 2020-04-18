@@ -7,18 +7,19 @@ import io.vavr.Tuple3;
 import io.vavr.collection.Seq;
 import io.vavr.control.Option;
 import io.vavr.control.Try;
+import org.perudevteam.fa.DFA;
 import org.perudevteam.statemachine.DStateMachine;
 
-public abstract class SimpleDLexer<I, CL, L, D, C> extends DLexer<I, CL, L, D, C> {
+public abstract class SimpleDLexer<I, L, D, C> extends DLexer<I, L, D, C> {
     public SimpleDLexer(L initLex,
-                DStateMachine<? super CL, ? extends Function1<? super C, ? extends D>> d) {
+                        DFA<? super I, ?, ? extends Function1<? super C, ? extends D>> d) {
         super(initLex, d);
     }
 
     @Override
-    public Tuple3<Tuple2<L, Try<D>>, C, Seq<I>> buildUnchecked(Seq<I> input, C context) {
+    public Tuple3<Tuple2<L, Try<D>>, C, Seq<I>> buildUnchecked(Seq<? extends I> input, C context) {
         C algoContext = context;
-        Seq<I> tail = input;
+        Seq<I> tail = Seq.narrow(input);
 
         // Initial State and Lexeme.
         L lexeme = getInitialLexeme();
@@ -27,16 +28,16 @@ public abstract class SimpleDLexer<I, CL, L, D, C> extends DLexer<I, CL, L, D, C
         Tuple2<L, Try<D>> lastToken = null;
         Seq<I> lastTail = null;
 
-        DStateMachine<CL, Function1<C, D>> dsm = getDSM();
+        DFA<I, ?, Function1<C, D>> dfa = getDFA();
 
         while(!stateOp.isEmpty()) {
             int state = stateOp.get();
-            Option<Function1<C, D>> dataBuilderOp = dsm.getOutput(state);
 
             // If we are on an accepting state.
-            if (!dataBuilderOp.isEmpty()) {
+            if (dfa.isAccepting(state)) {
+                Function1<C, D> dataBuilder = dfa.getOutput(state);
                 // Build data for token.
-                D data = dataBuilderOp.get().apply(algoContext);
+                D data = dataBuilder.apply(algoContext);
 
                 lastToken = Tuple.of(lexeme,Try.success(data));
                 lastTail = tail;    // Save tail position.
@@ -58,7 +59,7 @@ public abstract class SimpleDLexer<I, CL, L, D, C> extends DLexer<I, CL, L, D, C
             tail = tail.tail(); // Advance through input.
 
             // Calc next State.
-            stateOp = dsm.getNextState(state, inputClass(next));
+            stateOp = dfa.getTransitionAsOption(state, next);
         }
 
         if (lastToken == null) {

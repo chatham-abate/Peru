@@ -12,8 +12,7 @@ import java.util.Objects;
 
 public class OperatorSet<OT extends Enum<OT>, DT extends Enum<DT>, DC extends Tagged<DT>> {
 
-    @SuppressWarnings("unchecked")
-    private static final OperatorSet<?, ?, ?> EMPTY = new OperatorSet<>(HashMap.empty(), HashMap.empty());
+    private static final OperatorSet<?, ?, ?> EMPTY = new OperatorSet(HashMap.empty(), HashMap.empty());
 
     @SuppressWarnings("unchecked")
     public static <OT extends Enum<OT>, DT extends Enum<DT>, DC extends Tagged<DT>> OperatorSet<OT, DT, DC> empty() {

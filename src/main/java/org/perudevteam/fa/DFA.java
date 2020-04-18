@@ -2,17 +2,15 @@ package org.perudevteam.fa;
 
 import io.vavr.Function1;
 import io.vavr.Tuple2;
-import io.vavr.collection.Array;
-import io.vavr.collection.HashMap;
-import io.vavr.collection.Map;
-import io.vavr.collection.Set;
+import io.vavr.collection.*;
+import io.vavr.control.Option;
+import io.vavr.control.Try;
 import org.perudevteam.misc.SeqHelpers;
 
 import java.util.Objects;
 import java.util.function.Function;
 
 public abstract class DFA<I, IC, O> extends FA<I, IC, O> {
-
     public static <I, IC, O> DFA<I, IC, O> dfa(int numberOfStates, Set<IC> ia,
                                                Function1<? super I, ? extends IC> getInputClass) {
         return dfa(HashMap.empty(), ia, Array.fill(numberOfStates, HashMap.empty()), getInputClass);
@@ -90,10 +88,22 @@ public abstract class DFA<I, IC, O> extends FA<I, IC, O> {
         return transitionTable.get(from).get(inputClass).get();
     }
 
+    public Option<Integer> getTransitionAsOption(int from, I input) {
+        IC inputClass = getInputClass(input);
+        validateState(from);
+        return transitionTable.get(from).get(inputClass);
+    }
+
     public int getTransitionFromClass(int from, IC inputClass) {
         validateInputClass(inputClass);
         validateState(from);
         return transitionTable.get(from).get(inputClass).get();
+    }
+
+    public Option<Integer> getTransitionFromClassAsOption(int from, IC inputClass) {
+        validateInputClass(inputClass);
+        validateState(from);
+        return transitionTable.get(from).get(inputClass);
     }
 
     @Override
