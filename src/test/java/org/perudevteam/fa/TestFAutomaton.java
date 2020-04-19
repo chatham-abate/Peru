@@ -176,7 +176,7 @@ public class TestFAutomaton {
                     () -> nfa(
                             HashMap.empty(),
                             INPUT_ALPHA,
-                            Array.of(HashMap.empty()),
+                            Array.of(HashMap.empty(), HashMap.empty()),
                             Array.of(null, HashSet.empty()), a -> InputClass.A
                     )),
             Tuple.of("Null Epsilon Transition",
@@ -245,5 +245,42 @@ public class TestFAutomaton {
     @TestFactory
     Seq<DynamicTest> testNFAOutOfBoundsErrors() {
         return buildThrowTests(IndexOutOfBoundsException.class, NFA_OUT_OF_B_ERRORS);
+    }
+
+    private static final NFAutomaton<Character, InputClass, OutputClass> TEST_NFA =
+            NFAutomaton.<Character, InputClass, OutputClass>nfa(4, INPUT_ALPHA, (input) -> {
+                if (input == 'A') return InputClass.A;
+                if (input == 'B') return InputClass.B;
+                return InputClass.B;
+            })
+                    .withEpsilonTransition(0, 1)
+                    .withSingleTransition(0, 2, InputClass.B)
+                    .withSingleTransition(1, 2, InputClass.A)
+                    .withSingleTransition(1, 3, InputClass.A)
+                    .withAcceptingState(3, OutputClass.Thing1);
+
+    public static final Seq<Tuple3<Integer, InputClass, Set<Integer>>> NFA_TRANSITIONS = List.of(
+            Tuple.of(0, InputClass.B, HashSet.of(2)),
+            Tuple.of(1, InputClass.A, HashSet.of(2, 3))
+    );
+
+    @TestFactory
+    Seq<DynamicTest> testNFATransitions() {
+        return NFA_TRANSITIONS.map(tuple -> DynamicTest.dynamicTest(tuple.toString(),
+                () -> assertEquals(tuple._3, TEST_NFA.getTransitionsFromClass(tuple._1, tuple._2))));
+    }
+
+    public static final Seq<Tuple2<Integer, InputClass>> NFA_ERROR_TRANSITIONS = List.of(
+            Tuple.of(0, InputClass.A),
+            Tuple.of(1, InputClass.B),
+            Tuple.of(-1, InputClass.C),
+            Tuple.of(10, InputClass.B),
+            Tuple.of(1, InputClass.OTHER)
+    );
+
+    @TestFactory
+    Seq<DynamicTest> testNFATransitionErrors() {
+        return NFA_ERROR_TRANSITIONS.map(tuple -> DynamicTest.dynamicTest(tuple.toString(),
+                () -> assertThrows(Exception.class, () -> TEST_NFA.getTransitionsFromClass(tuple._1, tuple._2))));
     }
 }
