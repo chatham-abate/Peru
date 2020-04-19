@@ -6,7 +6,7 @@ import io.vavr.collection.*;
 import io.vavr.control.Option;
 import java.util.Objects;
 
-// DFA
+// DFA.
 public abstract class DFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
     public static <I, IC, O> DFAutomaton<I, IC, O> dfa(int numberOfStates,
                                                        Set<? extends IC> ia,
