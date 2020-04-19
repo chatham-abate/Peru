@@ -7,7 +7,7 @@
     <!-- Get URL Someday -->
     <groupId>org.perudevteam</groupId>
     <artifactId>peru</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.1.0-SNAPSHOT</version>
 
     <properties>
         <!-- Java 8 -->
