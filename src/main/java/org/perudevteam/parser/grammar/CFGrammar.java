@@ -6,7 +6,7 @@ import io.vavr.control.Either;
 import java.util.Objects;
 
 /**
- * Context free grammar class.
+ * Context free grammar class
  *
  * @param <NT> Non terminal Type
  * @param <T> Terminal Type
