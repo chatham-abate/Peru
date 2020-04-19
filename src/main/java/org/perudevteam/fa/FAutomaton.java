@@ -5,7 +5,7 @@ import io.vavr.collection.*;
 
 import java.util.Objects;
 
-// Finite Automaton Class
+// Finite Automaton Class.
 abstract class FAutomaton<I, IC, O> {
 
     // We also need accepting states here.
