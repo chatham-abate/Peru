@@ -72,6 +72,10 @@ public abstract class DFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
         return transitionTable.length();
     }
 
+    public Array<Map<IC, Integer>> getTransitionTable() {
+        return transitionTable;
+    }
+
     public boolean hasTransition(int from, I input) {
         IC inputClass = getInputClass(input);
         validateState(from);

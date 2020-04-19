@@ -103,6 +103,14 @@ public abstract class NFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
         return transitionTable.length();
     }
 
+    public Array<Map<IC, Set<Integer>>> getTransitionTable() {
+        return transitionTable;
+    }
+
+    public Array<Set<Integer>> getEpsilonTransitions() {
+        return epsilonTransitions;
+    }
+
     public boolean hasTransitions(int from, I input) {
         IC inputClass = getInputClass(input);
         validateState(from);
