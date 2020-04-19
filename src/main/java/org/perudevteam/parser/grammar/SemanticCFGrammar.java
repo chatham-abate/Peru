@@ -25,9 +25,9 @@ import java.util.Objects;
 public class SemanticCFGrammar<NT extends Enum<NT>, T extends Enum<T>,
         P extends SemanticProduction<NT, T, R>, L, D extends Tokenized<T>, R> extends CFGrammar<NT, T, P> {
 
-    private final Map<? super T, CheckedFunction2<L, D, R>> terminalResGenerators;
+    private final Map<T, CheckedFunction2<L, D, R>> terminalResGenerators;
 
-    public SemanticCFGrammar(NT start, Map<? super T, ? extends CheckedFunction2<L, D, ? extends R>> termResGens,
+    public SemanticCFGrammar(NT start, Map<? extends T, ? extends CheckedFunction2<L, D, ? extends R>> termResGens,
                              Seq<P> prods) {
         super(start, prods);
 
@@ -35,18 +35,21 @@ public class SemanticCFGrammar<NT extends Enum<NT>, T extends Enum<T>,
         Objects.requireNonNull(termResGens);
         termResGens.values().forEach(Objects::requireNonNull);
 
+        Map<T, CheckedFunction2<L, D, R>> narrowTermResGens =
+                Map.narrow(termResGens.mapValues(CheckedFunction2::narrow));
+
         for (T terminal: getTerminalsUsed()) {
-            if (!termResGens.containsKey(terminal)) {
+            if (!narrowTermResGens.containsKey(terminal)) {
                 throw new IllegalArgumentException("All terminal types need result generators.");
             }
         }
 
-        terminalResGenerators = Map.narrow(termResGens.mapValues(CheckedFunction2::narrow));
+        terminalResGenerators = narrowTermResGens;
     }
 
     // Direct Constructor with no checks... only used by methods of this class.
     protected SemanticCFGrammar(NT start, Map<NT, Set<P>> prodMap, Set<T> termsUsed,
-                                Map<? super T, CheckedFunction2<L, D, R>> termResGens) {
+                                Map<T, CheckedFunction2<L, D, R>> termResGens) {
         super(start, prodMap, termsUsed);
         terminalResGenerators = termResGens;
     }
