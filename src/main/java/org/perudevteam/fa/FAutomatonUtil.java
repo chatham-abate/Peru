@@ -85,7 +85,7 @@ public final class FAutomatonUtil {
                 dfaTTRow = dfaTTRow.put(input, stateSetIndex.get(stateSet).get());
             }
 
-            dfaTT.update(newStateSetIndex, dfaTTRow);
+            dfaTT = dfaTT.update(newStateSetIndex, dfaTTRow);
         }
 
         return new DFAutomaton<>(dfaAS, nfa.getInputAlphabet(), Array.ofAll(dfaTT),
