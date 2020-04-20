@@ -41,8 +41,8 @@ public class TestCharLexer {
      */
 
     private static final DFAutomaton<Character, CharType1, Function1<CharSimpleContext, CharData<TokenType1>>>
-            DFA_SIMPLE1 = DFAutomaton.<Character, CharType1, Function1<CharSimpleContext, CharData<TokenType1>>>
-            dfa(5, HashSet.of(CharType1.values()), (input) -> {
+            DFA_SIMPLE1 = new DFAutomaton<Character, CharType1, Function1<CharSimpleContext, CharData<TokenType1>>>
+            (5, HashSet.of(CharType1.values()), (input) -> {
         if ('0' <= input && input <= '9') {
             return CharType1.NUMBER;
         }
@@ -103,8 +103,8 @@ public class TestCharLexer {
      */
 
     private static final DFAutomaton<Character, CharType2, Function1<CharSimpleContext, CharData<TokenType2>>>
-            DFA_SIMPLE2 = DFAutomaton.<Character, CharType2, Function1<CharSimpleContext, CharData<TokenType2>>>
-            dfa(6, HashSet.of(CharType2.values()), (input) -> CHAR_MAP2.get(input).get())
+            DFA_SIMPLE2 = new DFAutomaton<Character, CharType2, Function1<CharSimpleContext, CharData<TokenType2>>>
+            (6, HashSet.of(CharType2.values()), (input) -> CHAR_MAP2.get(input).get())
             .withSingleTransition(0, 1, CharType2.A)
             .withSingleTransition(1, 2, CharType2.B)
             .withSingleTransition(2, 3, CharType2.A)

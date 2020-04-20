@@ -7,32 +7,26 @@ import io.vavr.control.Option;
 import java.util.Objects;
 
 // DFA.
-public abstract class DFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
-    public static <I, IC, O> DFAutomaton<I, IC, O> dfa(int numberOfStates,
-                                                       Set<? extends IC> ia,
-                                                       final  Function1<? super I, ? extends IC> getInputClass) {
-        return dfa(HashMap.empty(), ia, Array.fill(numberOfStates, HashMap.empty()), getInputClass);
-    }
-
-    public static <I, IC, O> DFAutomaton<I, IC, O> dfa(Map<? extends Integer, ? extends O> as,
-                                                       Set<? extends IC> ia,
-                                                       Array<? extends Map<? extends IC, ? extends Integer>> tt,
-                                                       final Function1<? super I, ? extends IC> getInputClass) {
-        Objects.requireNonNull(getInputClass);
-        return new DFAutomaton<I, IC, O>(as, ia, tt, true) {
-            @Override
-            protected IC getInputClassUnchecked(I input) {
-                return getInputClass.apply(input);
-            }
-        };
-    }
+public class DFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
 
     private final Array<Map<IC, Integer>> transitionTable;
 
+    public DFAutomaton(int numberOfStates, Set<? extends IC> ia, Function1<? super I, ? extends IC> gic) {
+        this(HashMap.empty(), ia, Array.fill(numberOfStates, HashMap.empty()), gic, true);
+    }
+
     public DFAutomaton(Map<? extends Integer, ? extends O> as,
                        Set<? extends IC> ia,
-                       Array<? extends Map<? extends IC, ? extends Integer>> tt, boolean withCheck) {
-        super(as, ia, withCheck);
+                       Array<? extends Map<? extends IC, ? extends Integer>> tt,
+                       Function1<? super I, ? extends IC> gic) {
+        this(as, ia, tt, gic, true);
+    }
+
+    protected DFAutomaton(Map<? extends Integer, ? extends O> as,
+                        Set<? extends IC> ia,
+                        Array<? extends Map<? extends IC, ? extends Integer>> tt,
+                        Function1<? super I, ? extends IC> gic, boolean withCheck) {
+        super(as, ia, gic, withCheck);
 
         if (withCheck) {
             Objects.requireNonNull(tt);
@@ -115,15 +109,9 @@ public abstract class DFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
         validateState(to);
         validateInputClass(inputClass);
 
-        final DFAutomaton<I, IC, O> thisDFA = this;
-
         return new DFAutomaton<I, IC, O>(getAcceptingStates(), getInputAlphabet(),
-                transitionTable.update(from, row -> row.put(inputClass, to)), false) {
-            @Override
-            protected IC getInputClassUnchecked(I input) {
-                return thisDFA.getInputClassUnchecked(input);
-            }
-        };
+                transitionTable.update(from, row -> row.put(inputClass, to)),
+                getGetInputClassUnchecked(),false);
     }
 
     @Override
@@ -131,14 +119,7 @@ public abstract class DFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
         validateState(state);
         Objects.requireNonNull(output);
 
-        final DFAutomaton<I, IC, O> thisDFA = this;
-
         return new DFAutomaton<I, IC, O>(getAcceptingStates().put(state, output), getInputAlphabet(),
-                transitionTable, false) {
-            @Override
-            protected IC getInputClassUnchecked(I input) {
-                return thisDFA.getInputClassUnchecked(input);
-            }
-        };
+                transitionTable, getGetInputClassUnchecked(),false);
     }
 }

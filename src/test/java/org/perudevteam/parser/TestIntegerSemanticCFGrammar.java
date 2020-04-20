@@ -36,8 +36,8 @@ public class TestIntegerSemanticCFGrammar {
 
 
     private static final DFAutomaton<Character, CL, Function1<CharSimpleContext, CharData<T>>>
-            DFA_1 = DFAutomaton.<Character, CL, Function1<CharSimpleContext, CharData<T>>>
-            dfa(3, HashSet.of(CL.values()), (input) -> {
+            DFA_1 = new DFAutomaton<Character, CL, Function1<CharSimpleContext, CharData<T>>>(
+                    3, HashSet.of(CL.values()), (input) -> {
         if ('0' <= input && input <= '9') {
             return CL.DIGIT;
         }

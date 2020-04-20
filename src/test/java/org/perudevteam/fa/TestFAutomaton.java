@@ -35,17 +35,18 @@ public class TestFAutomaton {
 
     private static final Seq<Tuple2<String, Executable>> DFA_NULL_ERRORS = List.of(
             Tuple.of("Null Accepting",
-                    () -> dfa(null, INPUT_ALPHA, Array.of(HashMap.empty()), a -> InputClass.A)),
+                    () -> new DFAutomaton<>(null, INPUT_ALPHA, Array.of(HashMap.empty()), a -> InputClass.A)),
             Tuple.of("Null Alphabet",
-                    () -> dfa(HashMap.empty(), null, Array.of(HashMap.empty()), a -> InputClass.A)),
+                    () -> new DFAutomaton<>(HashMap.empty(), null, Array.of(HashMap.empty()), a -> InputClass.A)),
             Tuple.of("Null Transition Table",
-                    () -> dfa(HashMap.empty(), INPUT_ALPHA, null, a -> InputClass.A)),
+                    () -> new DFAutomaton<>(HashMap.empty(), INPUT_ALPHA, null, a -> InputClass.A)),
             Tuple.of("Null Input Function",
-                    () -> dfa(HashMap.empty(), INPUT_ALPHA, Array.of(HashMap.empty()), null)),
+                    () -> new DFAutomaton<>(HashMap.empty(), INPUT_ALPHA, Array.of(HashMap.empty()), null)),
             Tuple.of("Null Accepting State",
-                    () -> dfa(HashMap.of(null, OutputClass.Thing1), INPUT_ALPHA, Array.empty(), a -> InputClass.A)),
+                    () -> new DFAutomaton<>(
+                            HashMap.of(null, OutputClass.Thing1), INPUT_ALPHA, Array.empty(), a -> InputClass.A)),
             Tuple.of("Null Output",
-                    () -> dfa(HashMap.of(5, null), INPUT_ALPHA, Array.empty(), a -> InputClass.A))
+                    () -> new DFAutomaton<>(HashMap.of(5, null), INPUT_ALPHA, Array.empty(), a -> InputClass.A))
     );
 
     @TestFactory
@@ -55,11 +56,13 @@ public class TestFAutomaton {
 
     private static final Seq<Tuple2<String, Executable>> DFA_ILLEGAL_ARG_ERRORS = List.of(
             Tuple.of("Empty Input Alphabet",
-                    () -> dfa(HashMap.empty(), HashSet.empty(), Array.of(HashMap.empty()), a -> InputClass.A)),
+                    () -> new DFAutomaton<>(
+                            HashMap.empty(), HashSet.empty(), Array.of(HashMap.empty()), a -> InputClass.A)),
             Tuple.of("Empty Transition Table",
-                    () -> dfa(HashMap.empty(), INPUT_ALPHA, Array.empty(), a -> InputClass.A)),
+                    () -> new DFAutomaton<>(
+                            HashMap.empty(), INPUT_ALPHA, Array.empty(), a -> InputClass.A)),
             Tuple.of("Bad Input Class",
-                    () -> dfa(
+                    () -> new DFAutomaton<>(
                             HashMap.empty(),
                             INPUT_ALPHA,
                             Array.of(HashMap.of(InputClass.OTHER, 0)),
@@ -74,14 +77,14 @@ public class TestFAutomaton {
 
     private static final Seq<Tuple2<String, Executable>> DFA_OUT_OF_B_ERRORS = List.of(
             Tuple.of("Bad Accepting State",
-                    () -> dfa(
+                    () -> new DFAutomaton<>(
                             HashMap.of(2, OutputClass.Thing1),
                             INPUT_ALPHA,
                             Array.of(HashMap.empty()),
                             a -> InputClass.A
                     )),
             Tuple.of("Bad Transition State",
-                    () -> dfa(
+                    () -> new DFAutomaton<>(
                             HashMap.empty(),
                             INPUT_ALPHA,
                             Array.of(HashMap.of(InputClass.A, 3)),
@@ -95,7 +98,7 @@ public class TestFAutomaton {
     }
 
     private static final DFAutomaton<Character, InputClass, OutputClass> TEST_DFA =
-            DFAutomaton.<Character,InputClass,OutputClass>dfa(3, INPUT_ALPHA, (input) -> {
+            new DFAutomaton<Character, InputClass, OutputClass>(3, INPUT_ALPHA, (input) -> {
                 if (input == 'A') return InputClass.A;
                 if (input == 'B') return InputClass.B;
                 if (input == 'C') return InputClass.C;
@@ -143,44 +146,44 @@ public class TestFAutomaton {
 
     private static final Seq<Tuple2<String, Executable>> NFA_NULL_ERRORS = List.of(
             Tuple.of("Null Transition Table",
-                    () -> nfa(HashMap.empty(), INPUT_ALPHA, null, Array.empty(), a -> InputClass.A)),
+                    () -> new NFAutomaton<>(HashMap.empty(), INPUT_ALPHA, null, Array.empty(), a -> InputClass.A)),
             Tuple.of("Null Transition Table Row",
-                    () -> nfa(
+                    () -> new NFAutomaton<>(
                             HashMap.empty(),
                             INPUT_ALPHA,
                             Array.of(HashMap.empty(), null),
                             Array.empty(), a -> InputClass.A
                     )),
             Tuple.of("Null Transition Input Class",
-                    () -> nfa(
+                    () -> new NFAutomaton<>(
                             HashMap.empty(),
                             INPUT_ALPHA,
                             Array.of(HashMap.of(null, HashSet.empty())),
                             Array.empty(), a -> InputClass.A
                     )),
             Tuple.of("Null Transition",
-                    () -> nfa(
+                    () -> new NFAutomaton<>(
                             HashMap.empty(),
                             INPUT_ALPHA,
                             Array.of(HashMap.of(0, null)),
                             Array.empty(), a -> InputClass.A
                     )),
             Tuple.of("Null Epsilon Table",
-                    () -> nfa(
+                    () -> new NFAutomaton<>(
                             HashMap.empty(),
                             INPUT_ALPHA,
                             Array.of(HashMap.empty()),
                             null, a -> InputClass.A
                     )),
             Tuple.of("Null Epsilon Table Row",
-                    () -> nfa(
+                    () -> new NFAutomaton<>(
                             HashMap.empty(),
                             INPUT_ALPHA,
                             Array.of(HashMap.empty(), HashMap.empty()),
                             Array.of(null, HashSet.empty()), a -> InputClass.A
                     )),
             Tuple.of("Null Epsilon Transition",
-                    () -> nfa(
+                    () -> new NFAutomaton<>(
                             HashMap.empty(),
                             INPUT_ALPHA,
                             Array.of(HashMap.empty()),
@@ -195,26 +198,26 @@ public class TestFAutomaton {
 
     private static final Seq<Tuple2<String, Executable>> NFA_ILLEGAL_ARG_ERRORS = List.of(
             Tuple.of("Empty Transition Table",
-                    () -> nfa(HashMap.empty(),
+                    () -> new NFAutomaton<>(HashMap.empty(),
                             INPUT_ALPHA,
                             Array.empty(),
                             Array.of(HashSet.empty()), a -> InputClass.A
                     )),
             Tuple.of("Empty Transition Set",
-                    () -> nfa(HashMap.empty(),
+                    () -> new NFAutomaton<>(HashMap.empty(),
                             INPUT_ALPHA,
                             Array.of(HashMap.of(InputClass.A, HashSet.empty())),
                             Array.of(HashSet.empty()), a -> InputClass.A
                     )),
             Tuple.of("Illegal Input Class",
-                    () -> nfa(
+                    () -> new NFAutomaton<>(
                             HashMap.empty(),
                             INPUT_ALPHA,
                             Array.of(HashMap.of(InputClass.OTHER, HashSet.of(0))),
                             Array.of(HashSet.empty()), a -> InputClass.A
                     )),
             Tuple.of("Inconsistent Table Sizes.",
-                    () -> nfa(
+                    () -> new NFAutomaton<>(
                             HashMap.empty(),
                             INPUT_ALPHA,
                             Array.of(HashMap.of(InputClass.A, HashSet.of(0))),
@@ -229,13 +232,13 @@ public class TestFAutomaton {
 
     private static final Seq<Tuple2<String, Executable>> NFA_OUT_OF_B_ERRORS = List.of(
             Tuple.of("Bad Transition",
-                    () -> nfa(HashMap.empty(),
+                    () -> new NFAutomaton<>(HashMap.empty(),
                             INPUT_ALPHA,
                             Array.of(HashMap.of(InputClass.A, HashSet.of(12))),
                             Array.of(HashSet.empty()), a -> InputClass.A
                     )),
             Tuple.of("Bad Epsilon",
-                    () -> nfa(HashMap.empty(),
+                    () -> new NFAutomaton<>(HashMap.empty(),
                             INPUT_ALPHA,
                             Array.of(HashMap.of(InputClass.A, HashSet.of(0))),
                             Array.of(HashSet.of(12)), a -> InputClass.A
@@ -248,7 +251,7 @@ public class TestFAutomaton {
     }
 
     private static final NFAutomaton<Character, InputClass, OutputClass> TEST_NFA =
-            NFAutomaton.<Character, InputClass, OutputClass>nfa(4, INPUT_ALPHA, (input) -> {
+            new NFAutomaton<Character, InputClass, OutputClass>(4, INPUT_ALPHA, (input) -> {
                 if (input == 'A') return InputClass.A;
                 if (input == 'B') return InputClass.B;
                 return InputClass.B;

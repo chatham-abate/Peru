@@ -1,5 +1,6 @@
 package org.perudevteam.fa;
 
+import io.vavr.Function1;
 import io.vavr.Tuple2;
 import io.vavr.collection.*;
 
@@ -12,8 +13,10 @@ abstract class FAutomaton<I, IC, O> {
     // Both NFA and DFA have a finite number of accepting states.
     private final Map<Integer, O> acceptingStates;
     private final Set<IC> inputAlphabet;
+    private final Function1<I, IC> getInputClassUnchecked;
 
-    public FAutomaton(Map<? extends Integer, ? extends O> as, Set<? extends IC> ia, boolean withCheck) {
+    public FAutomaton(Map<? extends Integer, ? extends O> as, Set<? extends IC> ia,
+                      Function1<? super I, ? extends IC> gic, boolean withCheck) {
         if (withCheck) {
             Objects.requireNonNull(as);
 
@@ -27,6 +30,8 @@ abstract class FAutomaton<I, IC, O> {
                 throw new IllegalArgumentException("FA requires at least one input class.");
             }
             ia.forEach(Objects::requireNonNull);
+
+            Objects.requireNonNull(gic);
         }
 
         // **NOTE** The states inside the accepting states Map are yet to be checked.
@@ -34,6 +39,7 @@ abstract class FAutomaton<I, IC, O> {
         // This is up to child classes to check based on how they specifically handle state validation.
         acceptingStates = Map.narrow(as);
         inputAlphabet = Set.narrow(ia);
+        getInputClassUnchecked = Function1.narrow(gic);
     }
 
     protected abstract int getNumberOfStates();
@@ -50,11 +56,9 @@ abstract class FAutomaton<I, IC, O> {
         }
     }
 
-    protected abstract IC getInputClassUnchecked(I input);
-
     protected IC getInputClass(I input) {
         Objects.requireNonNull(input);
-        IC inputClass = getInputClassUnchecked(input);
+        IC inputClass = getInputClassUnchecked.apply(input);
         validateInputClass(inputClass);
         return inputClass;
     }
@@ -65,6 +69,10 @@ abstract class FAutomaton<I, IC, O> {
 
     protected Map<Integer, O> getAcceptingStates() {
         return acceptingStates;
+    }
+
+    public Function1<I, IC> getGetInputClassUnchecked() {
+        return getInputClassUnchecked;
     }
 
     public boolean isAccepting(int state) {

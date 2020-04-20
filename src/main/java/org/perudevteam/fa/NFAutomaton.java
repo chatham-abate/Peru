@@ -7,34 +7,32 @@ import io.vavr.control.Option;
 
 import java.util.Objects;
 
-public abstract class NFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
-    public static <I, IC, O> NFAutomaton<I, IC, O> nfa(int numberOfStates,
-                                                       Set<? extends IC> ia,
-                                                       final Function1<? super I, ? extends IC> getInputClass) {
-        return nfa(HashMap.empty(), ia, Array.fill(numberOfStates, HashMap.empty()),
-                Array.fill(numberOfStates, HashSet.empty()), getInputClass);
-    }
-
-    public static <I, IC, O> NFAutomaton<I, IC, O> nfa(Map<? extends Integer, O> as,
-                                                       Set<? extends IC> ia,
-                                                       Array<? extends Map<? extends IC, ? extends Set<? extends Integer>>> tt,
-                                                       Array<? extends Set<? extends Integer>> ets,
-                                                       final Function1<? super I, ? extends IC> getInputClass) {
-        return new NFAutomaton<I, IC, O>(as, ia, tt, ets, true) {
-            @Override
-            protected IC getInputClassUnchecked(I input) {
-                return getInputClass.apply(input);
-            }
-        };
-    }
+public class NFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
 
     private final Array<Map<IC, Set<Integer>>> transitionTable;
     private final Array<Set<Integer>> epsilonTransitions;
 
+    public NFAutomaton(int numberOfStates,
+                       Set<? extends IC> ia,
+                       Function1<? super I, ? extends IC> gic) {
+        this(HashMap.empty(), ia,
+                Array.fill(numberOfStates, HashMap.empty()),
+                Array.fill(numberOfStates, HashSet.empty()), gic, true);
+    }
+
     public NFAutomaton(Map<? extends Integer, ? extends O> as, Set<? extends IC> ia,
                        Array<? extends Map<? extends IC, ? extends Set<? extends Integer>>> tt,
-                       Array<? extends Set<? extends Integer>> ets, boolean withCheck) {
-        super(as, ia, withCheck);
+                       Array<? extends Set<? extends Integer>> ets,
+                       Function1<? super I, ? extends IC> gic) {
+        this(as, ia, tt, ets, gic, true);
+    }
+
+    protected NFAutomaton(Map<? extends Integer, ? extends O> as, Set<? extends IC> ia,
+                          Array<? extends Map<? extends IC, ? extends Set<? extends Integer>>> tt,
+                          Array<? extends Set<? extends Integer>> ets,
+                          Function1<? super I, ? extends IC> gic, boolean withCheck) {
+
+        super(as, ia, gic, withCheck);
 
         if (withCheck) {
             Objects.requireNonNull(tt);
@@ -169,21 +167,14 @@ public abstract class NFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
         validateState(to);
         validateInputClass(inputClass);
 
-        final NFAutomaton<I, IC, O> thisNFA = this;
-
         Array<Map<IC, Set<Integer>>> newTT = transitionTable.update(from, row ->
                 row.containsKey(inputClass)
                         ? row.put(inputClass, row.get(inputClass).get().add(to))
                         : row.put(inputClass, HashSet.of(to))
                 );
 
-        return new NFAutomaton<I, IC, O>(getAcceptingStates(), getInputAlphabet(), newTT,
-                epsilonTransitions, false) {
-            @Override
-            protected IC getInputClassUnchecked(I input) {
-                return thisNFA.getInputClassUnchecked(input);
-            }
-        };
+        return new NFAutomaton<I, IC, O>(getAcceptingStates(), getInputAlphabet(),
+                newTT, epsilonTransitions, getGetInputClassUnchecked(), false);
     }
 
     public NFAutomaton<I, IC, O> withEpsilonTransition(int from, int to) {
@@ -192,28 +183,14 @@ public abstract class NFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
 
         Array<Set<Integer>> newEps = epsilonTransitions.update(from, set -> set.add(to));
 
-        final NFAutomaton<I, IC, O> thisNFA = this;
-
-        return new NFAutomaton<I, IC, O>(getAcceptingStates(), getInputAlphabet(), transitionTable, newEps, false) {
-            @Override
-            protected IC getInputClassUnchecked(I input) {
-                return thisNFA.getInputClassUnchecked(input);
-            }
-        };
+        return new NFAutomaton<I, IC, O>(getAcceptingStates(), getInputAlphabet(),
+                transitionTable, newEps, getGetInputClassUnchecked(), false);
     }
 
     @Override
     public NFAutomaton<I, IC, O> withAcceptingState(int state, O output) {
         validateState(state);
-
-        final NFAutomaton<I, IC, O> thisNFA = this;
-
-        return new NFAutomaton<I, IC, O>(getAcceptingStates().put(state, output), getInputAlphabet(), transitionTable,
-                epsilonTransitions, false) {
-            @Override
-            protected IC getInputClassUnchecked(I input) {
-                return thisNFA.getInputClassUnchecked(input);
-            }
-        };
+        return new NFAutomaton<I, IC, O>(getAcceptingStates().put(state, output), getInputAlphabet(),
+                transitionTable, epsilonTransitions, getGetInputClassUnchecked(), false);
     }
 }
