@@ -1,9 +1,6 @@
 package org.perudevteam.fa;
 
-import io.vavr.collection.Array;
-import io.vavr.collection.HashSet;
-import io.vavr.collection.Seq;
-import io.vavr.collection.Set;
+import io.vavr.collection.*;
 
 public final class FAutomatonUtil {
     private FAutomatonUtil() {
@@ -14,7 +11,8 @@ public final class FAutomatonUtil {
         return reachableSets(nfa.getEpsilonTransitions());
     }
 
-    public static Array<Set<Integer>> reachableSets(Array<? extends Set<? extends Integer>> graph) {
+    // No Checks... hence why this is package private.
+    static Array<Set<Integer>> reachableSets(Array<? extends Set<? extends Integer>> graph) {
         Array<Set<Integer>> reachableSets = Array.rangeBy(0, graph.length(), 1).map(HashSet::of);
 
         int oldSize = 0;
@@ -40,5 +38,18 @@ public final class FAutomatonUtil {
         }
 
         return reachableSets;
+    }
+
+
+    // SAME here, no null checks.
+    // We want some NFA to DFA Code here...
+    // what we need is the e* sets... and the normal map...
+    // The normal will be an array of maps which nmap some input class to some set of integers...
+    // Don't care about normal e transitions here, just e* transitions
+    static <IC> Array<Map<IC, Integer>> buildDFATransTable(
+            Array<? extends Map<? extends IC, ? extends Set<? extends Integer>>> nfaTransTable,
+            Array<? extends Set<? extends Integer>> eStar) {
+        // FINISH LATER.
+        return null;
     }
 }

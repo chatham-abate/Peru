@@ -13,6 +13,7 @@ import java.util.Objects;
 // Operator Set...
 public class OperatorSet<OT extends Enum<OT>, DT extends Enum<DT>, DC extends Tagged<DT>> {
 
+    @SuppressWarnings("all")
     private static final OperatorSet<?, ?, ?> EMPTY = new OperatorSet(HashMap.empty(), HashMap.empty());
 
     @SuppressWarnings("unchecked")
