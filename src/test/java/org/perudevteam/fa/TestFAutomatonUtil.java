@@ -7,7 +7,6 @@ import io.vavr.collection.*;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
-import org.perudevteam.lexer.DLexer;
 import org.perudevteam.lexer.charlexer.CharData;
 import org.perudevteam.lexer.charlexer.CharSimpleContext;
 import org.perudevteam.lexer.charlexer.CharSimpleDLexer;
@@ -76,7 +75,7 @@ public class TestFAutomatonUtil {
 
     @Test
     void testAmbiguousNFA() {
-        assertThrows(IllegalArgumentException.class, () -> convertNFAToDFA(AMBIGUOUS_NFA));
+        assertThrows(IllegalArgumentException.class, AMBIGUOUS_NFA::toDFA);
     }
 
     private static final NFAutomaton<Character, InputClass, Function1<CharSimpleContext, CharData<OutputClass>>> NFA1 =
@@ -89,7 +88,7 @@ public class TestFAutomatonUtil {
                     .withSingleTransition(3, 4, InputClass.B)
                     .withAcceptingState(4, c -> new CharData<>(OutputClass.THING1, c))
 
-                    .withEpsilonTransition(0, 5)
+                    .withSingleTransition(0, 5, InputClass.A)
                     .withEpsilonTransition(5, 6)
                     .withEpsilonTransition(5, 8)
                     .withSingleTransition(6, 7, InputClass.C)
@@ -98,15 +97,16 @@ public class TestFAutomatonUtil {
                     .withAcceptingState(8, c -> new CharData<>(OutputClass.THING2, c));
 
     private static final DFAutomaton<Character, InputClass, Function1<CharSimpleContext, CharData<OutputClass>>>
-            DFA1 = convertNFAToDFA(NFA1);
+            DFA1 = NFA1.toDFA();
 
     private static final CharSimpleDLexer<OutputClass> LEXER1 = new CharSimpleDLexer<>(DFA1);
 
     private static final Seq<Tuple2<String, OutputClass>> EXPECTED1 = List.of(
             Tuple.of("ab", OutputClass.THING1),
-            Tuple.of("c", OutputClass.THING2),
-            Tuple.of("cc", OutputClass.THING2),
-            Tuple.of("ccccc", OutputClass.THING2)
+            Tuple.of("a", OutputClass.THING2),
+            Tuple.of("ac", OutputClass.THING2),
+            Tuple.of("acc", OutputClass.THING2),
+            Tuple.of("accccc", OutputClass.THING2)
     );
 
     @TestFactory
@@ -123,5 +123,19 @@ public class TestFAutomatonUtil {
             assertEquals(tuple._1, result._1);
             assertEquals(tuple._2, result._2.getTokenType());
         }));
+    }
+
+    private static final Seq<String> FAILURES1 = List.of(
+            "ba",
+            "caa",
+            "ccc",
+            "bbbb"
+    );
+
+    @TestFactory
+    Seq<DynamicTest> testExpectedErrors() {
+        return FAILURES1.map(failure -> DynamicTest.dynamicTest("Failure : " + failure, () ->
+            assertTrue(LEXER1.build(List.ofAll(failure.toCharArray()), CharSimpleContext.INIT_SIMPLE_CONTEXT)
+                    ._1._2.isFailure())));
     }
 }

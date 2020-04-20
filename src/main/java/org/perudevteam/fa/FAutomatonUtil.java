@@ -9,7 +9,7 @@ public final class FAutomatonUtil {
         // Should never be initialized.
     }
 
-    public static <I, IC, O> DFAutomaton<I, IC, O> convertNFAToDFA(NFAutomaton<I, IC, O> nfa) {
+    static <I, IC, O> DFAutomaton<I, IC, O> convertNFAToDFA(NFAutomaton<I, IC, O> nfa) {
         Objects.requireNonNull(nfa);
 
         // NFA Accepting states and Transition Table.

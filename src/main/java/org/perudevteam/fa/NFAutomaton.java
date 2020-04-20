@@ -27,7 +27,7 @@ public class NFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
         this(as, ia, tt, ets, gic, true);
     }
 
-    protected NFAutomaton(Map<? extends Integer, ? extends O> as, Set<? extends IC> ia,
+    NFAutomaton(Map<? extends Integer, ? extends O> as, Set<? extends IC> ia,
                           Array<? extends Map<? extends IC, ? extends Set<? extends Integer>>> tt,
                           Array<? extends Set<? extends Integer>> ets,
                           Function1<? super I, ? extends IC> gic, boolean withCheck) {
@@ -192,5 +192,10 @@ public class NFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
         validateState(state);
         return new NFAutomaton<I, IC, O>(getAcceptingStates().put(state, output), getInputAlphabet(),
                 transitionTable, epsilonTransitions, getGetInputClassUnchecked(), false);
+    }
+
+    @Override
+    public DFAutomaton<I, IC, O> toDFA() {
+        return FAutomatonUtil.convertNFAToDFA(this);
     }
 }
