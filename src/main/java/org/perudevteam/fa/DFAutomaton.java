@@ -22,7 +22,7 @@ public class DFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
         this(as, ia, tt, gic, true);
     }
 
-    protected DFAutomaton(Map<? extends Integer, ? extends O> as,
+    DFAutomaton(Map<? extends Integer, ? extends O> as,
                         Set<? extends IC> ia,
                         Array<? extends Map<? extends IC, ? extends Integer>> tt,
                         Function1<? super I, ? extends IC> gic, boolean withCheck) {
