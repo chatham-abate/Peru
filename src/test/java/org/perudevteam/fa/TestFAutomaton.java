@@ -286,4 +286,43 @@ public class TestFAutomaton {
         return NFA_ERROR_TRANSITIONS.map(tuple -> DynamicTest.dynamicTest(tuple.toString(),
                 () -> assertThrows(Exception.class, () -> TEST_NFA.getTransitionsFromClass(tuple._1, tuple._2))));
     }
+
+    // Test Merge Function.
+
+    private static final Set<InputClass> INPUT_ALPHA_A = HashSet.of(InputClass.A);
+
+    private static final NFAutomaton<Character, InputClass, OutputClass> NFA_A =
+            new NFAutomaton<Character, InputClass, OutputClass>(2, INPUT_ALPHA_A, (input) -> {
+                if (input == 'A') return InputClass.A;
+                return InputClass.OTHER;
+            })
+                    .withSingleTransition(0, 1, InputClass.A)
+                    .withAcceptingState(1, OutputClass.Thing1);
+
+    private static final Set<InputClass> INPUT_ALPHA_B = HashSet.of(InputClass.B);
+
+    private static final NFAutomaton<Character, InputClass, OutputClass> NFA_B =
+            new NFAutomaton<Character, InputClass, OutputClass>(2, INPUT_ALPHA_B, (input) -> {
+                if (input == 'B') return InputClass.B;
+                return InputClass.OTHER;
+            })
+                    .withSingleTransition(0, 1, InputClass.B)
+                    .withAcceptingState(1, OutputClass.Thing1);
+
+    private static final NFAutomaton<Character, InputClass, OutputClass> NFA_AB = NFA_A.merge(NFA_B, (input) -> {
+        if (input == 'A') return InputClass.A;
+        if (input == 'B') return InputClass.B;
+        return InputClass.OTHER;
+    });
+
+    @Test
+    void testMerge() {
+        assertThrows(IllegalArgumentException.class, () -> NFA_A.getTransitions(0, 'B'));
+        assertThrows(IllegalArgumentException.class, () -> NFA_B.getTransitions(0, 'A'));
+
+        assertEquals(4, NFA_AB.getNumberOfStates());
+        assertEquals(HashSet.of(2), NFA_AB.getEpsilonTransitions(0));
+        assertEquals(HashSet.of(3), NFA_AB.getTransitions(2, 'B'));
+        assertEquals(HashSet.of(1), NFA_AB.getTransitions(0, 'A'));
+    }
 }

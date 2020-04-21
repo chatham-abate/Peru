@@ -1,7 +1,9 @@
 package org.perudevteam.fa;
 
 import io.vavr.Function1;
+import io.vavr.Tuple;
 import io.vavr.Tuple2;
+import io.vavr.Tuple3;
 import io.vavr.collection.*;
 import io.vavr.control.Option;
 
@@ -158,6 +160,16 @@ public class NFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
                 : Option.some(epsilonTransitions.get(from));
     }
 
+    // Shift Helper Functions...
+
+    public Tuple3<Map<Integer, O>, Array<Map<IC, Set<Integer>>>, Array<Set<Integer>>> shift(int shift) {
+        return Tuple.of(
+                getAcceptingStates().mapKeys(acceptingState -> acceptingState + shift),
+                transitionTable.map(row -> row.mapValues(stateSet -> stateSet.map(state -> state + shift))),
+                epsilonTransitions.map(stateSet -> stateSet.map(state -> state + shift))
+        );
+    }
+
     // With moves...
 
 
@@ -194,11 +206,46 @@ public class NFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
                 transitionTable, epsilonTransitions, getGetInputClassUnchecked(), false);
     }
 
+    public NFAutomaton<I, IC, O> merge(NFAutomaton<? super I, ? extends IC, ? extends O> nfa2) {
+        return merge(nfa2, getGetInputClassUnchecked());    // Keep old get input class function.
+    }
+
+    public NFAutomaton<I, IC, O> merge(NFAutomaton<? super I, ? extends IC, ? extends O> nfa2,
+                                       Function1<? super I, ? extends IC> newGIC) {
+        Objects.requireNonNull(nfa2);
+        Objects.requireNonNull(newGIC);
+
+        // Union of Input Alphabets.
+        Set<IC> iaUnion = getInputAlphabet().addAll(nfa2.getInputAlphabet());
+
+        int shift = getNumberOfStates();
+
+        Tuple3<Map<Integer, O>, Array<Map<IC, Set<Integer>>>, Array<Set<Integer>>>
+                nfa2Shifts = nfa2.shift(shift)
+                .<Map<Integer, O>>map1(Map::narrow)
+                .map2(table -> table.map(Map::narrow));
+
+        Map<Integer, O> newAcceptingStates = getAcceptingStates().merge(nfa2Shifts._1);
+        Array<Map<IC, Set<Integer>>> newTransitionTable = transitionTable.appendAll(nfa2Shifts._2);
+        Array<Set<Integer>> newEpsilonTransitions = epsilonTransitions.appendAll(nfa2Shifts._3);
+
+        newEpsilonTransitions = newEpsilonTransitions.update(0, stateSet -> stateSet.add(shift));
+
+        return new NFAutomaton<>(newAcceptingStates, iaUnion,
+                newTransitionTable, newEpsilonTransitions, newGIC, false);
+    }
+
     public DFAutomaton<I, IC, O> toDFA() {
         return FAutomatonUtil.convertNFAToDFA(this, List.empty());
+    }
+
+    public DFAutomaton<I, IC, O> toDFA(Set<? extends O> strongSignals) {
+        return FAutomatonUtil.convertNFAToDFA(this, List.of(strongSignals));
     }
 
     public DFAutomaton<I, IC, O> toDFA(Seq<? extends Set<? extends O>> precSeq) {
         return FAutomatonUtil.convertNFAToDFA(this, precSeq);
     }
+
+
 }

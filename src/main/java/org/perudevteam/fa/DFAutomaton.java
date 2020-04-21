@@ -1,6 +1,7 @@
 package org.perudevteam.fa;
 
 import io.vavr.Function1;
+import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import io.vavr.collection.*;
 import io.vavr.control.Option;
@@ -101,6 +102,13 @@ public class DFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
         validateInputClass(inputClass);
         validateState(from);
         return transitionTable.get(from).get(inputClass);
+    }
+
+    public Tuple2<Map<Integer, O>, Array<Map<IC, Integer>>> shift(int shift) {
+        return Tuple.of(
+                getAcceptingStates().mapKeys(acceptingState -> acceptingState + shift),
+                transitionTable.map(row -> row.mapValues(state -> state + shift))
+        );
     }
 
     @Override
