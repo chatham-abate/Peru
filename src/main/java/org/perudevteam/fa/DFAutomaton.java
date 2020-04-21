@@ -122,9 +122,4 @@ public class DFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
         return new DFAutomaton<I, IC, O>(getAcceptingStates().put(state, output), getInputAlphabet(),
                 transitionTable, getGetInputClassUnchecked(),false);
     }
-
-    @Override
-    public DFAutomaton<I, IC, O> toDFA() {
-        return this;
-    }
 }

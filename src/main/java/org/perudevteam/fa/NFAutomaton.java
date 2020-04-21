@@ -194,8 +194,11 @@ public class NFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
                 transitionTable, epsilonTransitions, getGetInputClassUnchecked(), false);
     }
 
-    @Override
     public DFAutomaton<I, IC, O> toDFA() {
-        return FAutomatonUtil.convertNFAToDFA(this);
+        return FAutomatonUtil.convertNFAToDFA(this, List.empty());
+    }
+
+    public DFAutomaton<I, IC, O> toDFA(Seq<? extends Set<? extends O>> precSeq) {
+        return FAutomatonUtil.convertNFAToDFA(this, precSeq);
     }
 }

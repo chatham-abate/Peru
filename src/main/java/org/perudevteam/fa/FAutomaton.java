@@ -87,6 +87,4 @@ abstract class FAutomaton<I, IC, O> {
     public abstract FAutomaton<I, IC, O> withSingleTransition(int from, int to, IC inputClass);
 
     public abstract FAutomaton<I, IC, O> withAcceptingState(int state, O output);
-
-    public abstract DFAutomaton<I, IC, O> toDFA();
 }

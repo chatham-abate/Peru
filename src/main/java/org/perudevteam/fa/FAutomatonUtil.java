@@ -9,12 +9,16 @@ public final class FAutomatonUtil {
         // Should never be initialized.
     }
 
-    static <I, IC, O> DFAutomaton<I, IC, O> convertNFAToDFA(NFAutomaton<I, IC, O> nfa) {
+    static <I, IC, O> DFAutomaton<I, IC, O> convertNFAToDFA(
+            NFAutomaton<? super I, ? extends IC, ? extends O> nfa,
+            Seq<? extends Set<? extends O>> precSeq) {
         Objects.requireNonNull(nfa);
 
+        Map<O, Integer> precMap = precedenceMap(precSeq);
+
         // NFA Accepting states and Transition Table.
-        Array<Map<IC, Set<Integer>>> nfaTT = nfa.getTransitionTable();
-        Map<Integer, O> nfaAS = nfa.getAcceptingStates();
+        Array<Map<IC, Set<Integer>>> nfaTT = nfa.getTransitionTable().map(Map::narrow);
+        Map<Integer, O> nfaAS = Map.narrow(nfa.getAcceptingStates());
 
         // Array of All NFA States' e* transitions.
         Array<Set<Integer>> epsilonStar = reachableSets(nfa.getEpsilonTransitions());
@@ -39,16 +43,14 @@ public final class FAutomatonUtil {
 
             // Get its index.
             int newStateSetIndex = stateSetIndex.get(newStateSet).get();
-            Set<Integer> underlyingAcceptances = HashSet.ofAll(newStateSet.filter(nfaAS::containsKey));
 
-            if (underlyingAcceptances.length() > 1) {
-                throw new IllegalArgumentException("Given NFA has ambiguous accepting states.");
-            }
+            // Find stateSet's underlying outputs.
+            Set<O> underlyingOutputs = HashSet.ofAll(newStateSet.filter(nfaAS::containsKey))
+                    .map(acceptState -> nfaAS.get(acceptState).get());
 
-            // Mark new State set as accepting state if applicable.
-            if (underlyingAcceptances.length() == 1) {
-                int underlyingAcceptingState = underlyingAcceptances.head();
-                dfaAS = dfaAS.put(newStateSetIndex, nfaAS.get(underlyingAcceptingState).get());
+            if (underlyingOutputs.length() > 0) {
+                O output = getMostPrecedent(precMap, underlyingOutputs);
+                dfaAS = dfaAS.put(newStateSetIndex, output);
             }
 
             // Flatten Transition Sets for all found inputs.
@@ -90,6 +92,50 @@ public final class FAutomatonUtil {
 
         return new DFAutomaton<>(dfaAS, nfa.getInputAlphabet(), Array.ofAll(dfaTT),
                 nfa.getGetInputClassUnchecked(), false);
+    }
+
+    static <O> O getMostPrecedent(Map<? extends O, ? extends Integer> precMap,
+                                   Set<? extends O> outputs) {
+
+        Map<O, Integer> narrowPrecMap = Map.narrow(precMap);
+        Set<O> mostPrecedent = HashSet.empty();
+        int mostPrecedentRank = Integer.MAX_VALUE;    // Most Precedent Rank is 0.
+
+        for (O output: outputs) {
+            int rank = narrowPrecMap.containsKey(output)
+                    ? narrowPrecMap.get(output).get()
+                    : Integer.MAX_VALUE;
+
+            if (rank == mostPrecedentRank) {
+                mostPrecedent = mostPrecedent.add(output);
+            } else if (rank < mostPrecedentRank) {
+                mostPrecedentRank = rank;
+                mostPrecedent = HashSet.of(output);
+            }
+        }
+
+        if (mostPrecedent.length() > 1) {
+            throw new IllegalArgumentException("Ambiguous Accepting State.");
+        }
+
+        return mostPrecedent.head();
+    }
+
+    static <O> Map<O, Integer> precedenceMap(Seq<? extends Set<? extends O>> precSeq) {
+        // No NULLs anywhere.
+        Objects.requireNonNull(precSeq);
+        precSeq.forEach(Objects::requireNonNull);
+        precSeq.forEach(s -> s.forEach(Objects::requireNonNull));
+
+        Map<O, Integer> precMap = HashMap.empty();
+
+        for (int i = 0; i < precSeq.length(); i++) {
+            for (O output: precSeq.get(i)) {
+                precMap = precMap.put(output, i);
+            }
+        }
+
+        return precMap;
     }
 
     static Set<Integer> epsilonClosure(Set<Integer> stateSet, Array<Set<Integer>> epsilonStar) {
