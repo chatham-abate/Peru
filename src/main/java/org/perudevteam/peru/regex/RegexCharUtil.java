@@ -69,7 +69,7 @@ public class RegexCharUtil {
     public static void main(String[] args) {
         String test = "b";
         System.out.println(test.matches(
-                "a{1,}"
+                "[]]"
         ));
     }
 
