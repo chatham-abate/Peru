@@ -1,9 +1,8 @@
 package org.perudevteam.parser.lrone;
 
-import io.vavr.Tuple2;
 import io.vavr.collection.*;
 import io.vavr.control.Either;
-import org.perudevteam.misc.SeqHelpers;
+import org.perudevteam.misc.MiscHelpers;
 import org.perudevteam.parser.grammar.CFGrammar;
 import org.perudevteam.parser.grammar.Production;
 import static io.vavr.control.Either.*;
@@ -271,7 +270,7 @@ public class LROneTable<NT extends Enum<NT>, T extends Enum<T>, P extends Produc
             return cell.get().getSource().name();
         }));
 
-        return SeqHelpers.gridString(rowLabels, colLabels, grid);
+        return MiscHelpers.gridString(rowLabels, colLabels, grid);
     }
 
     public String gotoTableString() {
@@ -281,6 +280,6 @@ public class LROneTable<NT extends Enum<NT>, T extends Enum<T>, P extends Produc
 
         Seq<Seq<String>> grid = gotoTable.map(r -> r.map(cell -> cell.equals(0) ? "" : cell + ""));
 
-        return SeqHelpers.gridString(rowLabels, colLabels, grid);
+        return MiscHelpers.gridString(rowLabels, colLabels, grid);
     }
 }

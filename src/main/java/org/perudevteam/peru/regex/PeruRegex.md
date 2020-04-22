@@ -62,7 +62,7 @@ Here the order for which to interpret the Peru Regex rules listed above.
 
 <Literal>       =:: <Escape> | <Digit> | <NonSpecial> 
 
-<ClassPreset>   =:: "\" <NonSpecial>
+<ClassPreset>   =:: "\" <NonSpecial> | "\" <Digit>
 
 <ClassAtom>     =:: <Literal> | <Literal> "-" <Literal>
 <ClassInner>    =:: <ClassInner> <ClassAtom> | <ClassAtom>

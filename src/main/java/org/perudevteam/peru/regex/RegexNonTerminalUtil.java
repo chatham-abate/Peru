@@ -18,12 +18,13 @@ public final class RegexNonTerminalUtil {
         NUMBER,
         QUANTIFIER,
         CONCAT,
-        EXPRESSION
+        EXPRESSION,
+        REGEX_GOAL
     }
 
     // Static Either Wrappers.
 
-    private static final Either<RegexNonTerminal, RegexTerminal>
+    static final Either<RegexNonTerminal, RegexTerminal>
     NT_ESCAPE = left(RegexNonTerminal.ESCAPE),
     NT_LITERAL = left(RegexNonTerminal.LITERAL),
     NT_CLASS_PRESET = left(RegexNonTerminal.CLASS_PRESET),
@@ -37,7 +38,7 @@ public final class RegexNonTerminalUtil {
     NT_EXPRESSION = left(RegexNonTerminal.EXPRESSION);
 
     // Rules.
-    private static final Seq<Either<RegexNonTerminal, RegexTerminal>>
+    static final Seq<Either<RegexNonTerminal, RegexTerminal>>
 
     // Escape Rules.
     ESCAPE_R1 = List.of(T_BACKSLASH, T_STAR),
@@ -63,6 +64,7 @@ public final class RegexNonTerminalUtil {
 
     // Class Preset Rule.
     CLASS_PRESET_R1 = List.of(T_BACKSLASH, T_NON_SPECIAL),
+    CLASS_PRESET_R2 = List.of(T_BACKSLASH, T_DIGIT),
 
     // Atomic Class Rules.
     CLASS_ATOM_R1 = List.of(NT_LITERAL),
@@ -74,8 +76,34 @@ public final class RegexNonTerminalUtil {
 
     // Character Class Rules.
     CLASS_R1 = List.of(T_LEFT_SQ, NT_CLASS_INNER, T_RIGHT_SQ),
-    CLASS_R2 = List.of(T_LEFT_SQ, T_CARROT, NT_CLASS_INNER, T_RIGHT_SQ);
+    CLASS_R2 = List.of(T_LEFT_SQ, T_CARROT, NT_CLASS_INNER, T_RIGHT_SQ),
 
     // Value Rules.
-    //... for tomorrow...
+    VALUE_R1 = List.of(NT_LITERAL),
+    VALUE_R2 = List.of(NT_CLASS),
+    VALUE_R3 = List.of(NT_CLASS_PRESET),
+    VALUE_R4 = List.of(T_LEFT_P, NT_EXPRESSION, T_RIGHT_P),
+
+    // Number Rules.
+    NUMBER_R1 = List.of(NT_NUMBER, T_DIGIT),
+    NUMBER_R2 = List.of(T_DIGIT),
+
+    // Quantifier Rules.
+    QUANTIFIER_R1 = List.of(NT_VALUE, T_PLUS),
+    QUANTIFIER_R2 = List.of(NT_VALUE, T_STAR),
+    QUANTIFIER_R3 = List.of(NT_VALUE, T_Q_MARK),
+    QUANTIFIER_R4 = List.of(NT_VALUE, T_LEFT_B, NT_NUMBER, T_RIGHT_B),
+    QUANTIFIER_R5 = List.of(NT_VALUE, T_LEFT_B, NT_NUMBER, T_COMMA, T_RIGHT_B),
+    QUANTIFIER_R6 = List.of(NT_VALUE, T_LEFT_B, NT_NUMBER, T_COMMA, NT_NUMBER, T_RIGHT_B),
+
+    // Concat Rules.
+    CONCAT_R1 = List.of(NT_CONCAT, NT_QUANTIFIER),
+    CONCAT_R2 = List.of(NT_QUANTIFIER),
+
+    // Expressions Rules.
+    EXPRESSION_R1 = List.of(NT_EXPRESSION, T_PIPE, NT_CONCAT),
+    EXPRESSION_R2 = List.of(NT_CONCAT),
+
+    // Regex Goal Rule.
+    REGEX_GOAL_R1 = List.of(NT_EXPRESSION);
 }

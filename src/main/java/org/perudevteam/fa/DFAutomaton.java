@@ -5,10 +5,22 @@ import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import io.vavr.collection.*;
 import io.vavr.control.Option;
+import org.perudevteam.misc.MiscHelpers;
+
 import java.util.Objects;
 
 // DFA.
 public class DFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
+
+    public static <I, IC, O> DFAutomaton<I, IC, O> narrow(DFAutomaton<? super I, ? extends IC, ? extends O> dfa) {
+        return new DFAutomaton<>(
+                dfa.getAcceptingStates(),
+                dfa.getInputAlphabet(),
+                dfa.getTransitionTable(),
+                dfa.getGetInputClassUnchecked(),
+                false
+        );
+    }
 
     private final Array<Map<IC, Integer>> transitionTable;
 
@@ -117,7 +129,7 @@ public class DFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
         validateState(to);
         validateInputClass(inputClass);
 
-        return new DFAutomaton<I, IC, O>(getAcceptingStates(), getInputAlphabet(),
+        return new DFAutomaton<>(getAcceptingStates(), getInputAlphabet(),
                 transitionTable.update(from, row -> row.put(inputClass, to)),
                 getGetInputClassUnchecked(),false);
     }
@@ -127,7 +139,15 @@ public class DFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
         validateState(state);
         Objects.requireNonNull(output);
 
-        return new DFAutomaton<I, IC, O>(getAcceptingStates().put(state, output), getInputAlphabet(),
+        return new DFAutomaton<>(getAcceptingStates().put(state, output), getInputAlphabet(),
                 transitionTable, getGetInputClassUnchecked(),false);
+    }
+
+    @Override
+    public <OP> DFAutomaton<I, IC, OP> withAcceptingStates(Map<? extends Integer, ? extends OP> newOutputs) {
+        MiscHelpers.requireNonNullMap(newOutputs);
+        newOutputs.keySet().forEach(this::validateState);
+        return new DFAutomaton<>(newOutputs, getInputAlphabet(), transitionTable,
+                getGetInputClassUnchecked(), false);
     }
 }

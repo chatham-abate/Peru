@@ -7,7 +7,7 @@ import io.vavr.collection.Seq;
 import io.vavr.control.Try;
 import org.perudevteam.type.Tagged;
 
-import static org.perudevteam.misc.SeqHelpers.*;
+import static org.perudevteam.misc.MiscHelpers.*;
 import java.util.Objects;
 
 // Operator Set...
@@ -170,7 +170,7 @@ public class OperatorSet<OT extends Enum<OT>, DT extends Enum<DT>, DC extends Ta
 
     public OperatorSet<OT, DT, DC>
     withBinaryOverloads(Seq<DT> dataTags1, Seq<DT> dataTags2, Seq<BinaryOperator<OT, DT, DC>> ops) {
-        validateNestedSeq(List.of(dataTags1, dataTags2, ops));
+        requireNonNullNestedSeq(List.of(dataTags1, dataTags2, ops));
         return withBinaryOverloadsUnchecked(dataTags1, dataTags2, ops);
     }
 
@@ -210,7 +210,7 @@ public class OperatorSet<OT extends Enum<OT>, DT extends Enum<DT>, DC extends Ta
 
     public OperatorSet<OT, DT, DC>
     withSymmetricBinaryOverloads(Seq<DT> dataTags1, Seq<DT> dataTags2, Seq<BinaryOperator<OT, DT, DC>> ops) {
-        validateNestedSeq(List.of(dataTags1, dataTags2, ops));
+        requireNonNullNestedSeq(List.of(dataTags1, dataTags2, ops));
 
         return withBinaryOverloadsUnchecked(dataTags1, dataTags2, ops)
                 .withBinaryOverloadsUnchecked(dataTags2, dataTags1, ops);

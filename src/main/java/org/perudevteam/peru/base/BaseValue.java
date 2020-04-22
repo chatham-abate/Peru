@@ -3,6 +3,7 @@ package org.perudevteam.peru.base;
 import io.vavr.Function1;
 import io.vavr.collection.Map;
 import io.vavr.collection.Seq;
+import org.perudevteam.misc.MiscHelpers;
 import org.perudevteam.type.Tagged;
 
 import java.util.Objects;
@@ -62,7 +63,7 @@ public abstract class BaseValue extends Tagged<BaseType> {
      * (Except for String, everything can be cast to a String)
      */
 
-    public Enum toEnum() {
+    public Enum<?> toEnum() {
         throw castError(getTag(), BaseType.ENUM);
     }
 
@@ -121,7 +122,8 @@ public abstract class BaseValue extends Tagged<BaseType> {
         return new BaseCharacter(v);
     }
 
-    public static BaseValue ofEnum(Enum v) {
+    public static BaseValue ofEnum(Enum<?> v) {
+        Objects.requireNonNull(v);
         return new BaseEnum(v);
     }
 
@@ -130,18 +132,23 @@ public abstract class BaseValue extends Tagged<BaseType> {
     }
 
     public static BaseValue ofString(String v) {
+        Objects.requireNonNull(v);
         return new BaseString(v);
     }
 
     public static BaseValue ofMap(Map<? extends String, ? extends BaseValue> v) {
+        MiscHelpers.requireNonNullMap(v);
         return new BaseMap(v);
     }
 
     public static BaseValue ofSequence(Seq<? extends BaseValue> v) {
+        Objects.requireNonNull(v);
+        v.forEach(Objects::requireNonNull);
         return new BaseSequence(v);
     }
 
     public static BaseValue ofFunction(Function1<? super Seq<BaseValue>, ? extends BaseValue> v) {
+        Objects.requireNonNull(v);
         return new BaseFunction(v);
     }
 
@@ -179,7 +186,7 @@ public abstract class BaseValue extends Tagged<BaseType> {
         return new BaseCharacter(f.apply(toCharacter()));
     }
 
-    public BaseValue mapEnum(Function1<? super Enum, ? extends Enum> f) {
+    public BaseValue mapEnum(Function1<? super Enum<?>, ? extends Enum<?>> f) {
         return new BaseEnum(f.apply(toEnum()));
     }
 
@@ -208,7 +215,7 @@ public abstract class BaseValue extends Tagged<BaseType> {
      * Base Byte Class.
      */
     private static class BaseByte  extends BaseValue {
-        private byte value;
+        private final byte value;
 
         private BaseByte(byte v) {
             super(BaseType.BYTE);
@@ -270,7 +277,7 @@ public abstract class BaseValue extends Tagged<BaseType> {
      * Base Short Class.
      */
     private static class BaseShort extends BaseValue {
-        private short value;
+        private final short value;
 
         private BaseShort(short v) {
             super(BaseType.SHORT);
@@ -326,7 +333,7 @@ public abstract class BaseValue extends Tagged<BaseType> {
      * Base Int Class.
      */
     private static class BaseInt extends BaseValue{
-        private int value;
+        private final int value;
 
         private BaseInt(int v) {
             super(BaseType.INT);
@@ -378,7 +385,7 @@ public abstract class BaseValue extends Tagged<BaseType> {
      * Base Long Class.
      */
     private static class BaseLong extends BaseValue {
-        private long value;
+        private final long value;
 
         private BaseLong(long v) {
             super(BaseType.LONG);
@@ -424,7 +431,7 @@ public abstract class BaseValue extends Tagged<BaseType> {
      * Base Float Class.
      */
     private static class BaseFloat extends BaseValue {
-        private float value;
+        private final float value;
         private BaseFloat(float v) {
             super(BaseType.FLOAT);
             value = v;
@@ -465,7 +472,7 @@ public abstract class BaseValue extends Tagged<BaseType> {
      * Base Double Class.
      */
     private static class BaseDouble extends BaseValue {
-        private double value;
+        private final double value;
         private BaseDouble(double v) {
             super(BaseType.DOUBLE);
             value = v;
@@ -501,7 +508,7 @@ public abstract class BaseValue extends Tagged<BaseType> {
      * Base Character Class.
      */
     private static class BaseCharacter extends BaseValue {
-        private char value;
+        private final char value;
         private BaseCharacter(char v) {
             super(BaseType.CHARACTER);
             value = v;
@@ -557,15 +564,15 @@ public abstract class BaseValue extends Tagged<BaseType> {
      * Base Enum Class.
      */
     private static class BaseEnum  extends BaseValue {
-        private Enum value;
-        private BaseEnum(Enum v) {
+        private final Enum<?> value;
+        private BaseEnum(Enum<?> v) {
             super(BaseType.ENUM);
             Objects.requireNonNull(v);
             value = v;
         }
 
         @Override
-        public Enum toEnum() {
+        public Enum<?> toEnum() {
             return value;
         }
 
@@ -597,7 +604,7 @@ public abstract class BaseValue extends Tagged<BaseType> {
         static final BaseBoolean TRUE = new BaseBoolean(true);
         static final BaseBoolean FALSE = new BaseBoolean(false);
 
-        private boolean value;
+        private final boolean value;
         private BaseBoolean(boolean v) {
             super(BaseType.BOOLEAN);
             value = v;
@@ -633,7 +640,7 @@ public abstract class BaseValue extends Tagged<BaseType> {
      * Base String Class.
      */
     private static class BaseString extends BaseValue {
-        private String value;
+        private final String value;
         private BaseString(String v) {
             super(BaseType.STRING);
             Objects.requireNonNull(v);
@@ -665,7 +672,7 @@ public abstract class BaseValue extends Tagged<BaseType> {
      * Base Map Class.
      */
     private static class BaseMap extends BaseValue {
-        private Map<String, BaseValue> value;
+        private final Map<String, BaseValue> value;
         private BaseMap(Map<? extends String, ? extends BaseValue> v) {
             super(BaseType.MAP);
             Objects.requireNonNull(v);
@@ -702,7 +709,7 @@ public abstract class BaseValue extends Tagged<BaseType> {
      * Base Sequence Class.
      */
     private static class BaseSequence extends BaseValue {
-        private Seq<BaseValue> value;
+        private final Seq<BaseValue> value;
         private BaseSequence(Seq<? extends BaseValue> v) {
             super(BaseType.SEQUENCE);
             Objects.requireNonNull(v);
@@ -740,7 +747,7 @@ public abstract class BaseValue extends Tagged<BaseType> {
      * Base Function Class.
      */
     private static class BaseFunction extends BaseValue {
-        private Function1<Seq<BaseValue>, BaseValue> value;
+        private final Function1<Seq<BaseValue>, BaseValue> value;
         private BaseFunction(Function1<? super Seq<BaseValue>, ? extends BaseValue> v) {
             super(BaseType.FUNCTION);
             Objects.requireNonNull(v);

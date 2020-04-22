@@ -1,6 +1,7 @@
 package org.perudevteam.misc;
 
 import io.vavr.collection.Array;
+import io.vavr.collection.Map;
 import io.vavr.collection.Seq;
 import io.vavr.collection.Stream;
 import io.vavr.control.Try;
@@ -11,7 +12,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Objects;
 
-public final class SeqHelpers {
+public final class MiscHelpers {
+    private MiscHelpers() {
+        // Never should be initialized.
+    }
+
     public static Stream<Character> fileUnchecked(String filename) {
         return file(filename).get().map(Try::get);
     }
@@ -35,12 +40,18 @@ public final class SeqHelpers {
         }
     }
 
-    public static void validateNestedSeq(Seq<? extends Seq<?>> nestedSeq) {
+    public static void requireNonNullNestedSeq(Seq<? extends Seq<?>> nestedSeq) {
         Objects.requireNonNull(nestedSeq);
         for (Seq<?> row: nestedSeq) {
             Objects.requireNonNull(row);
             row.forEach(Objects::requireNonNull);
         }
+    }
+
+    public static <K, V> void requireNonNullMap(Map<K, V> map) {
+        Objects.requireNonNull(map);
+        map.keySet().forEach(Objects::requireNonNull);
+        map.values().forEach(Objects::requireNonNull);
     }
 
     /**

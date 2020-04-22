@@ -6,10 +6,22 @@ import io.vavr.Tuple2;
 import io.vavr.Tuple3;
 import io.vavr.collection.*;
 import io.vavr.control.Option;
+import org.perudevteam.misc.MiscHelpers;
 
 import java.util.Objects;
 
 public class NFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
+
+    public static <I, IC, O> NFAutomaton<I, IC, O> narrow(NFAutomaton<? super I, ? extends IC, ? extends O> nfa) {
+        return new NFAutomaton<>(
+                nfa.getAcceptingStates(),
+                nfa.getInputAlphabet(),
+                nfa.getTransitionTable(),
+                nfa.getEpsilonTransitions(),
+                nfa.getGetInputClassUnchecked(),
+                false
+        );
+    }
 
     private final Array<Map<IC, Set<Integer>>> transitionTable;
     private final Array<Set<Integer>> epsilonTransitions;
@@ -202,8 +214,16 @@ public class NFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
     @Override
     public NFAutomaton<I, IC, O> withAcceptingState(int state, O output) {
         validateState(state);
-        return new NFAutomaton<I, IC, O>(getAcceptingStates().put(state, output), getInputAlphabet(),
+        return new NFAutomaton<>(getAcceptingStates().put(state, output), getInputAlphabet(),
                 transitionTable, epsilonTransitions, getGetInputClassUnchecked(), false);
+    }
+
+    @Override
+    public <OP> NFAutomaton<I, IC, OP> withAcceptingStates(Map<? extends Integer, ? extends OP> newOutputs) {
+        MiscHelpers.requireNonNullMap(newOutputs);
+        newOutputs.keySet().forEach(this::validateState);
+        return new NFAutomaton<>(newOutputs, getInputAlphabet(), transitionTable, epsilonTransitions,
+                getGetInputClassUnchecked(), false);
     }
 
     public NFAutomaton<I, IC, O> merge(NFAutomaton<? super I, ? extends IC, ? extends O> nfa2) {
@@ -246,6 +266,4 @@ public class NFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
     public DFAutomaton<I, IC, O> toDFA(Seq<? extends Set<? extends O>> precSeq) {
         return FAutomatonUtil.convertNFAToDFA(this, precSeq);
     }
-
-
 }

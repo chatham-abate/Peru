@@ -55,7 +55,7 @@ public final class RegexTerminalUtil {
     T_DIGIT = right(RegexTerminal.DIGIT),
     T_NON_SPECIAL = right(RegexTerminal.NON_SPECIAL);
 
-    private static final Map<Character, RegexTerminal> CMDS =
+    static final Map<Character, RegexTerminal> CMDS =
             HashMap.<Character, RegexTerminal>empty()
                     .put('^', RegexTerminal.CARROT)
                     .put('.', RegexTerminal.DOT)
@@ -73,7 +73,7 @@ public final class RegexTerminalUtil {
                     .put('\\', RegexTerminal.BACKSLASH)
                     .put('-', RegexTerminal.DASH);
 
-    private static RegexTerminal getRegexCharType(Character input) {
+    static RegexTerminal getRegexCharType(Character input) {
         if (input > 127) {
             throw new IllegalArgumentException("Given character not basic ASCII.");
         }

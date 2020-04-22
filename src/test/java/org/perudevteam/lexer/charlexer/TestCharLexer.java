@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.perudevteam.fa.DFAutomaton;
 import org.perudevteam.lexer.DLexer;
 
-import org.perudevteam.misc.SeqHelpers;
+import org.perudevteam.misc.MiscHelpers;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -168,7 +168,7 @@ public class TestCharLexer {
 
     @Test
     void testLinearLexerSpeed() {
-        Seq<Character> input = SeqHelpers.fileUnchecked("src/test/testcases/TestCaseLinearDLexer.txt");
+        Seq<Character> input = MiscHelpers.fileUnchecked("src/test/testcases/TestCaseLinearDLexer.txt");
 
         double linearStart = System.nanoTime();
         LEXER_LINEAR2.buildSuccessfulTokenStream(input, CharLinearContext.INIT_LINEAR_CONTEXT).toArray().length();
@@ -183,7 +183,7 @@ public class TestCharLexer {
 
 
     private static final Seq<Character> VERBOSE_INPUT =
-            SeqHelpers.fileUnchecked("src/test/testcases/TestCaseVerboseDLexer.txt");
+            MiscHelpers.fileUnchecked("src/test/testcases/TestCaseVerboseDLexer.txt");
 
     @Test
     void testVerboseNumberOfTokens() {
