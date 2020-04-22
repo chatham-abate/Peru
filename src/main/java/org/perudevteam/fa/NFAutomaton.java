@@ -197,8 +197,37 @@ public class NFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
                         : row.put(inputClass, HashSet.of(to))
                 );
 
-        return new NFAutomaton<I, IC, O>(getAcceptingStates(), getInputAlphabet(),
+        return new NFAutomaton<>(getAcceptingStates(), getInputAlphabet(),
                 newTT, epsilonTransitions, getGetInputClassUnchecked(), false);
+    }
+
+    @Override
+    public NFAutomaton<I, IC, O> withSingleTransitions(Set<? extends Integer> froms,
+                                                      Set<? extends Integer> tos,
+                                                      Set<? extends IC> inputClasses) {
+        Objects.requireNonNull(froms);
+        Objects.requireNonNull(tos);
+        Objects.requireNonNull(inputClasses);
+
+        froms.forEach(this::validateState);
+        tos.forEach(this::validateState);
+        inputClasses.forEach(this::validateInputClass);
+
+        Array<Map<IC, Set<Integer>>> tt = transitionTable;
+
+        for (int from: froms) {
+            for (int to: tos) {
+                for (IC inputClass: inputClasses) {
+                    tt = tt.update(from, row -> row.containsKey(inputClass)
+                            ? row.put(inputClass, row.get(inputClass).get().add(to))
+                            : row.put(inputClass, HashSet.of(to))
+                    );
+                }
+            }
+        }
+
+        return new NFAutomaton<>(getAcceptingStates(), getInputAlphabet(),
+                tt, epsilonTransitions, getGetInputClassUnchecked(), false);
     }
 
     public NFAutomaton<I, IC, O> withEpsilonTransition(int from, int to) {
@@ -207,7 +236,7 @@ public class NFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
 
         Array<Set<Integer>> newEps = epsilonTransitions.update(from, set -> set.add(to));
 
-        return new NFAutomaton<I, IC, O>(getAcceptingStates(), getInputAlphabet(),
+        return new NFAutomaton<>(getAcceptingStates(), getInputAlphabet(),
                 transitionTable, newEps, getGetInputClassUnchecked(), false);
     }
 

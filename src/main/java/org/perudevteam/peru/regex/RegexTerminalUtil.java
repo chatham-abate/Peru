@@ -3,7 +3,9 @@ package org.perudevteam.peru.regex;
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import io.vavr.collection.HashMap;
+import io.vavr.collection.HashSet;
 import io.vavr.collection.Map;
+import io.vavr.collection.Set;
 import org.perudevteam.parser.Tokenized;
 import io.vavr.control.Either;
 import org.perudevteam.peru.regex.RegexNonTerminalUtil.RegexNonTerminal;
@@ -13,6 +15,18 @@ import static io.vavr.control.Either.*;
 public final class RegexTerminalUtil {
     private RegexTerminalUtil() {
         // Should never be initialized.
+    }
+
+    static final Set<Character> ASCII_SET = buildASCIISet();
+
+    private static Set<Character> buildASCIISet() {
+        Set<Character> asciiSet = HashSet.empty();
+
+        for (char c = 0; c < 128; c++) {
+            asciiSet = asciiSet.add(c);
+        }
+
+        return asciiSet;
     }
 
     enum RegexTerminal {

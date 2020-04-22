@@ -135,6 +135,32 @@ public class DFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
     }
 
     @Override
+    public DFAutomaton<I, IC, O> withSingleTransitions(Set<? extends Integer> froms,
+                                                      Set<? extends Integer> tos,
+                                                      Set<? extends IC> inputClasses) {
+        Array<Map<IC, Integer>> tt = transitionTable;
+
+        Objects.requireNonNull(froms);
+        Objects.requireNonNull(tos);
+        Objects.requireNonNull(inputClasses);
+
+        froms.forEach(this::validateState);
+        tos.forEach(this::validateState);
+        inputClasses.forEach(this::validateInputClass);
+
+        for (int from: froms) {
+            for (int to: tos) {
+                for (IC inputClass: inputClasses) {
+                    tt.update(from, row -> row.put(inputClass, to));
+                }
+            }
+        }
+
+        return new DFAutomaton<>(getAcceptingStates(), getInputAlphabet(),
+                tt, getGetInputClassUnchecked(), false);
+    }
+
+    @Override
     public DFAutomaton<I, IC, O> withAcceptingState(int state, O output) {
         validateState(state);
         Objects.requireNonNull(output);

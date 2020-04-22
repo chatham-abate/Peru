@@ -57,7 +57,6 @@ abstract class FAutomaton<I, IC, O> {
     }
 
     protected IC getInputClass(I input) {
-        Objects.requireNonNull(input);
         IC inputClass = getInputClassUnchecked.apply(input);
         validateInputClass(inputClass);
         return inputClass;
@@ -85,6 +84,10 @@ abstract class FAutomaton<I, IC, O> {
     }
 
     public abstract FAutomaton<I, IC, O> withSingleTransition(int from, int to, IC inputClass);
+
+    public abstract FAutomaton<I, IC, O> withSingleTransitions(Set<? extends Integer> froms,
+                                                               Set<? extends Integer> tos,
+                                                               Set<? extends IC> inputClasses);
 
     public abstract FAutomaton<I, IC, O> withAcceptingState(int state, O output);
 
