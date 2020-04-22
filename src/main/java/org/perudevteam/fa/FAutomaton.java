@@ -83,6 +83,10 @@ abstract class FAutomaton<I, IC, O> {
         return acceptingStates.get(state).get();
     }
 
+    public abstract FAutomaton<I, IC, O> prependStates(int states);
+
+    public abstract FAutomaton<I, IC, O> appendStates(int states);
+
     public abstract FAutomaton<I, IC, O> withSingleTransition(int from, int to, IC inputClass);
 
     public abstract FAutomaton<I, IC, O> withSingleTransitions(Set<? extends Integer> froms,

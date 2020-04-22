@@ -80,6 +80,29 @@ public class DFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
         return transitionTable.length();
     }
 
+    @Override
+    public DFAutomaton<I, IC, O> prependStates(int states) {
+        if (states <= 0) throw new IllegalArgumentException("States must be positive.");
+
+        // states = the shift here.
+        Tuple2<Map<Integer, O>, Array<Map<IC, Integer>>> shiftedTuple = shift(states);
+
+        Array<Map<IC, Integer>> prefix = Array.fill(states, HashMap.empty());
+
+        return new DFAutomaton<>(shiftedTuple._1, getInputAlphabet(),
+                shiftedTuple._2.prependAll(prefix), getGetInputClassUnchecked(), false);
+    }
+
+    @Override
+    public DFAutomaton<I, IC, O> appendStates(int states) {
+        if (states <= 0) throw new IllegalArgumentException("States must be positive.");
+
+        Array<Map<IC, Integer>> suffix = Array.fill(states, HashMap.empty());
+
+        return new DFAutomaton<>(getAcceptingStates(), getInputAlphabet(),
+                transitionTable.appendAll(suffix), getGetInputClassUnchecked(), false);
+    }
+
     public Array<Map<IC, Integer>> getTransitionTable() {
         return transitionTable;
     }

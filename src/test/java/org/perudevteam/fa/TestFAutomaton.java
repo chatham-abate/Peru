@@ -325,4 +325,16 @@ public class TestFAutomaton {
         assertEquals(HashSet.of(3), NFA_AB.getTransitions(2, 'B'));
         assertEquals(HashSet.of(1), NFA_AB.getTransitions(0, 'A'));
     }
+
+    private static final NFAutomaton<Character, InputClass, OutputClass> NFA_AA =
+            NFA_A.prependStates(1).withSingleTransition(0, 1, InputClass.A);
+
+    @Test
+    void testPrependAndAppend() {
+        assertThrows(IllegalArgumentException.class, () -> NFA_A.prependStates(-10));
+
+        assertEquals(3, NFA_AA.getNumberOfStates());
+        assertEquals(HashSet.of(2), NFA_AA.getTransitionsFromClass(1, InputClass.A));
+        assertEquals(HashSet.of(1), NFA_AA.getTransitionsFromClass(0, InputClass.A));
+    }
 }

@@ -115,6 +115,28 @@ public class NFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
         return transitionTable.length();
     }
 
+    @Override
+    public NFAutomaton<I, IC, O> prependStates(int states) {
+        if (states <= 0) throw new IllegalArgumentException("States must be positive.");
+
+        Tuple3<Map<Integer, O>, Array<Map<IC, Set<Integer>>>, Array<Set<Integer>>> shiftTuple = shift(states);
+
+        return new NFAutomaton<>(shiftTuple._1, getInputAlphabet(),
+                shiftTuple._2.prependAll(Array.fill(states, HashMap.empty())),
+                shiftTuple._3.prependAll(Array.fill(states, HashSet.empty())),
+                getGetInputClassUnchecked(), false);
+    }
+
+    @Override
+    public NFAutomaton<I, IC, O> appendStates(int states) {
+        if (states <= 0) throw new IllegalArgumentException("States must be positive.");
+
+        return new NFAutomaton<>(getAcceptingStates(), getInputAlphabet(),
+                transitionTable.appendAll(Array.fill(states, HashMap.empty())),
+                epsilonTransitions.appendAll(Array.fill(states, HashSet.empty())),
+                getGetInputClassUnchecked(), false);
+    }
+
     public Array<Map<IC, Set<Integer>>> getTransitionTable() {
         return transitionTable;
     }
