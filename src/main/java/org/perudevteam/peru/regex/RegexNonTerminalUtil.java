@@ -62,5 +62,20 @@ public final class RegexNonTerminalUtil {
     LITERAL_R3 = List.of(T_NON_SPECIAL),
 
     // Class Preset Rule.
-    CLASS_PRESET_R1 = List.of(T_BACKSLASH, T_NON_SPECIAL)
+    CLASS_PRESET_R1 = List.of(T_BACKSLASH, T_NON_SPECIAL),
+
+    // Atomic Class Rules.
+    CLASS_ATOM_R1 = List.of(NT_LITERAL),
+    CLASS_ATOM_R2 = List.of(NT_LITERAL, T_DASH, NT_LITERAL),
+
+    // Class Inner Rules.
+    CLASS_INNER_R1 = List.of(NT_CLASS_INNER, NT_CLASS_ATOM),
+    CLASS_INNER_R2 = List.of(NT_CLASS_ATOM),
+
+    // Character Class Rules.
+    CLASS_R1 = List.of(T_LEFT_SQ, NT_CLASS_INNER, T_RIGHT_SQ),
+    CLASS_R2 = List.of(T_LEFT_SQ, T_CARROT, NT_CLASS_INNER, T_RIGHT_SQ);
+
+    // Value Rules.
+    //... for tomorrow...
 }
