@@ -309,14 +309,15 @@ public class TestFAutomaton {
                     .withSingleTransition(0, 1, InputClass.B)
                     .withAcceptingState(1, OutputClass.Thing1);
 
-    private static final NFAutomaton<Character, InputClass, OutputClass> NFA_AB = NFA_A.merge(NFA_B, (input) -> {
+    private static final NFAutomaton<Character, InputClass, OutputClass> NFA_AB =
+            NFA_A.combineWithEpsilonConnection(0, NFA_B, (input) -> {
         if (input == 'A') return InputClass.A;
         if (input == 'B') return InputClass.B;
         return InputClass.OTHER;
     });
 
     @Test
-    void testMerge() {
+    void testCombine() {
         assertThrows(IllegalArgumentException.class, () -> NFA_A.getTransitions(0, 'B'));
         assertThrows(IllegalArgumentException.class, () -> NFA_B.getTransitions(0, 'A'));
 
@@ -324,6 +325,15 @@ public class TestFAutomaton {
         assertEquals(HashSet.of(2), NFA_AB.getEpsilonTransitions(0));
         assertEquals(HashSet.of(3), NFA_AB.getTransitions(2, 'B'));
         assertEquals(HashSet.of(1), NFA_AB.getTransitions(0, 'A'));
+    }
+
+    private static final NFAutomaton<Character, InputClass, OutputClass> NFA_AB_3 = NFA_AB.repeat(1, 3);
+
+    @Test
+    void testRepeat() {
+        assertEquals(12, NFA_AB_3.getNumberOfStates());
+        assertEquals(HashSet.of(4), NFA_AB_3.getEpsilonTransitions(1));
+        assertEquals(HashSet.of(8), NFA_AB_3.getEpsilonTransitions(5));
     }
 
     private static final NFAutomaton<Character, InputClass, OutputClass> NFA_AA =

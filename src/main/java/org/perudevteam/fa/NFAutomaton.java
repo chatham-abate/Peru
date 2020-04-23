@@ -111,7 +111,7 @@ public class NFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
     }
 
     @Override
-    protected int getNumberOfStates() {
+    public int getNumberOfStates() {
         return transitionTable.length();
     }
 
@@ -277,33 +277,66 @@ public class NFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
                 getGetInputClassUnchecked(), false);
     }
 
-    public NFAutomaton<I, IC, O> merge(NFAutomaton<? super I, ? extends IC, ? extends O> nfa2) {
-        return merge(nfa2, getGetInputClassUnchecked());    // Keep old get input class function.
+    public NFAutomaton<I, IC, O> combine(NFAutomaton<? super I, ? extends IC, ? extends O> nfa2) {
+        return combine(nfa2, getGetInputClassUnchecked());    // Keep old get input class function.
     }
 
-    public NFAutomaton<I, IC, O> merge(NFAutomaton<? super I, ? extends IC, ? extends O> nfa2,
-                                       Function1<? super I, ? extends IC> newGIC) {
+    public NFAutomaton<I, IC, O> combine(NFAutomaton<? super I, ? extends IC, ? extends O> nfa2,
+                                         Function1<? super I, ? extends IC> newGIC) {
         Objects.requireNonNull(nfa2);
         Objects.requireNonNull(newGIC);
-
-        // Union of Input Alphabets.
-        Set<IC> iaUnion = getInputAlphabet().addAll(nfa2.getInputAlphabet());
 
         int shift = getNumberOfStates();
 
         Tuple3<Map<Integer, O>, Array<Map<IC, Set<Integer>>>, Array<Set<Integer>>>
-                nfa2Shifts = nfa2.shift(shift)
-                .<Map<Integer, O>>map1(Map::narrow)
-                .map2(table -> table.map(Map::narrow));
+                nfa2Shifts = NFAutomaton.<I, IC, O>narrow(nfa2).shift(shift);
 
-        Map<Integer, O> newAcceptingStates = getAcceptingStates().merge(nfa2Shifts._1);
-        Array<Map<IC, Set<Integer>>> newTransitionTable = transitionTable.appendAll(nfa2Shifts._2);
-        Array<Set<Integer>> newEpsilonTransitions = epsilonTransitions.appendAll(nfa2Shifts._3);
+        return new NFAutomaton<>(
+                getAcceptingStates().merge(nfa2Shifts._1),
+                getInputAlphabet().addAll(nfa2.getInputAlphabet()),
+                transitionTable.appendAll(nfa2Shifts._2),
+                epsilonTransitions.appendAll(nfa2Shifts._3),
+                newGIC, false
+        );
+    }
 
-        newEpsilonTransitions = newEpsilonTransitions.update(0, stateSet -> stateSet.add(shift));
+    public NFAutomaton<I, IC, O> combineWithEpsilonConnection(int from,
+                                        NFAutomaton<? super I, ? extends IC, ? extends O> nfa2) {
+        return combine(nfa2).withEpsilonTransition(from, getNumberOfStates());
+    }
 
-        return new NFAutomaton<>(newAcceptingStates, iaUnion,
-                newTransitionTable, newEpsilonTransitions, newGIC, false);
+    public NFAutomaton<I, IC, O> combineWithEpsilonConnection(int from,
+                                        NFAutomaton<? super I, ? extends IC, ? extends O> nfa2,
+                                        Function1<? super I, ? extends IC> newGIC) {
+        return combine(nfa2, newGIC).withEpsilonTransition(from, getNumberOfStates());
+    }
+
+    public NFAutomaton<I, IC, O> repeat(int from, int times) {
+        validateState(from);
+
+        if (times < 0) {
+            throw new IllegalArgumentException("Cannot repeat negative times.");
+        }
+
+        if (times == 0) {
+            return new NFAutomaton<>(
+                    HashMap.empty(),
+                    getInputAlphabet(),
+                    Array.of(HashMap.empty()),
+                    Array.of(HashSet.empty()),
+                    getGetInputClassUnchecked(), false
+            );
+        }
+
+        return repeatHelper(from, times, this);
+    }
+
+    private static <I, IC, O> NFAutomaton<I, IC, O> repeatHelper(int from, int times, NFAutomaton<I, IC, O> nfa) {
+        if (times == 1) {
+            return nfa;
+        }
+
+        return nfa.combineWithEpsilonConnection(from, repeatHelper(from, times - 1, nfa));
     }
 
     public DFAutomaton<I, IC, O> toDFA() {

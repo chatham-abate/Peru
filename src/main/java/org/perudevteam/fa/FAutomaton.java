@@ -42,7 +42,7 @@ abstract class FAutomaton<I, IC, O> {
         getInputClassUnchecked = Function1.narrow(gic);
     }
 
-    protected abstract int getNumberOfStates();
+    public abstract int getNumberOfStates();
 
     protected void validateState(int state) {
         if (state < 0 || state >= getNumberOfStates()) {

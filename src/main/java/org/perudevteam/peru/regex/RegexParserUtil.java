@@ -2,6 +2,7 @@ package org.perudevteam.peru.regex;
 
 import io.vavr.CheckedFunction2;
 import io.vavr.Tuple;
+import io.vavr.Tuple3;
 import io.vavr.collection.*;
 import org.perudevteam.fa.NFAutomaton;
 import org.perudevteam.parser.grammar.SemanticProduction;
@@ -33,6 +34,9 @@ public final class RegexParserUtil {
 
     static final NFAutomaton<Character, Character, ?> TWO_STATE_NFA =
             new NFAutomaton<>(2, ASCII_SET, c -> c);
+
+    // NFA Regex Helpers...
+
 
     static final Map<RegexTerminal, CheckedFunction2<Character, Tagged<RegexTerminal>, RegexParse>>
     REGEX_TERMINAL_RES_GENS = HashMap.ofEntries(

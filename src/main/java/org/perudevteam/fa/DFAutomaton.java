@@ -76,7 +76,7 @@ public class DFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
     }
 
     @Override
-    protected int getNumberOfStates() {
+    public int getNumberOfStates() {
         return transitionTable.length();
     }
 
@@ -143,6 +143,26 @@ public class DFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
         return Tuple.of(
                 getAcceptingStates().mapKeys(acceptingState -> acceptingState + shift),
                 transitionTable.map(row -> row.mapValues(state -> state + shift))
+        );
+    }
+
+    public DFAutomaton<I, IC, O> combine(DFAutomaton<? super I, ? extends IC, ? extends O> nfa) {
+        return combine(nfa, getGetInputClassUnchecked());
+    }
+
+    public DFAutomaton<I, IC, O> combine(DFAutomaton<? super I, ? extends IC, ? extends O> nfa,
+                                         Function1<? super I, ? extends IC> newGIC) {
+        Objects.requireNonNull(nfa);
+        Objects.requireNonNull(newGIC);
+
+        int shift = getNumberOfStates();
+        Tuple2<Map<Integer, O>, Array<Map<IC, Integer>>> shiftTuple = DFAutomaton.<I, IC, O>narrow(nfa).shift(shift);
+
+        return new DFAutomaton<>(
+                getAcceptingStates().merge(shiftTuple._1),
+                getInputAlphabet().addAll(nfa.getInputAlphabet()),
+                transitionTable.appendAll(shiftTuple._2),
+                newGIC, false
         );
     }
 
