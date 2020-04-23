@@ -1,6 +1,8 @@
 package org.perudevteam.peru.regex;
 
+import io.vavr.Function1;
 import io.vavr.collection.Set;
+import org.perudevteam.fa.DFAutomaton;
 import org.perudevteam.fa.NFAutomaton;
 
 import java.util.Objects;
@@ -38,8 +40,27 @@ public interface RegexParse {
         throw new NullPointerException("RegexParse contains no String.");
     }
 
-    default NFAutomaton<Character, Character, ?> asNFAutomaton() {
+    default NFAutomaton<Character, Character, Object> asNFAutomaton() {
         throw new NullPointerException("RegexParse contains no NFA.");
+    }
+
+    // Mapper Functions.
+
+    default RegexParse mapCharacter(Function1<? super Character, ? extends Character> f) {
+        return ofCharacter(f.apply(asCharacter()));
+    }
+
+    default RegexParse mapCharacterSet(Function1<? super Set<Character>, ? extends Set<Character>> f) {
+        return ofCharacterSet(f.apply(asCharacterSet()));
+    }
+
+    default RegexParse mapString(Function1<? super String, ? extends String> f) {
+        return ofString(f.apply(asString()));
+    }
+
+    default RegexParse mapNFAutomaton(Function1<? super NFAutomaton<Character, Character, Object>,
+            ? extends NFAutomaton<Character, Character, Object>> f) {
+        return ofNFAutomaton(f.apply(asNFAutomaton()));
     }
 
     class CharacterParse implements RegexParse {
@@ -79,13 +100,13 @@ public interface RegexParse {
     }
 
     class NFAutomatonParse implements RegexParse {
-        private final NFAutomaton<Character, Character, ?> value;
-        private NFAutomatonParse(NFAutomaton<Character, Character, ?> v) {
+        private final NFAutomaton<Character, Character, Object> value;
+        private NFAutomatonParse(NFAutomaton<Character, Character, Object> v) {
             value = v;
         }
 
         @Override
-        public NFAutomaton<Character, Character, ?> asNFAutomaton() {
+        public NFAutomaton<Character, Character, Object> asNFAutomaton() {
             return value;
         }
     }

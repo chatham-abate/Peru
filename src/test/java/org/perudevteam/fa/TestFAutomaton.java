@@ -334,6 +334,11 @@ public class TestFAutomaton {
         assertEquals(12, NFA_AB_3.getNumberOfStates());
         assertEquals(HashSet.of(4), NFA_AB_3.getEpsilonTransitions(1));
         assertEquals(HashSet.of(8), NFA_AB_3.getEpsilonTransitions(5));
+
+        assertTrue(NFA_AB_3.isAccepting(5));
+        assertTrue(NFA_AB_3.isAccepting(9));
+
+        assertEquals(1, NFA_AB.repeat(0, 0).getNumberOfStates());
     }
 
     private static final NFAutomaton<Character, InputClass, OutputClass> NFA_AA =

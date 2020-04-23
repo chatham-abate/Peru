@@ -332,11 +332,9 @@ public class NFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
     }
 
     private static <I, IC, O> NFAutomaton<I, IC, O> repeatHelper(int from, int times, NFAutomaton<I, IC, O> nfa) {
-        if (times == 1) {
-            return nfa;
-        }
-
-        return nfa.combineWithEpsilonConnection(from, repeatHelper(from, times - 1, nfa));
+        return times == 1
+                ? nfa
+                : nfa.combineWithEpsilonConnection(from, repeatHelper(from, times - 1, nfa));
     }
 
     public DFAutomaton<I, IC, O> toDFA() {
