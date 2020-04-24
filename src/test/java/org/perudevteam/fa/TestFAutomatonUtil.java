@@ -101,7 +101,7 @@ public class TestFAutomatonUtil {
                     .withAcceptingState(8, OUTPUT_2);
 
     private static final DFAutomaton<Character, InputClass, Function1<CharSimpleContext, CharData<OutputClass>>>
-            DFA1 = NFA1.toDFA();
+            DFA1 = NFA1.tryToDFA().get();
 
     private static final CharSimpleDLexer<OutputClass> LEXER1 = new CharSimpleDLexer<>(DFA1);
 
@@ -159,15 +159,14 @@ public class TestFAutomatonUtil {
 
     @Test
     void checkSimplePrecedence() {
-        NFA2.toDFA();
+        NFA2.tryToDFA().get();
 
         // Precedence conflict.
         assertThrows(IllegalArgumentException.class,
                 () -> NFA2.withAcceptingState(2, OutputClass.THING2).toDFA());
 
-        NFA2.withAcceptingState(2, OutputClass.THING2).toDFA(
+        NFA2.withAcceptingState(2, OutputClass.THING2).tryToDFA(
                 List.of(HashSet.of(OutputClass.THING1), HashSet.of(OutputClass.THING2))
-        );
+        ).get();
     }
-
 }

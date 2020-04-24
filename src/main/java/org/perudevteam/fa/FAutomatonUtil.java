@@ -11,7 +11,7 @@ public final class FAutomatonUtil {
 
     static <I, IC, O> DFAutomaton<I, IC, O> convertNFAToDFA(
             NFAutomaton<? super I, ? extends IC, ? extends O> nfa,
-            Seq<? extends Set<? extends O>> precSeq) {
+            Seq<? extends Set<? extends O>> precSeq) throws Exception {
         Objects.requireNonNull(nfa);
 
         Map<O, Integer> precMap = precedenceMap(precSeq);
@@ -95,7 +95,7 @@ public final class FAutomatonUtil {
     }
 
     static <O> O getMostPrecedent(Map<? extends O, ? extends Integer> precMap,
-                                   Set<? extends O> outputs) {
+                                   Set<? extends O> outputs) throws Exception {
 
         Map<O, Integer> narrowPrecMap = Map.narrow(precMap);
         Set<O> mostPrecedent = HashSet.empty();
@@ -115,7 +115,7 @@ public final class FAutomatonUtil {
         }
 
         if (mostPrecedent.length() > 1) {
-            throw new IllegalArgumentException("Ambiguous Accepting State.");
+            throw new Exception("Ambiguous Accepting State.");
         }
 
         return mostPrecedent.head();

@@ -6,6 +6,7 @@ import io.vavr.Tuple2;
 import io.vavr.Tuple3;
 import io.vavr.collection.*;
 import io.vavr.control.Option;
+import io.vavr.control.Try;
 import org.perudevteam.misc.MiscHelpers;
 
 import java.util.Objects;
@@ -337,15 +338,27 @@ public class NFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
                 : nfa.combineWithEpsilonConnection(from, repeatHelper(from, times - 1, nfa));
     }
 
-    public DFAutomaton<I, IC, O> toDFA() {
+    public DFAutomaton<I, IC, O> toDFA() throws Exception {
         return FAutomatonUtil.convertNFAToDFA(this, List.empty());
     }
 
-    public DFAutomaton<I, IC, O> toDFA(Set<? extends O> strongSignals) {
+    public Try<DFAutomaton<I, IC, O>> tryToDFA() {
+        return Try.of(() -> FAutomatonUtil.convertNFAToDFA(this, List.empty()));
+    }
+
+    public DFAutomaton<I, IC, O> toDFA(Set<? extends O> strongSignals) throws Exception {
         return FAutomatonUtil.convertNFAToDFA(this, List.of(strongSignals));
     }
 
-    public DFAutomaton<I, IC, O> toDFA(Seq<? extends Set<? extends O>> precSeq) {
+    public Try<DFAutomaton<I, IC, O>> tryToDFA(Set<? extends O> strongSignals) {
+        return Try.of(() -> FAutomatonUtil.convertNFAToDFA(this, List.of(strongSignals)));
+    }
+
+    public DFAutomaton<I, IC, O> toDFA(Seq<? extends Set<? extends O>> precSeq) throws Exception {
         return FAutomatonUtil.convertNFAToDFA(this, precSeq);
+    }
+
+    public Try<DFAutomaton<I, IC, O>> tryToDFA(Seq<? extends Set<? extends O>> precSeq) {
+        return Try.of(() -> FAutomatonUtil.convertNFAToDFA(this, precSeq));
     }
 }

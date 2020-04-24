@@ -1,10 +1,14 @@
 package org.perudevteam.peru.regex;
 
+import io.vavr.Tuple;
 import io.vavr.Tuple2;
+import io.vavr.Tuple3;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.HashSet;
 import io.vavr.collection.Seq;
+import io.vavr.collection.Set;
 import io.vavr.control.Try;
+import org.perudevteam.fa.DFAutomaton;
 import org.perudevteam.fa.NFAutomaton;
 import org.perudevteam.parser.Tokenized;
 
@@ -60,5 +64,20 @@ public final class PeruRegex {
     public static <O> Try<NFAutomaton<Character, Character, O>> tryBuildMultiResultNFA(
             Seq<? extends Tuple2<? extends String, ? extends O>> patterns) {
         return Try.of(() -> buildMultiResultNFA(patterns));
+    }
+
+    public static <O> DFAutomaton<Character, Character, O> buildMultiResultDFA(
+            Seq<? extends Tuple3<? extends String, ? extends Boolean, ? extends O>> patternSignals
+    ) throws Throwable {
+        Seq<Tuple2<String, O>> patterns = patternSignals.map(tuple -> Tuple.of(tuple._1, tuple._3));
+        Set<O> strongSignals = HashSet.ofAll(patternSignals.filter(Tuple3::_2).map(Tuple3::_3));
+
+        return buildMultiResultNFA(patterns).toDFA(strongSignals);
+    }
+
+    public static <O> Try<DFAutomaton<Character, Character, O>> tryBuildMultiResultDFA(
+            Seq<? extends Tuple3<? extends String, ? extends Boolean, ? extends O>> patternSignals
+    ) {
+        return Try.of(() -> buildMultiResultDFA(patternSignals));
     }
 }

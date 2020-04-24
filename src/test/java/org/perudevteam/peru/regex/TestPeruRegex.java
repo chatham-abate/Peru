@@ -51,31 +51,26 @@ public class TestPeruRegex {
         A,
         B,
         C,
+        OR,
         WHITESPACE
     }
 
-    private static final Seq<Tuple2<String, Function1<CharSimpleContext, CharData<Terminal1>>>> PATTERNS1 = Array.of(
-            Tuple.of("\\d+", dataBuilder(Terminal1.INTEGER)),
-            Tuple.of("[0-9]+\\.[0-9]+", dataBuilder(Terminal1.DOUBLE)),
-            Tuple.of("[a-zA-Z_][a-zA-Z_0-9]*", dataBuilder(Terminal1.ID)),
-            Tuple.of("if", dataBuilder(Terminal1.IF)),
-            Tuple.of("then", dataBuilder(Terminal1.THEN)),
-            Tuple.of("(\\.|\\*)a{3}", dataBuilder(Terminal1.A)),
-            Tuple.of("(\\+$?)b{2,}", dataBuilder(Terminal1.B)),
-            Tuple.of("@c{3,5}", dataBuilder(Terminal1.C)),
-            Tuple.of("\\s+", dataBuilder(Terminal1.WHITESPACE))
-    );
-
-    private static final Set<Function1<CharSimpleContext, CharData<Terminal1>>> STRONG_SIGNALS1 = HashSet.of(
-            PATTERNS1.get(3)._2,
-            PATTERNS1.get(4)._2,
-            PATTERNS1.get(5)._2,
-            PATTERNS1.get(6)._2,
-            PATTERNS1.get(7)._2
+    private static final Seq<Tuple3<String, Boolean, Function1<CharSimpleContext, CharData<Terminal1>>>> PATTERNS1 =
+            Array.of(
+            Tuple.of("\\d+", false, dataBuilder(Terminal1.INTEGER)),
+            Tuple.of("[0-9]+\\.[0-9]+", false, dataBuilder(Terminal1.DOUBLE)),
+            Tuple.of("[a-zA-Z_][a-zA-Z_0-9]*", false, dataBuilder(Terminal1.ID)),
+            Tuple.of("if", true, dataBuilder(Terminal1.IF)),
+            Tuple.of("then", true, dataBuilder(Terminal1.THEN)),
+            Tuple.of("(\\.|\\*)a{3}", false, dataBuilder(Terminal1.A)),
+            Tuple.of("(\\+$?)b{2,}", false, dataBuilder(Terminal1.B)),
+            Tuple.of("@c{3,5}", false, dataBuilder(Terminal1.C)),
+            Tuple.of("(or\\-){0,3}else", true, dataBuilder(Terminal1.OR)),
+            Tuple.of("\\s+", false, dataBuilder(Terminal1.WHITESPACE))
     );
 
     private static final DFAutomaton<Character, Character, Function1<CharSimpleContext, CharData<Terminal1>>>
-            DFA1 = tryBuildMultiResultNFA(PATTERNS1).get().toDFA(STRONG_SIGNALS1);
+            DFA1 = tryBuildMultiResultDFA(PATTERNS1).get();
 
     private static final CharSimpleDLexer<Terminal1> LEXER1 = new CharSimpleDLexer<>(DFA1);
 
@@ -95,7 +90,10 @@ public class TestPeruRegex {
             Tuple.of("+bbbbbbbb", Terminal1.B),
             Tuple.of("@ccc", Terminal1.C),
             Tuple.of("@cccc", Terminal1.C),
-            Tuple.of("@ccccc", Terminal1.C)
+            Tuple.of("@ccccc", Terminal1.C),
+            Tuple.of("else", Terminal1.OR),
+            Tuple.of("or-else", Terminal1.OR),
+            Tuple.of("or-or-else", Terminal1.OR)
     );
 
     @TestFactory
