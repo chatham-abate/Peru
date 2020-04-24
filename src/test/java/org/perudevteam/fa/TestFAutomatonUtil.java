@@ -79,7 +79,7 @@ public class TestFAutomatonUtil {
 
     @Test
     void testAmbiguousNFA() {
-        assertThrows(IllegalArgumentException.class, AMBIGUOUS_NFA::toDFA);
+        assertThrows(Exception.class, AMBIGUOUS_NFA::toDFA);
     }
 
     private static final NFAutomaton<Character, InputClass, Function1<CharSimpleContext, CharData<OutputClass>>> NFA1 =
@@ -159,14 +159,16 @@ public class TestFAutomatonUtil {
 
     @Test
     void checkSimplePrecedence() {
-        NFA2.tryToDFA().get();
+
+
+        assertTrue(NFA2.tryToDFA().isSuccess());
 
         // Precedence conflict.
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(Exception.class,
                 () -> NFA2.withAcceptingState(2, OutputClass.THING2).toDFA());
 
-        NFA2.withAcceptingState(2, OutputClass.THING2).tryToDFA(
+        assertTrue(NFA2.withAcceptingState(2, OutputClass.THING2).tryToDFA(
                 List.of(HashSet.of(OutputClass.THING1), HashSet.of(OutputClass.THING2))
-        ).get();
+        ).isSuccess());
     }
 }

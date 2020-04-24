@@ -9,6 +9,7 @@ import io.vavr.collection.Map;
 import io.vavr.collection.Seq;
 import io.vavr.control.Either;
 import io.vavr.control.Try;
+import org.perudevteam.misc.MiscHelpers;
 import org.perudevteam.parser.grammar.SemanticProduction;
 import org.perudevteam.peru.base.BaseValue;
 
@@ -19,11 +20,12 @@ public abstract class ASTProduction<NT extends Enum<NT>, T extends Enum<T>>
 
     // Try of (env', seq of results)
     public static Try<Tuple2<Map<String, BaseValue>, Seq<ASTResult>>>
-    tryExtractOrderedResultsUnchecked(Map<String, BaseValue> env, Seq<AST> children) {
+    tryExtractOrderedResultsUnchecked(Map<String, BaseValue> env, Seq<AST> children,
+                                      int... indices) {
         Map<String, BaseValue> envPrime = env;
         Seq<ASTResult> results = List.empty();
 
-        for (int i = 0; i < children.length(); i++) {
+        for (int i: indices) {
             Try<Tuple2<Map<String, BaseValue>, ASTResult>> resultTupleTry =
                     children.get(i).tryExecuteUnchecked(envPrime);
 
@@ -41,9 +43,9 @@ public abstract class ASTProduction<NT extends Enum<NT>, T extends Enum<T>>
     }
 
     public static Try<Tuple2<Map<String, BaseValue>, Seq<ASTResult>>>
-    tryExtractOrderedResult(Map<? extends String, ? extends BaseValue> env, Seq<? extends AST> children) {
-        Objects.requireNonNull(env);
-        env.values().forEach(Objects::requireNonNull);
+    tryExtractOrderedResult(Map<? extends String, ? extends BaseValue> env,
+                            Seq<? extends AST> children, int... indices) {
+        MiscHelpers.requireNonNullMap(env);
 
         Objects.requireNonNull(children);
         children.forEach(Objects::requireNonNull);

@@ -30,9 +30,9 @@ public class OperatorSet<OT extends Enum<OT>, DT extends Enum<DT>, DC extends Ta
         binaries = Map.narrow(bins.mapValues(m -> Map.narrow(m.mapValues(Map::narrow))));
     }
 
-    public DC applyUnary(OT unOpTag, DC i) throws Throwable {
+    public UnaryOperator<OT, DT, DC> getUnary(OT unOpTag, DT dataTag) throws Exception {
         Objects.requireNonNull(unOpTag);
-        Objects.requireNonNull(i);
+        Objects.requireNonNull(dataTag);
 
         if (!unaries.containsKey(unOpTag)) {
             throw new Exception("Operator set does not contain unary operator "
@@ -40,13 +40,21 @@ public class OperatorSet<OT extends Enum<OT>, DT extends Enum<DT>, DC extends Ta
         }
 
         Map<DT, UnaryOperator<OT, DT, DC>> overloads = unaries.get(unOpTag).get();
-        DT dataTag = i.getTag();
 
         if (!overloads.containsKey(dataTag)) {
             throw new Exception("No overload for " + unOpTag.name() + " given " + dataTag.name() + ".");
         }
 
-        return overloads.get(dataTag).get().apply(i);
+        return overloads.get(dataTag).get();
+    }
+
+    public Try<UnaryOperator<OT, DT, DC>> tryGetUnary(OT unOpTag, DT dataTag) {
+        return Try.of(() -> getUnary(unOpTag, dataTag));
+    }
+
+    public DC applyUnary(OT unOpTag, DC i) throws Throwable {
+        Objects.requireNonNull(i);
+        return getUnary(unOpTag, i.getTag()).apply(i);
     }
 
     public Try<DC> tryApplyUnary(OT unOpTag, DC i) {
@@ -57,10 +65,10 @@ public class OperatorSet<OT extends Enum<OT>, DT extends Enum<DT>, DC extends Ta
         return tryI.mapTry(i -> applyUnary(unOpTag, i));
     }
 
-    public DC applyBinary(OT binOpTag, DC i1, DC i2) throws Throwable {
+    public BinaryOperator<OT, DT, DC> getBinary(OT binOpTag, DT dataTag1, DT dataTag2) throws Exception {
         Objects.requireNonNull(binOpTag);
-        Objects.requireNonNull(i1);
-        Objects.requireNonNull(i2);
+        Objects.requireNonNull(dataTag1);
+        Objects.requireNonNull(dataTag2);
 
         if (!binaries.containsKey(binOpTag)) {
             throw new Exception("Operator set does not contain binary operator "
@@ -68,18 +76,27 @@ public class OperatorSet<OT extends Enum<OT>, DT extends Enum<DT>, DC extends Ta
         }
 
         Map<DT, Map<DT, BinaryOperator<OT, DT, DC>>> overloads1 = binaries.get(binOpTag).get();
-        DT dataTag1 = i1.getTag();
-        DT dataTag2 = i2.getTag();
 
         if (overloads1.containsKey(dataTag1)) {
             Map<DT, BinaryOperator<OT, DT, DC>> overloads2 = overloads1.get(dataTag1).get();
             if (overloads2.containsKey(dataTag2)) {
-                return overloads2.get(dataTag2).get().apply(i1, i2);
+                return overloads2.get(dataTag2).get();
             }
         }
 
         throw new Exception("No overload for " + binOpTag.name() + " given "  + dataTag1.name()
                 + " and " + dataTag2.name() + ".");
+    }
+
+    public Try<BinaryOperator<OT, DT, DC>> tryGetBinary(OT binOpTag, DT dataTag1, DT dataTag2) {
+        return Try.of(() -> getBinary(binOpTag, dataTag1, dataTag2));
+    }
+
+    public DC applyBinary(OT binOpTag, DC i1, DC i2) throws Throwable {
+        Objects.requireNonNull(i1);
+        Objects.requireNonNull(i2);
+
+        return getBinary(binOpTag, i1.getTag(), i2.getTag()).apply(i1, i2);
     }
 
     public Try<DC> tryApplyBinary(OT binOpTag, DC i1, DC i2) {

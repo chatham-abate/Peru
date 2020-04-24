@@ -1,6 +1,9 @@
 package org.perudevteam.peru.base;
 
 import io.vavr.Function1;
+import io.vavr.Tuple;
+import io.vavr.collection.Array;
+import io.vavr.collection.HashMap;
 import io.vavr.collection.Map;
 import io.vavr.collection.Seq;
 import org.perudevteam.misc.MiscHelpers;
@@ -15,7 +18,12 @@ public abstract class BaseValue extends Tagged<BaseType> {
         return new ClassCastException("Base Type " + from.name() + " cannot be converted to " + to.name() + ".");
     }
 
-    public BaseValue(BaseType tag) {
+    private static final Map<BaseType, BaseValue> PLACEHOLDERS = HashMap.ofEntries(Array.of(BaseType.values())
+            .map(v -> Tuple.of(v, new BaseValue(v) {
+                // Place Holder Base Value... Only holds a tag... no value.
+            })));
+
+    private BaseValue(BaseType tag) {
         super(tag);
     }
 
@@ -152,11 +160,14 @@ public abstract class BaseValue extends Tagged<BaseType> {
         return new BaseFunction(v);
     }
 
+    public static BaseValue placeHolder(BaseType t) {
+        Objects.requireNonNull(t);
+        return PLACEHOLDERS.get(t).get();
+    }
 
     /*
      * Map Functions.
      */
-
 
     public BaseValue mapByte(Function1<? super Byte, ? extends Byte> f) {
         return new BaseByte(f.apply(toByte()));
