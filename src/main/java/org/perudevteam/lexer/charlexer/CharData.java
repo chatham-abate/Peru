@@ -1,15 +1,21 @@
 package org.perudevteam.lexer.charlexer;
 
+import io.vavr.Function1;
 import org.perudevteam.misc.Positioned;
 import org.perudevteam.parser.Tokenized;
 
 import java.util.Objects;
 
 public class CharData<T extends Enum<T>> implements Tokenized<T>, Positioned {
-    private T type;
 
-    private int line;
-    private int linePosition;
+    public static <T extends Enum<T>> Function1<CharSimpleContext, CharData<T>> dataBuilder(T tokenType) {
+        return context -> new CharData<>(tokenType, context);
+    }
+
+    private final T type;
+
+    private final int line;
+    private final int linePosition;
 
     public CharData(T t, CharSimpleContext context) {
         this(t, context.getLine().getStarting(), context.getLinePosition().getStarting());

@@ -2,10 +2,7 @@ package org.perudevteam.peru.regex;
 
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
-import io.vavr.collection.HashMap;
-import io.vavr.collection.HashSet;
-import io.vavr.collection.Map;
-import io.vavr.collection.Set;
+import io.vavr.collection.*;
 import org.perudevteam.parser.Tokenized;
 import io.vavr.control.Either;
 import org.perudevteam.peru.regex.RegexNonTerminalUtil.RegexNonTerminal;
@@ -101,5 +98,9 @@ public final class RegexTerminalUtil {
 
     static Tuple2<Character, Tokenized<RegexTerminal>> asRegexToken(Character input) {
         return Tuple.of(input, Tokenized.token(getRegexCharType(input)));
+    }
+
+    static Stream<Tuple2<Character, Tokenized<RegexTerminal>>> asRegexTokenStream(String regex) {
+        return Stream.ofAll(regex.toCharArray()).map(RegexTerminalUtil::asRegexToken);
     }
 }

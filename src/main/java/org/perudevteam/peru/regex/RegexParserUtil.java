@@ -24,7 +24,13 @@ public final class RegexParserUtil {
         // Never to be initialized.
     }
 
-    static final Map<Character, Set<Character>> CLASS_PRESETS = HashMap.empty();
+    static final Set<Character> DIGITS = ASCII_SET.filter(Character::isDigit);
+    static final Set<Character> WHITESPACE = ASCII_SET.filter(Character::isWhitespace);
+
+    static final Map<Character, Set<Character>> CLASS_PRESETS = HashMap.of(
+            's', WHITESPACE,
+            'd', DIGITS
+    );
 
     static RegexParse getClassPreset(RegexParse key) {
         char k = key.asCharacter();
@@ -45,9 +51,11 @@ public final class RegexParserUtil {
         return integer;
     }
 
-    static final NFAutomaton<Character, Character, ?> TWO_STATE_NFA =
-            new NFAutomaton<>(2, ASCII_SET, c -> c);
+    static final NFAutomaton<Character, Character, Object> ONE_STATE_NFA =
+            new NFAutomaton<>(1, ASCII_SET, c -> c);
 
+    static final NFAutomaton<Character, Character, Object> TWO_STATE_NFA =
+            new NFAutomaton<>(2, ASCII_SET, c -> c);
 
     static final Map<RegexTerminal, CheckedFunction2<Character, Tokenized<RegexTerminal>, RegexParse>>
     REGEX_TERMINAL_RES_GENS = HashMap.ofEntries(
@@ -84,6 +92,9 @@ public final class RegexParserUtil {
             c -> getClassPreset(c.get(1))),
     CLASS_PRESET_P2 = semanticProduction(RegexNonTerminal.CLASS_PRESET, CLASS_PRESET_R2,
             c -> getClassPreset(c.get(1))),
+    CLASS_PRESET_P3 = semanticProduction(RegexNonTerminal.CLASS_PRESET, CLASS_PRESET_R3,
+            c -> ofCharacterSet(ASCII_SET)),
+
 
     // Class Atomic Productions. (Returns Char Set)
     CLASS_ATOM_P1 = semanticProduction(RegexNonTerminal.CLASS_ATOM, CLASS_ATOM_R1,
@@ -178,6 +189,8 @@ public final class RegexParserUtil {
 
                 return productNFA;
             })),
+    QUANTIFIER_P7 = semanticProduction(RegexNonTerminal.QUANTIFIER, QUANTIFIER_R7,
+            c -> c.get(0)),
 
     // Concat Productions. (Returns NFA)
     CONCAT_P1 = semanticProduction(RegexNonTerminal.CONCAT, CONCAT_R1,
@@ -236,6 +249,7 @@ public final class RegexParserUtil {
 
                     CLASS_PRESET_P1,
                     CLASS_PRESET_P2,
+                    CLASS_PRESET_P3,
 
                     CLASS_ATOM_P1,
                     CLASS_ATOM_P2,
@@ -260,6 +274,7 @@ public final class RegexParserUtil {
                     QUANTIFIER_P4,
                     QUANTIFIER_P5,
                     QUANTIFIER_P6,
+                    QUANTIFIER_P7,
 
                     CONCAT_P1,
                     CONCAT_P2,
