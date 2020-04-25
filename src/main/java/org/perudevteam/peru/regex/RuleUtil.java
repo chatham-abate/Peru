@@ -1,13 +1,12 @@
 package org.perudevteam.peru.regex;
 
 import io.vavr.collection.Array;
-import io.vavr.collection.List;
 import io.vavr.collection.Seq;
 import io.vavr.control.Either;
 import static io.vavr.control.Either.*;
-import static org.perudevteam.peru.regex.RegexTerminalUtil.*;
+import static org.perudevteam.peru.regex.LexerUtil.*;
 
-public final class RegexNonTerminalUtil {
+public final class RuleUtil {
     enum RegexNonTerminal {
         ESCAPE,
         LITERAL,
@@ -36,7 +35,25 @@ public final class RegexNonTerminalUtil {
     NT_NUMBER = left(RegexNonTerminal.NUMBER),
     NT_QUANTIFIER = left(RegexNonTerminal.QUANTIFIER),
     NT_CONCAT = left(RegexNonTerminal.CONCAT),
-    NT_EXPRESSION = left(RegexNonTerminal.EXPRESSION);
+    NT_EXPRESSION = left(RegexNonTerminal.EXPRESSION),
+    
+    T_CARROT = right(RegexTerminal.CARROT),
+    T_DOT = right(RegexTerminal.DOT),
+    T_LEFT_SQ = right(RegexTerminal.LEFT_SQ),
+    T_RIGHT_SQ = right(RegexTerminal.RIGHT_SQ),
+    T_LEFT_P = right(RegexTerminal.LEFT_P),
+    T_RIGHT_P = right(RegexTerminal.RIGHT_P),
+    T_LEFT_B = right(RegexTerminal.LEFT_B),
+    T_RIGHT_B = right(RegexTerminal.RIGHT_B),
+    T_STAR = right(RegexTerminal.STAR),
+    T_COMMA = right(RegexTerminal.COMMA),
+    T_Q_MARK = right(RegexTerminal.Q_MARK),
+    T_PLUS = right(RegexTerminal.PLUS),
+    T_PIPE = right(RegexTerminal.PIPE),
+    T_BACKSLASH = right(RegexTerminal.BACKSLASH),
+    T_DASH = right(RegexTerminal.DASH),
+    T_DIGIT = right(RegexTerminal.DIGIT),
+    T_NON_SPECIAL = right(RegexTerminal.NON_SPECIAL);
 
     // Rules.
     static final Seq<Either<RegexNonTerminal, RegexTerminal>>
@@ -58,7 +75,7 @@ public final class RegexNonTerminalUtil {
     ESCAPE_R14 = Array.of(T_BACKSLASH, T_CARROT),
     ESCAPE_R15 = Array.of(T_BACKSLASH, T_BACKSLASH),
 
-    // Literal Rules.
+    // eral Rules.
     LITERAL_R1 = Array.of(NT_ESCAPE),
     LITERAL_R2 = Array.of(T_DIGIT),
     LITERAL_R3 = Array.of(T_NON_SPECIAL),

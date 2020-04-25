@@ -2,7 +2,6 @@ package org.perudevteam.peru.regex;
 
 import io.vavr.CheckedFunction2;
 import io.vavr.Tuple;
-import io.vavr.Tuple3;
 import io.vavr.collection.*;
 import org.perudevteam.fa.NFAutomaton;
 import org.perudevteam.parser.Parser;
@@ -10,17 +9,15 @@ import org.perudevteam.parser.Tokenized;
 import org.perudevteam.parser.grammar.SemanticCFGrammar;
 import org.perudevteam.parser.grammar.SemanticProduction;
 import org.perudevteam.parser.lrone.LROneParser;
-import org.perudevteam.peru.regex.RegexParse;
-import org.perudevteam.type.Tagged;
 
-import static org.perudevteam.peru.regex.RegexTerminalUtil.*;
-import static org.perudevteam.peru.regex.RegexNonTerminalUtil.*;
+import static org.perudevteam.peru.regex.LexerUtil.*;
+import static org.perudevteam.peru.regex.RuleUtil.*;
 import static org.perudevteam.peru.regex.RegexParse.*;
 import static org.perudevteam.parser.grammar.SemanticProduction.*;
 
 
-public final class RegexParserUtil {
-    private RegexParserUtil() {
+public final class ParserUtil {
+    private ParserUtil() {
         // Never to be initialized.
     }
 

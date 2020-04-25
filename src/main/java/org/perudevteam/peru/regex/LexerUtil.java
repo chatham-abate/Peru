@@ -5,12 +5,12 @@ import io.vavr.Tuple2;
 import io.vavr.collection.*;
 import org.perudevteam.parser.Tokenized;
 import io.vavr.control.Either;
-import org.perudevteam.peru.regex.RegexNonTerminalUtil.RegexNonTerminal;
+import org.perudevteam.peru.regex.RuleUtil.RegexNonTerminal;
 
 import static io.vavr.control.Either.*;
 
-public final class RegexTerminalUtil {
-    private RegexTerminalUtil() {
+public final class LexerUtil {
+    private LexerUtil() {
         // Should never be initialized.
     }
 
@@ -45,26 +45,6 @@ public final class RegexTerminalUtil {
         DIGIT,
         NON_SPECIAL
     }
-
-    // Either Wrappers.
-    static final Either<RegexNonTerminal, RegexTerminal>
-    T_CARROT = right(RegexTerminal.CARROT),
-    T_DOT = right(RegexTerminal.DOT),
-    T_LEFT_SQ = right(RegexTerminal.LEFT_SQ),
-    T_RIGHT_SQ = right(RegexTerminal.RIGHT_SQ),
-    T_LEFT_P = right(RegexTerminal.LEFT_P),
-    T_RIGHT_P = right(RegexTerminal.RIGHT_P),
-    T_LEFT_B = right(RegexTerminal.LEFT_B),
-    T_RIGHT_B = right(RegexTerminal.RIGHT_B),
-    T_STAR = right(RegexTerminal.STAR),
-    T_COMMA = right(RegexTerminal.COMMA),
-    T_Q_MARK = right(RegexTerminal.Q_MARK),
-    T_PLUS = right(RegexTerminal.PLUS),
-    T_PIPE = right(RegexTerminal.PIPE),
-    T_BACKSLASH = right(RegexTerminal.BACKSLASH),
-    T_DASH = right(RegexTerminal.DASH),
-    T_DIGIT = right(RegexTerminal.DIGIT),
-    T_NON_SPECIAL = right(RegexTerminal.NON_SPECIAL);
 
     static final Map<Character, RegexTerminal> CMDS =
             HashMap.<Character, RegexTerminal>empty()
@@ -101,6 +81,6 @@ public final class RegexTerminalUtil {
     }
 
     static Stream<Tuple2<Character, Tokenized<RegexTerminal>>> asRegexTokenStream(String regex) {
-        return Stream.ofAll(regex.toCharArray()).map(RegexTerminalUtil::asRegexToken);
+        return Stream.ofAll(regex.toCharArray()).map(LexerUtil::asRegexToken);
     }
 }

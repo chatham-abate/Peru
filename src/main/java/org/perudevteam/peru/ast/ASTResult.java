@@ -81,6 +81,7 @@ public interface ASTResult extends Positioned {
 
     ASTResult EMPTY = new ASTResult() {
         @Override
+        @SuppressWarnings("all")
         public boolean equals(Object obj) {
             return ASTResult.equalsASTResult(this, obj);
         }
@@ -153,6 +154,7 @@ public interface ASTResult extends Positioned {
             }
 
             @Override
+            @SuppressWarnings("all")
             public boolean equals(Object obj) {
                 return ASTResult.equalsASTResult(this, obj);
             }
@@ -203,6 +205,7 @@ public interface ASTResult extends Positioned {
             }
 
             @Override
+            @SuppressWarnings("all")
             public boolean equals(Object obj) {
                 return ASTResult.equalsASTResult(this, obj);
             }

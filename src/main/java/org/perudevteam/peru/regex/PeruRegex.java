@@ -14,9 +14,8 @@ import org.perudevteam.parser.Tokenized;
 
 import java.util.Objects;
 
-import static org.perudevteam.peru.regex.RegexTerminalUtil.*;
-import static org.perudevteam.peru.regex.RegexNonTerminalUtil.*;
-import static org.perudevteam.peru.regex.RegexParserUtil.*;
+import static org.perudevteam.peru.regex.LexerUtil.*;
+import static org.perudevteam.peru.regex.ParserUtil.*;
 
 public final class PeruRegex {
     private PeruRegex() {
