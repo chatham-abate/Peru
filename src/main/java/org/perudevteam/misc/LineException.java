@@ -14,15 +14,7 @@ public class LineException extends Exception implements Positioned {
     public static <T> Try<T> matchLineEx(Try<? extends T> tryValue,
                                          Function1<? super T, ? extends T> valueMap,
                                          Function1<? super LineException, ? extends LineException> exMap) {
-        if (tryValue.isSuccess()) {
-            return tryValue.map(valueMap);
-        }
-
-        if (tryValue.getCause().getClass() != LineException.class) {
-            throw new IllegalArgumentException("Given Try with incorrect exception type.");
-        }
-
-        return Try.failure(exMap.apply((LineException)(tryValue.getCause())));
+        return MiscHelpers.throwMatch(LineException.class, tryValue, valueMap, exMap);
     }
 
     public static LineException lineEx(Positioned d, String msg) {

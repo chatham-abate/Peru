@@ -1,5 +1,6 @@
 package org.perudevteam.misc;
 
+import io.vavr.Function1;
 import io.vavr.collection.Array;
 import io.vavr.collection.Map;
 import io.vavr.collection.Seq;
@@ -143,5 +144,20 @@ public final class MiscHelpers {
         }
 
         return gridStr.toString();
+    }
+
+    // Exception Matcher...
+    public static <T, X extends Throwable> Try<T> throwMatch(Class<X> exClass, Try<? extends T> tryValue,
+                                                      Function1<? super T, ? extends T> valueMap,
+                                                      Function1<? super X, ? extends X> exMap) {
+        if (tryValue.isSuccess()) {
+            return tryValue.map(valueMap);
+        }
+
+        if (tryValue.getCause().getClass() != exClass) {
+            throw new IllegalArgumentException("Unexpected Throwable given.");
+        }
+
+        return Try.failure(exMap.apply(exClass.cast(tryValue.getCause())));
     }
 }

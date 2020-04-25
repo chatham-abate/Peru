@@ -1,13 +1,21 @@
 package org.perudevteam.misc;
 
 
+import io.vavr.Function1;
 import io.vavr.collection.List;
 import io.vavr.collection.Seq;
+import io.vavr.control.Try;
 
 import javax.sound.sampled.Line;
 import java.util.Objects;
 
 public class TraceException extends Exception implements Positioned {
+
+    public static <T> Try<T> matchTraceEx(Try<? extends T> tryValue,
+                                          Function1<? super T, ? extends T> valueMap,
+                                          Function1<? super TraceException, ? extends TraceException> exMap) {
+        return MiscHelpers.throwMatch(TraceException.class, tryValue, valueMap, exMap);
+    }
 
     private static final TraceException EMPTY_TRACE = new TraceException(List.empty());
 
