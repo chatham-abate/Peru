@@ -75,5 +75,5 @@ public final class BaseOperatorSetUtil {
                     .withBinaryOverload(BaseType.MAP, BaseType.MAP, EQ_MAP)
 
                     // Function Operations.
-                    .withBinaryOverloads(BaseType.FUNCTION, BaseType.FUNCTION, FUNCTION_BINOPS);
+                    .withBinaryOverload(BaseType.FUNCTION, BaseType.FUNCTION, EQ_FUNCTION);
 }

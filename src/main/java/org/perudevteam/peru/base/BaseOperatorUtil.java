@@ -191,13 +191,7 @@ public final class BaseOperatorUtil {
 
     // Function Operations.
     EQ_FUNCTION = binop(BaseOperator.EQ, BaseType.BOOLEAN,
-            (i1, i2) -> ofBoolean(i1.toFunction().equals(i2.toFunction()))),
-    COMPOSE_FUNCTION = binop(BaseOperator.COMPOSE, BaseType.FUNCTION,
-            (i1, i2) -> ofFunction(i1.toFunction()
-                    .compose(args -> List.of(i2.toFunction().apply(args))))),
-    AND_THEN_FUNCTION = binop(BaseOperator.AND_THEN, BaseType.FUNCTION,
-            (i1, i2) -> ofFunction(i2.toFunction()
-                    .compose(args -> List.of(i1.toFunction().apply(args)))));
+            (i1, i2) -> ofBoolean(i1.toFunction().equals(i2.toFunction())));
 
 
     /*
@@ -256,11 +250,7 @@ public final class BaseOperatorUtil {
     BOOLEAN_BINOPS = List.of(AND_BOOLEAN, OR_BOOLEAN, EQ_BOOLEAN),
 
     // String Binops...
-    STRING_BINOPS = List.of(PLUS_STRING, LT_STRING, GT_STRING, LT_EQ_STRING, GT_EQ_STRING, EQ_STRING),
-
-    // Function Binops...
-    FUNCTION_BINOPS = List.of(AND_THEN_FUNCTION, COMPOSE_FUNCTION, EQ_FUNCTION);
-
+    STRING_BINOPS = List.of(PLUS_STRING, LT_STRING, GT_STRING, LT_EQ_STRING, GT_EQ_STRING, EQ_STRING);
 
     // Lists of Unary Operators.
     public static final Seq<UnaryOperator<BaseOperator, BaseType, BaseValue>>

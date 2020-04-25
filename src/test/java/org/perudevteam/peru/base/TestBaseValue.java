@@ -4,6 +4,7 @@ import static org.perudevteam.peru.base.BaseValue.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import io.vavr.collection.List;
+import io.vavr.control.Try;
 import org.junit.jupiter.api.Test;
 import org.perudevteam.peru.base.BaseType;
 import org.perudevteam.peru.base.BaseValue;
@@ -27,11 +28,11 @@ public class TestBaseValue {
         string = string.mapString(s -> s + " World");
         assertEquals("Hello World", string.toString());
 
-        BaseValue func = ofFunction(args -> args.get(0).mapInt(i -> i + 1));
-        assertEquals(2, func.toFunction().apply(List.of(ofInt(1))).toInt());
+        BaseValue func = ofFunction(args -> Try.success(args.get(0).mapInt(i -> i + 1)));
+        assertEquals(2, func.toFunction().apply(List.of(ofInt(1))).get().toInt());
 
-        func = func.mapFunction(f -> (args -> f.apply(args).mapInt(i -> i * 2)));
-        assertEquals(4, func.toFunction().apply(List.of(ofInt(1))).toInt());
+        func = func.mapFunction(f -> (args -> Try.success(f.apply(args).get().mapInt(i -> i * 2))));
+        assertEquals(4, func.toFunction().apply(List.of(ofInt(1))).get().toInt());
 
         BaseValue seq = ofSequence(List.of(integer1, integer2));
         seq = seq.mapSequence(s -> s.map(e -> e.mapInt(i -> i * 2)));

@@ -104,7 +104,7 @@ public class TestIntegerSemanticCFGrammar {
             PARSER = new LROneParser<NT, T, String, CharData<T>, Integer>(G) {
         @Override
         protected Exception onError(Tuple2<String, CharData<T>> lookAhead) {
-            return new LineException(lookAhead._2, "Unexpected Token : " + lookAhead._2.getTokenType().name());
+            return LineException.lineEx(lookAhead._2, "Unexpected Token : " + lookAhead._2.getTokenType().name());
         }
 
         @Override

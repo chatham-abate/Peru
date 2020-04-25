@@ -24,8 +24,4 @@ public enum BaseOperator {
     LT_EQ,
     GT_EQ,
     EQ,
-
-    // Function Operators.
-    COMPOSE,
-    AND_THEN
 }

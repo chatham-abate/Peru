@@ -6,6 +6,7 @@ import io.vavr.collection.Array;
 import io.vavr.collection.HashMap;
 import io.vavr.collection.Map;
 import io.vavr.collection.Seq;
+import io.vavr.control.Try;
 import org.perudevteam.misc.MiscHelpers;
 import org.perudevteam.type.Tagged;
 
@@ -92,7 +93,7 @@ public abstract class BaseValue extends Tagged<BaseType> {
         throw castError(getTag(), BaseType.SEQUENCE);
     }
 
-    public Function1<Seq<BaseValue>, BaseValue> toFunction() {
+    public Function1<Seq<BaseValue>, Try<BaseValue>> toFunction() {
         throw castError(getTag(), BaseType.FUNCTION);
     }
 
@@ -155,7 +156,7 @@ public abstract class BaseValue extends Tagged<BaseType> {
         return new BaseSequence(v);
     }
 
-    public static BaseValue ofFunction(Function1<? super Seq<BaseValue>, ? extends BaseValue> v) {
+    public static BaseValue ofFunction(Function1<? super Seq<BaseValue>, ? extends Try<BaseValue>> v) {
         Objects.requireNonNull(v);
         return new BaseFunction(v);
     }
@@ -217,8 +218,8 @@ public abstract class BaseValue extends Tagged<BaseType> {
         return new BaseSequence(f.apply(toSequence()));
     }
 
-    public BaseValue mapFunction(Function1<? super Function1<Seq<BaseValue>, BaseValue>,
-            ? extends Function1<Seq<BaseValue>, BaseValue>> f) {
+    public BaseValue mapFunction(Function1<? super Function1<Seq<BaseValue>, Try<BaseValue>>,
+            ? extends Function1<Seq<BaseValue>, Try<BaseValue>>> f) {
         return new BaseFunction(f.apply(toFunction()));
     }
 
@@ -758,15 +759,15 @@ public abstract class BaseValue extends Tagged<BaseType> {
      * Base Function Class.
      */
     private static class BaseFunction extends BaseValue {
-        private final Function1<Seq<BaseValue>, BaseValue> value;
-        private BaseFunction(Function1<? super Seq<BaseValue>, ? extends BaseValue> v) {
+        private final Function1<Seq<BaseValue>, Try<BaseValue>> value;
+        private BaseFunction(Function1<? super Seq<BaseValue>, ? extends Try<BaseValue>> v) {
             super(BaseType.FUNCTION);
             Objects.requireNonNull(v);
             value = Function1.narrow(v);
         }
 
         @Override
-        public Function1<Seq<BaseValue>, BaseValue> toFunction() {
+        public Function1<Seq<BaseValue>, Try<BaseValue>> toFunction() {
             return value;
         }
 

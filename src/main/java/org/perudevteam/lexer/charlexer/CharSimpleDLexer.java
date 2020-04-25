@@ -35,7 +35,7 @@ public class CharSimpleDLexer<T extends Enum<T>> extends
 
     @Override
     protected LineException makeError(String lexeme, CharSimpleContext context) {
-        return new LineException(context.getLine().getStarting(), context.getLinePosition().getStarting(),
+        return LineException.lineEx(context.getLine().getStarting(), context.getLinePosition().getStarting(),
                 "Lexeme cannot be lexed.");
     }
 

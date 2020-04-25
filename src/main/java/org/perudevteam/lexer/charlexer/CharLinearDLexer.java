@@ -40,7 +40,7 @@ public class CharLinearDLexer<T extends Enum<T>>
 
     @Override
     protected Throwable makeError(String lexeme, CharLinearContext context) {
-        return new LineException(context.getLine().getStarting(),
+        return LineException.lineEx(context.getLine().getStarting(),
                 context.getLinePosition().getStarting(), "Lexeme cannot be lexed." + lexeme);
     }
 
