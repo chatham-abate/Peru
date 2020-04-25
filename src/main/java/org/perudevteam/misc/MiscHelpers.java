@@ -160,4 +160,17 @@ public final class MiscHelpers {
 
         return Try.failure(exMap.apply(exClass.cast(tryValue.getCause())));
     }
+
+    public static <T> Try<T>
+    mapCause(Try<? extends T> tryValue, Function1<? super Throwable, ? extends Throwable> exMap) {
+        return tryValue.isSuccess() ? Try.narrow(tryValue) : Try.failure(exMap.apply(tryValue.getCause()));
+    }
+
+    public static <T, X extends Throwable> Try<T>
+    mapCauseIfNeeded(Class<X> exClass, Try<? extends T> tryValue, Function1<? super Throwable, ? extends X> exMap) {
+        return tryValue.isSuccess() || tryValue.getCause().getClass() == exClass
+                ? Try.narrow(tryValue)
+                : Try.failure(exMap.apply(tryValue.getCause()));
+
+    }
 }

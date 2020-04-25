@@ -17,6 +17,11 @@ public class LineException extends Exception implements Positioned {
         return MiscHelpers.throwMatch(LineException.class, tryValue, valueMap, exMap);
     }
 
+    public static <T> Try<T> mapLineExIfNeeded(Try<? extends T> tryValue,
+                                               Function1<? super Throwable, ? extends LineException> exMap) {
+        return MiscHelpers.mapCauseIfNeeded(LineException.class, tryValue, exMap);
+    }
+
     public static LineException lineEx(Positioned d, String msg) {
         Objects.requireNonNull(d);
         return new LineException(d.getLine(), d.getLinePosition(), msg);

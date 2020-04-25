@@ -9,12 +9,19 @@ import io.vavr.control.Try;
 import javax.sound.sampled.Line;
 import java.util.Objects;
 
+import static org.perudevteam.misc.LineException.*;
+
 public class TraceException extends Exception implements Positioned {
 
     public static <T> Try<T> matchTraceEx(Try<? extends T> tryValue,
                                           Function1<? super T, ? extends T> valueMap,
                                           Function1<? super TraceException, ? extends TraceException> exMap) {
         return MiscHelpers.throwMatch(TraceException.class, tryValue, valueMap, exMap);
+    }
+
+    public static <T> Try<T> mapTraceExIfNeeded(Try<? extends T> tryValue,
+                                                Function1<? super Throwable, ? extends TraceException> exMap) {
+        return MiscHelpers.mapCauseIfNeeded(TraceException.class, tryValue, exMap);
     }
 
     private static final TraceException EMPTY_TRACE = new TraceException(List.empty());
@@ -71,5 +78,13 @@ public class TraceException extends Exception implements Positioned {
 
     public TraceException push(LineException e) {
         return new TraceException(trace.prepend(e));
+    }
+
+    public TraceException push(Positioned d, String msg) {
+        return new TraceException(trace.prepend(lineEx(d, msg)));
+    }
+
+    public TraceException push(int l, int lp, String msg) {
+        return new TraceException(trace.prepend(lineEx(l, lp, msg)));
     }
 }
