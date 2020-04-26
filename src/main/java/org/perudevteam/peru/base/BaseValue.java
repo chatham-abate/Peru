@@ -156,6 +156,13 @@ public abstract class BaseValue extends Tagged<BaseType> {
         return new BaseSequence(v);
     }
 
+    public static BaseValue ofSequence(BaseValue... v) {
+        Objects.requireNonNull(v);
+        Array<BaseValue> values = Array.of(v);
+        values.forEach(Objects::requireNonNull);
+        return new BaseSequence(values);
+    }
+
     public static BaseValue ofFunction(Function1<? super Seq<BaseValue>, ? extends Try<BaseValue>> v) {
         Objects.requireNonNull(v);
         return new BaseFunction(v);

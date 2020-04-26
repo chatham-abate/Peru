@@ -13,8 +13,8 @@ import static org.perudevteam.misc.LineException.*;
 
 public class TraceException extends Exception implements Positioned {
 
-    public static <T> Try<T> matchTraceEx(Try<? extends T> tryValue,
-                                          Function1<? super T, ? extends T> valueMap,
+    public static <T, U> Try<U> matchTraceEx(Try<? extends T> tryValue,
+                                          Function1<? super T, ? extends U> valueMap,
                                           Function1<? super TraceException, ? extends TraceException> exMap) {
         return MiscHelpers.throwMatch(TraceException.class, tryValue, valueMap, exMap);
     }

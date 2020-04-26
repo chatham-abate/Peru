@@ -147,8 +147,8 @@ public final class MiscHelpers {
     }
 
     // Exception Matcher...
-    public static <T, X extends Throwable> Try<T> throwMatch(Class<X> exClass, Try<? extends T> tryValue,
-                                                      Function1<? super T, ? extends T> valueMap,
+    public static <T, U, X extends Throwable> Try<U> throwMatch(Class<X> exClass, Try<? extends T> tryValue,
+                                                      Function1<? super T, ? extends U> valueMap,
                                                       Function1<? super X, ? extends X> exMap) {
         if (tryValue.isSuccess()) {
             return tryValue.map(valueMap);

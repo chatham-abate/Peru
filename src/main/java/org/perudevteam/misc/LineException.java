@@ -11,8 +11,8 @@ import java.util.Objects;
 
 public class LineException extends Exception implements Positioned {
 
-    public static <T> Try<T> matchLineEx(Try<? extends T> tryValue,
-                                         Function1<? super T, ? extends T> valueMap,
+    public static <T, U> Try<U> matchLineEx(Try<? extends T> tryValue,
+                                         Function1<? super T, ? extends U> valueMap,
                                          Function1<? super LineException, ? extends LineException> exMap) {
         return MiscHelpers.throwMatch(LineException.class, tryValue, valueMap, exMap);
     }

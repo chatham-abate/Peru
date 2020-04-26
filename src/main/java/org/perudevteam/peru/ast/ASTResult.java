@@ -166,6 +166,10 @@ public interface ASTResult extends Positioned {
         };
     }
 
+    default ASTResult withPosition(Positioned d) {
+        return withPosition(d.getLine(), d.getLinePosition());
+    }
+
     default ASTResult withPosition(int l, int lp) {
         final ASTResult This = this;
 

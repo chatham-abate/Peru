@@ -9,9 +9,28 @@ import org.perudevteam.misc.MiscHelpers;
 
 import java.util.Objects;
 
-// DFA.
+/**
+ * This class represents a deterministic finite automaton.
+ * A deterministic finite automaton is different from a finite automaton in that for any given state
+ * there can be at most one outgoing transition for each element of the input alphabet.
+ * Additionally a deterministic finite automaton cannot have epsilon transitions.
+ * @see <a href="https://en.wikipedia.org/wiki/Deterministic_finite_automaton">DFA</a>
+ *
+ * @param <I> The raw input type of the automaton.
+ * @param <IC> The translated input type of the automaton.
+ * @param <O> The output type of the automaton.
+ */
 public class DFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
 
+    /**
+     * Cast a <b>DFAutomaton</b>.
+     *
+     * @param dfa The automaton to cast.
+     * @param <I> The raw input type to cast to.
+     * @param <IC> The translated input type to cast to.
+     * @param <O> The output type to case to.
+     * @return The casted <b>DFAutomaton</b>.
+     */
     public static <I, IC, O> DFAutomaton<I, IC, O> narrow(DFAutomaton<? super I, ? extends IC, ? extends O> dfa) {
         return new DFAutomaton<>(
                 dfa.getAcceptingStates(),
@@ -22,12 +41,33 @@ public class DFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
         );
     }
 
+    /**
+     * The automatons transition table.
+     * Each state has exactly one row in this table.
+     * Each row maps translated input types to other states. This represents the
+     * outgoing transitions of a given state.
+     */
     private final Array<Map<IC, Integer>> transitionTable;
 
+    /**
+     * Builds a <b>DFAutomaton</b> with no transitions.
+     *
+     * @param numberOfStates The number of states to initialize.
+     * @param ia The input alphabet.
+     * @param gic The translation function.
+     */
     public DFAutomaton(int numberOfStates, Set<? extends IC> ia, Function1<? super I, ? extends IC> gic) {
         this(HashMap.empty(), ia, Array.fill(numberOfStates, HashMap.empty()), gic, true);
     }
 
+    /**
+     * Build a <b>DFAutomaton</b> with given transitions and states.
+     *
+     * @param as The accepting states of the automaton.
+     * @param ia The input alphabet of the automaton.
+     * @param tt The transition table of the automaton.
+     * @param gic The translation function of the automaton.
+     */
     public DFAutomaton(Map<? extends Integer, ? extends O> as,
                        Set<? extends IC> ia,
                        Array<? extends Map<? extends IC, ? extends Integer>> tt,
@@ -35,6 +75,16 @@ public class DFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
         this(as, ia, tt, gic, true);
     }
 
+    /**
+     * Build a <b>DFAutomaton</b> with given transitions and states.
+     *
+     * @param as The accepting states of the automaton.
+     * @param ia The input alphabet of the automaton.
+     * @param tt The transition table of the automaton.
+     * @param gic The translation function of the automaton.
+     * @param withCheck Whether or not the above parameters should be validated.
+     *                  For all public constructors this flag is true.
+     */
     DFAutomaton(Map<? extends Integer, ? extends O> as,
                         Set<? extends IC> ia,
                         Array<? extends Map<? extends IC, ? extends Integer>> tt,
@@ -103,26 +153,61 @@ public class DFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
                 transitionTable.appendAll(suffix), getGetInputClassUnchecked(), false);
     }
 
+    /**
+     * Get the states and transitions of this automaton.
+     *
+     * @return This automatons transition table.
+     */
     public Array<Map<IC, Integer>> getTransitionTable() {
         return transitionTable;
     }
 
+    /**
+     * Determine whether a state has an outgoing transition for a given raw input.
+     *
+     * @param from The state.
+     * @param input The raw input.
+     * @return Whether or not there is a transition.
+     */
     public boolean hasTransition(int from, I input) {
         IC inputClass = getInputClass(input);
         validateState(from);
         return transitionTable.get(from).containsKey(inputClass);
     }
 
+    /**
+     * Determine whether a state has an outgoing transition for a given translated input.
+     *
+     * @param from The state.
+     * @param inputClass The translated input.
+     * @return Whether or not there is a transition.
+     */
     public boolean hasTransitionFromClass(int from, IC inputClass) {
         validateInputClass(inputClass);
         validateState(from);
         return transitionTable.get(from).containsKey(inputClass);
     }
 
+    /**
+     * Given a state and a translated input, traverse the state's corresponding outgoing edge
+     * and return the ending state of that edge.
+     *
+     * @param from The starting state.
+     * @param input The translated input to interpret.
+     * @return The ending state.
+     */
     public int getTransition(int from, I input) {
         return getTransitionAsOption(from, input).get();
     }
 
+    /**
+     * Same as {@link DFAutomaton#getTransition(int, Object)} except result it returned as an <b>Option</b>.
+     * <b>None</b> is returned if there is no outgoing edge from the given state with said raw input.
+     * FINISFHSDHFSDHFSDHFSDHFDHFHFHDSFHSD
+     * @param from
+     * @param input
+     * @return
+     */
     public Option<Integer> getTransitionAsOption(int from, I input) {
         IC inputClass = getInputClass(input);
         validateState(from);
