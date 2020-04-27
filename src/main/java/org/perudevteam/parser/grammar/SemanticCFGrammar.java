@@ -12,21 +12,39 @@ import java.util.Objects;
 
 
 /**
- * Attributed Grammar built for producing some result of type R, from some sequence
- * of typed tokens.
- *
- * @param <NT> Non terminal enum type of the grammar.
- * @param <T> terminal Enum type of the grammar.
- * @param <P> Production Type. (Must extend Attribute Production)
- * @param <L> The lexeme type of the tokens.
- * @param <D> The Data type of the tokens.
- * @param <R> Result Type.
+ * This class represents a context free grammar whose productions have the ability to
+ * build some result given the results corresponding to each symbol on that
+ * productions rule.
+ * <br>
+ * Besides the productions, this grammar requires a way of turning terminal symbols
+ * into results. Thus, it contains a map of functions for turning a token of
+ * any terminal type into a result.
+ * @see org.perudevteam.parser.grammar.SemanticProduction
+ * @param <NT> The non-terminal <b>Enum</b> type of the grammar.
+ * @param <T> The terminal <b>Enum</b> type of the grammar.
+ * @param <P> The type of <b>SemanticProduction</b> used by the grammar.
+ * @param <L> The lexeme type of the tokens to be parsed by this grammar.
+ * @param <D> The data type of the tokens to be parsed by this grammar.
+ * @param <R> The result type produced by this grammar.
  */
 public class SemanticCFGrammar<NT extends Enum<NT>, T extends Enum<T>,
         P extends SemanticProduction<NT, T, R>, L, D extends Tokenized<T>, R> extends CFGrammar<NT, T, P> {
 
+    /**
+     * A map of terminal <b>Enum</b> types to <b>CheckedFunction</b>s.
+     * Each function in this map will translate the lexeme and data of a token
+     * into some result of type <b>R</b>. This function is allowed to throw
+     * an error during this translation step.
+     */
     private final Map<T, CheckedFunction2<L, D, R>> terminalResGenerators;
 
+    /**
+     * Constructor.
+     *
+     * @param start The start symbol of the grammar.
+     * @param termResGens The map of terminal result generating functions.
+     * @param prods The sequence of production rule for the grammar.
+     */
     public SemanticCFGrammar(NT start, Map<? extends T, ? extends CheckedFunction2<L, D, ? extends R>> termResGens,
                              Seq<P> prods) {
         super(start, prods);
@@ -47,17 +65,44 @@ public class SemanticCFGrammar<NT extends Enum<NT>, T extends Enum<T>,
         terminalResGenerators = narrowTermResGens;
     }
 
-    // Direct Constructor with no checks... only used by methods of this class.
+    /**
+     * Direct Constructor with no checks.
+     * <br>
+     * meant for interior use only.
+     *
+     * @param start The start symbol of the grammar.
+     * @param prodMap The productions of the grammar.
+     * @param termsUsed The terminals used by the grammar.
+     * @param termResGens The terminal result generating functions.
+     */
     protected SemanticCFGrammar(NT start, Map<NT, Set<P>> prodMap, Set<T> termsUsed,
                                 Map<T, CheckedFunction2<L, D, R>> termResGens) {
         super(start, prodMap, termsUsed);
         terminalResGenerators = termResGens;
     }
 
+    /**
+     * Given a lexeme of type <b>L</b> and data of type <b>D</b> attempt
+     * to build a result of type <b>R</b>. (No checks)
+     *
+     * @param lexeme The lexeme.
+     * @param data The data.
+     * @return The generated result.
+     * @throws Throwable When there is an error building the result.
+     */
     public R buildTerminalResultUnchecked(L lexeme, D data) throws Throwable {
         return terminalResGenerators.get(data.getTokenType()).get().apply(lexeme, data);
     }
 
+    /**
+     * Given a lexeme of type <b>L</b> and data of type <b>D</b> attempt
+     * to build a result of type <b>R</b>.
+     *
+     * @param lexeme The lexeme.
+     * @param data The data.
+     * @return The generated result.
+     * @throws Throwable When there is an error building the result.
+     */
     public R buildTerminalResult(L lexeme, D data) throws Throwable {
         Objects.requireNonNull(lexeme);
         Objects.requireNonNull(data);
@@ -71,6 +116,15 @@ public class SemanticCFGrammar<NT extends Enum<NT>, T extends Enum<T>,
         return terminalResGenerators.get(terminal).get().apply(lexeme, data);
     }
 
+    /**
+     * Given a lexeme of type <b>L</b> and data of type <b>D</b> attempt to
+     * build a result of type <b>R</b>. If there is an error, return a <b>Failure</b>.
+     * Otherwise return a <b>Success</b> containing the constructed result.
+     *
+     * @param lexeme The lexeme.
+     * @param data The data.
+     * @return A <b>Try</b> which may contain the built result.
+     */
     public Try<R> tryBuildTerminalResult(L lexeme, D data) {
         return Try.of(() -> buildTerminalResult(lexeme, data));
     }

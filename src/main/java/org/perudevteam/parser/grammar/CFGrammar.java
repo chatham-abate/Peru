@@ -6,27 +6,42 @@ import io.vavr.control.Either;
 import java.util.Objects;
 
 /**
- * Context free grammar class
+ * This class represents a Context Free Grammar.
+ * <br>
+ * It is composed of a set of productions.
+ * @see <a href="https://en.wikipedia.org/wiki/Context-free_grammar#Formal_definitions">Context Free Grammar</a>
  *
- * @param <NT> Non terminal Type
- * @param <T> Terminal Type
- * @param <P> Production Type
+ * @param <NT> The non-terminal <b>Enum</b> type.
+ * @param <T> The terminal <b>Enum</b> type.
+ * @param <P> The <b>Production</b> type.
  */
 public class CFGrammar<NT extends Enum<NT>, T extends Enum<T>, P extends Production<NT, T>> {
 
+    /**
+     * The start symbol of the grammar.
+     */
     private final NT startSymbol;
-    private final Map<NT, Set<P>> productionMap;
-
-    private final Set<T> terminalsUsed;
-    // Non-Terminals Used = productionMap.KeySet();
 
     /**
-     * Constructor for generating the production.. with checks.
-     * All non-terminals appearing in rules must have their own rule.
-     * The start symbol must have its own rule.
+     * The production map of the grammar.
+     * <br>
+     * This maps each non terminal to its corresponding set of <b>Production</b>s.
+     */
+    private final Map<NT, Set<P>> productionMap;
+
+    /**
+     * Set of terminal symbols used by the grammar.
+     */
+    private final Set<T> terminalsUsed;
+
+    /**
+     * Construct a new <b>CFGrammar</b> from some start symbol as sequence of <b>Production</b>s.
+     * <br>
+     * All non terminal symbols found in this grammar must have their own <b>Production</b>s also in this
+     * grammar.
      *
-     * @param start The start symbol.
-     * @param productions Sequence of productions.
+     * @param start The start symbol of the grammar.
+     * @param productions The sequence of <b>Production</b>s of this grammar.
      */
     public CFGrammar(NT start, Seq<P> productions) {
         // Neither productions nor start can be null.
@@ -68,25 +83,54 @@ public class CFGrammar<NT extends Enum<NT>, T extends Enum<T>, P extends Product
         productionMap = prodMapTemp;
     }
 
-    // Direct Constructor with no checks... only used by methods of this class.
+    /**
+     * Directly build a <b>CFGrammar</b> with no checks on the given parameters.
+     *
+     * @param start The start symbol of the grammar.
+     * @param prodMap A map from non terminal symbols to their corresponding sets of <b>Production</b>s.
+     * @param termsUsed The set of Terminals used by this grammar.
+     */
     protected CFGrammar(NT start, Map<NT, Set<P>> prodMap, Set<T> termsUsed) {
         startSymbol = start;
         productionMap = prodMap;
         terminalsUsed = termsUsed;
     }
 
+    /**
+     * Get this grammar's start symbol.
+     *
+     * @return The start symbol.
+     */
     public NT getStartSymbol() {
         return startSymbol;
     }
 
+    /**
+     * Get this grammar's set of non-terminal symbols.
+     *
+     * @return The set of non-terminals.
+     */
     public Set<NT> getNonTerminalsUsed() {
         return productionMap.keySet();
     }
 
+    /**
+     * Get this grammar's set of terminal symbols.
+     *
+     * @return The set of terminal symbols.
+     */
     public Set<T> getTerminalsUsed() {
         return terminalsUsed;
     }
 
+    /**
+     * Get a given non-terminal's set of <b>Production</b>s in this grammar.
+     * <br>
+     * If this grammar does not contain the given non-terminal, throw an error.
+     *
+     * @param nonTerminal The non-terminal.
+     * @return The set of <b>Productions</b>.
+     */
     public Set<P> getProductions(NT nonTerminal) {
         if (productionMap.containsKey(nonTerminal)) {
             return productionMap.get(nonTerminal).get();
@@ -95,17 +139,31 @@ public class CFGrammar<NT extends Enum<NT>, T extends Enum<T>, P extends Product
         throw new IllegalArgumentException("Given Non-Terminal (while valid) is not used in this grammar.");
     }
 
+    /**
+     * Get this grammar's <b>Production</b> map.
+     *
+     * @return The <b>Production</b> map.
+     */
     public Map<NT, Set<P>> getProductionMap() {
         return productionMap;
     }
 
+    /**
+     * Add a new <b>Production</b> to this grammar's production map.
+     * <br>
+     * If the given <b>Production</b> introduces non-terminals with no entries in the new map,
+     * an error is thrown.
+     *
+     * @param p The <b>Production</b> to be added.
+     * @return The new map.
+     */
     protected Map<NT, Set<P>> newProductionMap(P p) {
         NT source = p.getSource();
         Map<NT, Set<P>> newProdMap = productionMap.containsKey(source)
                 ? productionMap.put(source, productionMap.get(source).get().add(p))
                 : productionMap.put(source, HashSet.of(p));
 
-        // All nonterminals in the rule which are do not have rules...
+        // All non-terminals in the rule which are do not have rules...
         Seq<NT> notRuled = p.getRule()
                 .filter(Either::isLeft)
                 .map(Either::getLeft)
@@ -118,7 +176,12 @@ public class CFGrammar<NT extends Enum<NT>, T extends Enum<T>, P extends Product
         return newProdMap;
     }
 
-
+    /**
+     * Add a <b>Production</b> to this <b>CFGrammar</b>.
+     *
+     * @param p The <b>Production</b> to add.
+     * @return The new <b>CFGrammar</b>.
+     */
     public CFGrammar<NT, T, P> withProduction(P p) {
         Objects.requireNonNull(p);  // p cannot be null.
 

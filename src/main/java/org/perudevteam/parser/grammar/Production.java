@@ -5,14 +5,39 @@ import io.vavr.control.Either;
 
 import java.util.Objects;
 
-// Functional Production Representation. (Uses Eithers instead of plain Enums).
+/**
+ * A class representing a production of a context free grammar.
+ * <br>
+ * A <b>Production</b> is simply some non-terminal symbol which can be substituted for
+ * a sequence of other non-terminal and terminal symbols.
+ * <br>
+ * Here non-terminals and terminal <b>Enum</b>s are able to be stored in one sequence of
+ * <b>Either</b>s representing the rule of this <b>Production</b>.
+ * A non-terminal is represented by a left <b>Either</b> and a
+ * terminal is represented by a right <b>Either</b>.
+ *
+ * @param <NT> The <b>Enum</b> non-terminal type.
+ * @param <T> The <b>Enum</b> terminal type.
+ */
 public class Production<NT extends Enum<NT>, T extends Enum<T>> {
+
+    /**
+     * The non-terminal source of the <b>Production</b>.
+     */
     private final NT source;
 
-    // Each member of the rule sequence will either be a terminal, or
-    // a non-terminal.
+    /**
+     * The sequence of non-terminals and terminals representing the rule of this
+     * <b>Production</b>.
+     */
     private final Seq<Either<NT, T>> rule;
 
+    /**
+     * Create a <b>Production</b> given a non-terminal and its rule.
+     *
+     * @param s The non-terminal source symbol.
+     * @param r Its corresponding rule.
+     */
     public Production(NT s, Seq<? extends Either<NT, T>> r) {
         Objects.requireNonNull(s);
         Objects.requireNonNull(r);
@@ -32,19 +57,42 @@ public class Production<NT extends Enum<NT>, T extends Enum<T>> {
         rule = Seq.narrow(r);
     }
 
+    /**
+     * Get the source symbol <b>Enum</b> of this <b>Production</b>.
+     *
+     * @return The source symbol.
+     */
     public NT getSource() {
         return source;
     }
 
+    /**
+     * Update the source non-terminal symbol of this <b>Production</b>.
+     *
+     * @param s The new source symbol.
+     * @return The new <b>Production</b>.
+     */
     public Production<NT, T> withSource(NT s) {
         return new Production<>(s, rule);
     }
 
+    /**
+     * Get this <b>Production</b>'s rule.
+     *
+     * @return The sequence of non-terminals and terminals.
+     */
     public Seq<Either<NT, T>> getRule() {
         return rule;
     }
 
-    public <P extends Enum<P>> Production<NT, P> withRule(Seq<Either<NT, P>> r) {
+    /**
+     * Update the rule of this <b>Production</b>.
+     *
+     * @param r The new rule.
+     * @param <TP> The terminal type used in the new rule.
+     * @return The new <b>Production</b>.
+     */
+    public <TP extends Enum<TP>> Production<NT, TP> withRule(Seq<Either<NT, TP>> r) {
         return new Production<>(source, r);
     }
 

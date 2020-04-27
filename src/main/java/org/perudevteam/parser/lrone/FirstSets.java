@@ -9,13 +9,25 @@ import org.perudevteam.parser.grammar.Production;
 
 import java.util.Objects;
 
+/**
+ * This class holds a <b>FIRST</b> set for each of the non-terminal <b>Enum</b>s
+ * of a <b>CFGrammar</b>.
+ * @see <a href="https://www3.cs.stonybrook.edu/~warren/xsbbook/node29.html"><b>FIRST</b> sets</a>
+ * @param <NT> The non-terminal <b>Enum</b> type of the <b>CFGrammar</b> given.
+ * @param <T> The terminal <b>Enum</b> type of the <b>CFGrammar</b> given.
+ */
 public class FirstSets<NT extends Enum<NT>, T extends Enum<T>> {
 
     /**
-     * Generate the firsts set of a specific rule.
+     * Generate the firsts set of an entire rule.
      *
-     * @param <NT> The non-Terminal type of the rule.
-     * @param <T> The terminal type of the rule.
+     * @param rule The rule itself.
+     * @param nonTerminalFirsts The <b>FIRST</b> set for each non-terminal in grammar.
+     * @param mayBeEmpty The set of non-terminals in the grammar which may derive to epsilon.
+     * @param <NT> The non-terminal <b>Enum</b> type of the grammar.
+     * @param <T> The terminal <b>Enum</b> type of the grammar.
+     * @return The set of terminal <b>Enum</b>s which may start something derived from this rule, and
+     * whether or not the rule can derive to epsilon.
      */
     private static <NT extends Enum<NT>, T extends Enum<T>> Tuple2<Boolean, Set<T>>
     genRuleFirstSet(Seq<? extends Either<NT, T>> rule,
@@ -48,9 +60,21 @@ public class FirstSets<NT extends Enum<NT>, T extends Enum<T>> {
         }
     }
 
+    /**
+     * A map from non-terminal symbols to <b>FIRST</b> sets.
+     */
     private final Map<NT, Set<T>> nonTerminalFirsts;
+
+    /**
+     * The set of non-terminals symbols in the grammar which can derive to epsilon.
+     */
     private final Set<NT> mayBeEmpty;
 
+    /**
+     * Construct the <b>FIRST</b> sets of a <b>CFGrammar</b>.
+     *
+     * @param g the <b>CFGrammar</b>.
+     */
     public FirstSets(CFGrammar<NT, T, ? extends Production<NT, T>> g) {
         Objects.requireNonNull(g);  // Grammar cannot be null.
 
@@ -99,10 +123,20 @@ public class FirstSets<NT extends Enum<NT>, T extends Enum<T>> {
         nonTerminalFirsts = nonTerminalFirstsTemp;
     }
 
+    /**
+     * Get the <b>FIRST</b> set of every non-terminal in the grammar.
+     *
+     * @return The <b>FIRST</b> sets.
+     */
     public Map<NT, Set<T>> getNonTerminalFirsts() {
         return nonTerminalFirsts;
     }
 
+    /**
+     * Throw an error if a non-terminal is not defined in this group of <b>FIRST</b> sets.
+     *
+     * @param nt The non-terminal <b>Enum</b> to validate.
+     */
     private void validateNonTerminal(NT nt) {
         Objects.requireNonNull(nt);
         if (!nonTerminalFirsts.containsKey(nt)) {
@@ -110,11 +144,25 @@ public class FirstSets<NT extends Enum<NT>, T extends Enum<T>> {
         }
     }
 
+    /**
+     * Get the <b>FIRST</b> set of a non-terminal. Throw an error if the given non-terminal
+     * is not defined in this group of <b>FIRST</b> sets.
+     *
+     * @param nt The non-terminal <b>Enum</b>.
+     * @return The <b>FIRST</b> set of the given non-terminal.
+     */
     public Tuple2<Boolean, Set<T>> getFirstSet(NT nt) {
         validateNonTerminal(nt);
         return Tuple.of(mayBeEmpty.contains(nt), nonTerminalFirsts.get(nt).get());
     }
 
+    /**
+     * Get the <b>FIRST</b> set of an entire rule.
+     *
+     * @param rule The rule.
+     * @return The <b>FIRST</b> set of the rule, and whether or not the rule can
+     * derive to epsilon.
+     */
     public Tuple2<Boolean, Set<T>> getFirstSet(Seq<Either<NT, T>> rule) {
         Objects.requireNonNull(rule);
         return genRuleFirstSet(rule, nonTerminalFirsts, mayBeEmpty);
