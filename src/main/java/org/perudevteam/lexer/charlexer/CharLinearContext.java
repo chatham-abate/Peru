@@ -2,22 +2,43 @@ package org.perudevteam.lexer.charlexer;
 
 import io.vavr.Function1;
 import io.vavr.Tuple;
-import io.vavr.collection.HashMap;
-import io.vavr.collection.HashSet;
-import io.vavr.collection.Map;
-import io.vavr.collection.Set;
+import io.vavr.collection.*;
 import org.perudevteam.lexer.LinearContext;
 
 import java.util.Objects;
 
+/**
+ * The context used for a {@link org.perudevteam.lexer.charlexer.CharLinearDLexer}.
+ */
 public class CharLinearContext extends CharSimpleContext implements LinearContext<CharLinearContext> {
 
+    /**
+     * An initial linear context to used by any linear character lexer.
+     */
     public static final CharLinearContext INIT_LINEAR_CONTEXT =
             new CharLinearContext(HashMap.empty(), 0, PositionData.INIT_POSITION, PositionData.INIT_POSITION);
 
+    /**
+     * The absolute position of this context's lexer.
+     * @see LinearContext#getAbsolutePosition()
+     */
     private final int absolutePosition;
+
+    /**
+     * This map holds all previously seen errors states of the lexer after this context's absolute position.
+     * It maps absolute positions the set of states which inevitably result in error while lexing.
+     * @see org.perudevteam.lexer.LinearDLexer
+     */
     private final Map<Integer, Set<Integer>> failMap;
 
+    /**
+     * Construct a new character linear context.
+     *
+     * @param fm The error cache.
+     * @param ap The absolute position.
+     * @param l The line data.
+     * @param lp The line position data.
+     */
     public CharLinearContext(Map<Integer, ? extends Set<? extends Integer>> fm,
                              int ap, PositionData l, PositionData lp) {
         super(l, lp);
@@ -26,6 +47,11 @@ public class CharLinearContext extends CharSimpleContext implements LinearContex
         failMap = fm.map((p, st) -> Tuple.of(p, Set.narrow(st)));
     }
 
+    /**
+     * Get the size of the error cache of this context.
+     *
+     * @return The integer size of the error cache.
+     */
     int getMapSize() { return failMap.size(); }
 
     @Override
@@ -60,18 +86,14 @@ public class CharLinearContext extends CharSimpleContext implements LinearContex
     }
 
     @Override
-    public CharLinearContext withPreErrors(Map<Integer, ? extends Integer> preErrors) {
-        Map<Integer, Set<Integer>> preErrorSets = preErrors.mapValues(HashSet::of);
+    public CharLinearContext withPreErrors(Map<? extends Integer, ? extends Integer> preErrors) {
+        Map<Integer, Set<Integer>> preErrorSets = Map.<Integer, Integer>narrow(preErrors).mapValues(HashSet::of);
         Map<Integer, Set<Integer>> newFailMap = failMap.merge(preErrorSets,
                 Set::addAll);
 
         return new CharLinearContext(newFailMap, absolutePosition,
                 getLine(), getLinePosition());
     }
-
-    /*
-     * Updated Overridden methods...
-     */
 
     @Override
     public CharLinearContext withLine(PositionData l) {

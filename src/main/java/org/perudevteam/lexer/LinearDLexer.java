@@ -11,16 +11,45 @@ import io.vavr.control.Option;
 import io.vavr.control.Try;
 import org.perudevteam.fa.DFAutomaton;
 
+/**
+ * This class represents a lexer optimized for languages which may exhibit quadratic rollback while lexing.
+ *
+ * @param <I> The raw input of the lexer's deterministic finite automaton.
+ * @param <L> The lexeme type of the lexer.
+ * @param <D> The data type of the lexer.
+ * @param <C> The context of the lexer. (Must be a linear context).
+ */
 public abstract class LinearDLexer<I, L, D, C extends LinearContext<C>>
         extends DLexer<I, L, D, C> {
 
+    /**
+     * The preset maximum size of all linear lexer's error state cache.
+     */
     private static final int MAX_ROLLBACK_SIZE = 35;
+
+
+    /**
+     * The maximum size of this linear lexer's error state cache.
+     */
     private final int maxRollbackAmount;
 
+    /**
+     * Create a linear lexer.
+     *
+     * @param initLex The initial lexeme of the lexer.
+     * @param d The automaton used by this lexer.
+     */
     public LinearDLexer(L initLex, DFAutomaton<? super I, ?, ? extends Function1<? super C, ? extends D>> d) {
         this(MAX_ROLLBACK_SIZE, initLex, d);
     }
 
+    /**
+     * Create a linear lexer with a given maximum error cache size.
+     *
+     * @param mra The maximum error cache size.
+     * @param initLex The initial lexeme.
+     * @param d The automaton used by the lexer.
+     */
     public LinearDLexer(int mra, L initLex,
                         DFAutomaton<? super I, ?, ? extends Function1<? super C, ? extends D>> d) {
         super(initLex, d);

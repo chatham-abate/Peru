@@ -5,9 +5,22 @@ import org.perudevteam.fa.DFAutomaton;
 import org.perudevteam.lexer.SimpleDLexer;
 import org.perudevteam.misc.LineException;
 
+/**
+ * A lexer for lexing characters into strings using the simple lexing algorithm.
+ * This lexer will categorize a successful lexeme with some <b>Enum</b>.
+ * <br>
+ * For example, categorizing some string matching the regex <b>[0-9]+</b> as an <i>INTEGER</i>.
+ *
+ * @param <T> The category type.
+ */
 public class CharSimpleDLexer<T extends Enum<T>> extends
         SimpleDLexer<Character, String, CharData<T>, CharSimpleContext> {
 
+    /**
+     * Constructor.
+     *
+     * @param d The lexer's deterministic finite automaton.
+     */
     public CharSimpleDLexer(DFAutomaton<? super Character, ?,
                     ? extends Function1<? super CharSimpleContext, ? extends CharData<T>>> d) {
         super("", d);

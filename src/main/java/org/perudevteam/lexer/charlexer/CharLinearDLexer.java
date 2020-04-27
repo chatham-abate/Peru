@@ -5,14 +5,31 @@ import org.perudevteam.fa.DFAutomaton;
 import org.perudevteam.lexer.LinearDLexer;
 import org.perudevteam.misc.LineException;
 
+/**
+ * Lexer for lexing characters into categorized strings. This lexer uses the optimised algorithm from
+ * {@link org.perudevteam.lexer.LinearDLexer}.
+ *
+ * @param <T> The <b>Enum</b> category type.
+ */
 public class CharLinearDLexer<T extends Enum<T>>
         extends LinearDLexer<Character, String, CharData<T>, CharLinearContext> {
 
+    /**
+     * Build a linear character lexer with a max rollback amount.
+     *
+     * @param mra The max rollback amount.
+     * @param d The automaton of the lexer.
+     */
     protected CharLinearDLexer(int mra,
             DFAutomaton<? super Character,?, ? extends Function1<? super CharLinearContext, ? extends CharData<T>>> d) {
         super(mra, "", d);
     }
 
+    /**
+     * Build a linear character lexer with the preset max rollback amount.
+     *
+     * @param d The automaton of the lexer.
+     */
     protected CharLinearDLexer(
             DFAutomaton<? super Character, ?, ? extends Function1<? super CharLinearContext, ? extends CharData<T>>> d) {
         super("", d);

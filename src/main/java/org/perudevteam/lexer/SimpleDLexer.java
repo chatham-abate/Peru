@@ -9,7 +9,24 @@ import io.vavr.control.Option;
 import io.vavr.control.Try;
 import org.perudevteam.fa.DFAutomaton;
 
+/**
+ * This class represents a simple lexer. The algorithm used here simply traverses the given
+ * automaton until failure. Then returns a token with the last successful data and lexeme to be
+ * found.
+ *
+ * @param <I> The raw input type of the given automaton.
+ * @param <L> The lexeme type of the lexer.
+ * @param <D> The data type of the lexer.
+ * @param <C> The context type of the lexer.
+ */
 public abstract class SimpleDLexer<I, L, D, C> extends DLexer<I, L, D, C> {
+
+    /**
+     * Lexer Constructor.
+     *
+     * @param initLex The initial lexeme to use.
+     * @param d The deterministic finite automaton to be used by this lexer.
+     */
     public SimpleDLexer(L initLex,
                         DFAutomaton<? super I, ?, ? extends Function1<? super C, ? extends D>> d) {
         super(initLex, d);
