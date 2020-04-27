@@ -6,7 +6,6 @@ import io.vavr.Tuple2;
 import io.vavr.collection.*;
 import io.vavr.control.Option;
 import org.perudevteam.misc.MiscHelpers;
-
 import java.util.Objects;
 
 /**
@@ -189,7 +188,7 @@ public class DFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
     }
 
     /**
-     * Given a state and a translated input, traverse the state's corresponding outgoing edge
+     * Given a state and a raw input, traverse the state's corresponding outgoing edge
      * and return the ending state of that edge.
      *
      * @param from The starting state.
@@ -203,10 +202,10 @@ public class DFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
     /**
      * Same as {@link DFAutomaton#getTransition(int, Object)} except result it returned as an <b>Option</b>.
      * <b>None</b> is returned if there is no outgoing edge from the given state with said raw input.
-     * FINISFHSDHFSDHFSDHFSDHFDHFHFHDSFHSD
-     * @param from
-     * @param input
-     * @return
+     *
+     * @param from The starting state.
+     * @param input The raw input.
+     * @return The ending state as an <b>Option</b>.
      */
     public Option<Integer> getTransitionAsOption(int from, I input) {
         IC inputClass = getInputClass(input);
@@ -214,16 +213,41 @@ public class DFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
         return transitionTable.get(from).get(inputClass);
     }
 
+    /**
+     * Same as {@link DFAutomaton#getTransition(int, Object)} except a translated input is taken
+     * instead of a raw input.
+     *
+     * @param from The start state.
+     * @param inputClass The translated input.
+     * @return The ending state.
+     */
     public int getTransitionFromClass(int from, IC inputClass) {
         return getTransitionFromClassAsOption(from, inputClass).get();
     }
 
+    /**
+     * Same as {@link DFAutomaton#getTransitionAsOption(int, Object)} except a translated input is take
+     * instead of a raw input.
+     *
+     * @param from The starting state.
+     * @param inputClass The translated input.
+     * @return The ending state as an <b>Option</b>.
+     */
     public Option<Integer> getTransitionFromClassAsOption(int from, IC inputClass) {
         validateInputClass(inputClass);
         validateState(from);
         return transitionTable.get(from).get(inputClass);
     }
 
+    /**
+     * Shift this <b>DFAutomaton</b>'s fields by some constant.
+     * All transitions and accepting states will be incremented.
+     * The resulting fields will no longer represent a valid automaton, so the modified
+     * fields are returned as a tuple.
+     *
+     * @param shift Some integer to shift all states by.
+     * @return A tuple containing the shifted transition table and accepting states map.
+     */
     public Tuple2<Map<Integer, O>, Array<Map<IC, Integer>>> shift(int shift) {
         return Tuple.of(
                 getAcceptingStates().mapKeys(acceptingState -> acceptingState + shift),
@@ -231,10 +255,23 @@ public class DFAutomaton<I, IC, O> extends FAutomaton<I, IC, O> {
         );
     }
 
+    /**
+     * Place this <b>NFAutomaton</b> and the given <b>NFAutomaton</b> into the same automaton.
+     *
+     * @param nfa The automaton to be combined with.
+     * @return The combined <b>DFAutomaton</b>.
+     */
     public DFAutomaton<I, IC, O> combine(DFAutomaton<? super I, ? extends IC, ? extends O> nfa) {
         return combine(nfa, getGetInputClassUnchecked());
     }
 
+    /**
+     * Same as {@link NFAutomaton#combine(NFAutomaton)} with the ability to set a new translation function.
+     *
+     * @param nfa The automaton to be combined with.
+     * @param newGIC The new translation function.
+     * @return The combined <b>DFAutomaton</b> with the given translation function.
+     */
     public DFAutomaton<I, IC, O> combine(DFAutomaton<? super I, ? extends IC, ? extends O> nfa,
                                          Function1<? super I, ? extends IC> newGIC) {
         Objects.requireNonNull(nfa);

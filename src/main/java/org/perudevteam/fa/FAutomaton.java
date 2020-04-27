@@ -9,7 +9,14 @@ import java.util.Objects;
 /**
  * An <b>FAutomaton</b> represents some finite automaton which reads translated inputs of type <b>IC</b>,
  * and contains accepting states with outputs of type <b>O</b>.
- *
+ * The automaton can only interpret translated inputs of type <b>IC</b>, however with a translation function,
+ * the automaton has the ability to take in some raw type, translate it, then interpret it.
+ * <br>
+ * As a simple example imagine an automaton which accepts ascii characters.
+ * Character will be the automaton's raw type <b>I</b>.
+ * CharType will be the automaton's translated type <b>IC</b>. CharType could be some enum containing entries
+ * like <i>DIGIT</i> or <i>LETTER</i>.
+ * <br>
  * An <b>FAutomaton</b> contains <i>n</i> states numbered <i>1</i> through <i>n - 1</i>.
  *
  * @param <I> The raw input type of the automaton.

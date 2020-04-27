@@ -4,11 +4,26 @@ import io.vavr.collection.*;
 
 import java.util.Objects;
 
+/**
+ * Finite Automaton Static Helpers.
+ */
 public final class FAutomatonUtil {
     private FAutomatonUtil() {
         // Should never be initialized.
     }
 
+    /**
+     * Convert an <b>NFAutomaton</b> to a <b>DFAutomaton</b>.
+     * Enforces precedence signal rules described by {@link NFAutomaton#toDFA(Seq)}.
+     *
+     * @param nfa The <b>NFAutomaton</b> to convert.
+     * @param precSeq The Sequence of signal sets.
+     * @param <I> The raw input type of the given automaton.
+     * @param <IC> The translated input type of the given automaton.
+     * @param <O> The output type of the given automaton.
+     * @return The resulting <b>DFAutomaton</b>.
+     * @throws Exception When the given <b>NFAutomaton</b> has output ambiguities.
+     */
     static <I, IC, O> DFAutomaton<I, IC, O> convertNFAToDFA(
             NFAutomaton<? super I, ? extends IC, ? extends O> nfa,
             Seq<? extends Set<? extends O>> precSeq) throws Exception {
@@ -94,6 +109,19 @@ public final class FAutomatonUtil {
                 nfa.getGetInputClassUnchecked(), false);
     }
 
+    /**
+     * Given a map of elements to their precedences and a set of elements.
+     * Return the element with the highest precedence in the given set.
+     * <br>
+     * Here precedence is represented by an integer. The lower the integer, the higher the precedence.
+     * Basically and argmin function.
+     *
+     * @param precMap The map of elements to their precedence values.
+     * @param outputs The set of elements.
+     * @param <O> The type of the elements.
+     * @return The element with the highest precedence.
+     * @throws Exception When two or more elements in the given set share the highest precedence value.
+     */
     static <O> O getMostPrecedent(Map<? extends O, ? extends Integer> precMap,
                                    Set<? extends O> outputs) throws Exception {
 
@@ -121,6 +149,14 @@ public final class FAutomatonUtil {
         return mostPrecedent.head();
     }
 
+    /**
+     * Given a sequence of precedence sets, create a precedence map. Basically map each element
+     * to the index of its parent set in the given sequence.
+     *
+     * @param precSeq The sequence of precedence sets.
+     * @param <O> The type of the elements.
+     * @return A map mapping each element to its precedence.
+     */
     static <O> Map<O, Integer> precedenceMap(Seq<? extends Set<? extends O>> precSeq) {
         // No NULLs anywhere.
         Objects.requireNonNull(precSeq);
@@ -138,6 +174,13 @@ public final class FAutomatonUtil {
         return precMap;
     }
 
+    /**
+     * Perform an epsilon closure on the given set of states.
+     *
+     * @param stateSet The set of states to perform the closure on.
+     * @param epsilonStar The epsilon star sets for every state.
+     * @return The set of states reachable from the input set using only epsilon transitions.
+     */
     static Set<Integer> epsilonClosure(Set<Integer> stateSet, Array<Set<Integer>> epsilonStar) {
         Set<Integer> eClosure = HashSet.empty();
 
@@ -148,7 +191,12 @@ public final class FAutomatonUtil {
         return eClosure;
     }
 
-    // No Checks... hence why this is package private.
+    /**
+     * Given a directed graph, determine the set of reachable nodes for each node in the graph.
+     *
+     * @param graph The graph.
+     * @return A sequence, of reachable sets.
+     */
     static Array<Set<Integer>> reachableSets(Array<? extends Set<? extends Integer>> graph) {
         Array<Set<Integer>> reachableSets = Array.rangeBy(0, graph.length(), 1).map(HashSet::of);
 
