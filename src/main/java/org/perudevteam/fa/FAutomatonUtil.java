@@ -8,8 +8,12 @@ import java.util.Objects;
  * Finite Automaton Static Helpers.
  */
 public final class FAutomatonUtil {
+
+    /**
+     * Private constructor should never be used for this helper class.
+     */
     private FAutomatonUtil() {
-        // Should never be initialized.
+
     }
 
     /**
