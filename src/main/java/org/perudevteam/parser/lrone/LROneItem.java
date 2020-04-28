@@ -12,6 +12,14 @@ import org.perudevteam.parser.grammar.Production;
 
 import java.util.Objects;
 
+/**
+ * This class represents an LR(1) Item to be used by and LR(1) parser generator to generate an
+ * <i>ACTION</i> and <i>GOTO</i> table.
+ *
+ * @param <NT> The non-terminal <b>Enum</b> type of the rule held inside the <b>LROneItem</b>.
+ * @param <T> The terminal <b>Enum</b> type of the rule held inside the <b>LROneItem</b>.
+ * @param <P> The type of the <b>Production</b> held inside the <b>LROneItem</b>.
+ */
 public class LROneItem <NT extends Enum<NT>, T extends Enum<T>, P extends Production<NT, T>> {
 
     /*
@@ -157,10 +165,8 @@ public class LROneItem <NT extends Enum<NT>, T extends Enum<T>, P extends Produc
         return new LROneItem<>(cursor, p, suffix);
     }
 
-    /*
-     * Overridden methods.
-     */
 
+    @Override
     public String toString() {
         StringBuilder strBuilder = new StringBuilder();
 
