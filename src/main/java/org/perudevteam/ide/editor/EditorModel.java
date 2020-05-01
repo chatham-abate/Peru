@@ -2,7 +2,6 @@ package org.perudevteam.ide.editor;
 
 import io.vavr.Tuple2;
 import io.vavr.collection.Seq;
-import org.perudevteam.misc.Positioned;
 
 public abstract class EditorModel {
 
@@ -13,7 +12,8 @@ public abstract class EditorModel {
     public abstract EditorModel moveCursorDown();
 
     // Editor Text functions...
-    public abstract Seq<Tuple2<String, StyleData>> getTokens();
+    public abstract Seq<Tuple2<String, TokenStyleData>> getTokens();
+    public abstract String getText();
     public abstract EditorModel insertChar(char c);
     public abstract EditorModel deleteChar();
     public abstract EditorModel insertString(String s);
@@ -28,4 +28,6 @@ public abstract class EditorModel {
     public abstract EditorModel paste();
 
     public abstract EditorModel withSelectionMode(boolean on);
+
+
 }

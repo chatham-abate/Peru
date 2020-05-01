@@ -1,7 +1,7 @@
 package org.perudevteam.lexer.charlexer;
 
 import io.vavr.Function1;
-import org.perudevteam.misc.Positioned;
+import org.perudevteam.misc.CharPosition;
 import org.perudevteam.parser.Tokenized;
 
 import java.util.Objects;
@@ -16,7 +16,7 @@ import java.util.Objects;
  *
  * @param <T> The <b>Enum</b> category type of a successful lexeme.
  */
-public class CharData<T extends Enum<T>> implements Tokenized<T>, Positioned {
+public class CharData<T extends Enum<T>> implements Tokenized<T>, CharPosition {
 
     /**
      * Returns a function used for producing a <b>CharData</b> instance
@@ -67,11 +67,11 @@ public class CharData<T extends Enum<T>> implements Tokenized<T>, Positioned {
         linePosition = context.getLinePosition().getStarting();
     }
 
-    public CharData(T t, Positioned d) {
+    public CharData(T t, CharPosition d) {
         this(t, d, true);
     }
 
-    protected CharData(T t, Positioned d, boolean withCheck) {
+    protected CharData(T t, CharPosition d, boolean withCheck) {
         if (withCheck) {
             Objects.requireNonNull(t);
             Objects.requireNonNull(d);
@@ -115,7 +115,7 @@ public class CharData<T extends Enum<T>> implements Tokenized<T>, Positioned {
     }
 
     @Override
-    public CharData<T> withPosition(Positioned d) {
+    public CharData<T> withPosition(CharPosition d) {
         Objects.requireNonNull(d);
         return new CharData<>(type, d, false);
     }
@@ -133,7 +133,7 @@ public class CharData<T extends Enum<T>> implements Tokenized<T>, Positioned {
     }
 
     @Override
-    public CharData<T> mapPosition(Function1<? super Positioned, ? extends Positioned> f) {
+    public CharData<T> mapPosition(Function1<? super CharPosition, ? extends CharPosition> f) {
         Objects.requireNonNull(f);
         return withPosition(f.apply(this));
     }

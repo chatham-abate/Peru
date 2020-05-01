@@ -1,35 +1,35 @@
 package org.perudevteam.peru.ast;
 
 import io.vavr.Function1;
-import org.perudevteam.misc.Positioned;
+import org.perudevteam.misc.CharPosition;
 import org.perudevteam.peru.base.BaseValue;
 
 import java.util.Objects;
 
-public interface ASTResult extends Positioned {
+public interface ASTResult extends CharPosition {
 
     static ASTResult empty() {
         return EMPTY;
     }
 
-    static ASTResult positioned(int l, int lp) {
+    static ASTResult position(int l, int lp) {
         return EMPTY.withPosition(l, lp);
     }
 
-    static ASTResult positioned(Positioned d) {
+    static ASTResult position(CharPosition d) {
         return EMPTY.withPosition(d);
     }
 
-    static ASTResult valued(BaseValue val) {
+    static ASTResult value(BaseValue val) {
         return EMPTY.withValue(val);
     }
 
     static ASTResult fullResult(int l, int lp, BaseValue val) {
-        return valued(val).withPosition(l, lp);
+        return value(val).withPosition(l, lp);
     }
 
-    static ASTResult fullResult(Positioned d, BaseValue val) {
-        return valued(val).withPosition(d.getLine(), d.getLinePosition());
+    static ASTResult fullResult(CharPosition d, BaseValue val) {
+        return value(val).withPosition(d.getLine(), d.getLinePosition());
     }
 
     static boolean samePositions(ASTResult r1, ASTResult r2) {
@@ -178,7 +178,7 @@ public interface ASTResult extends Positioned {
     }
 
     @Override
-    default ASTResult withPosition(Positioned d) {
+    default ASTResult withPosition(CharPosition d) {
         Objects.requireNonNull(d);
         return withPosition(d.getLine(), d.getLinePosition());
     }
@@ -230,7 +230,7 @@ public interface ASTResult extends Positioned {
             }
 
             @Override
-            public ASTResult mapPosition(Function1<? super Positioned, ? extends Positioned> f) {
+            public ASTResult mapPosition(Function1<? super CharPosition, ? extends CharPosition> f) {
                 Objects.requireNonNull(f);
                 return withPosition(f.apply(this));
             }
@@ -273,7 +273,7 @@ public interface ASTResult extends Positioned {
     }
 
     @Override
-    default ASTResult mapPosition(Function1<? super Positioned, ? extends Positioned> f) {
+    default ASTResult mapPosition(Function1<? super CharPosition, ? extends CharPosition> f) {
         throw new NullPointerException("AST Result holds no position");
     }
 }

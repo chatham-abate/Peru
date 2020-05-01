@@ -141,7 +141,7 @@ public class TraceException extends Exception {
      * @param msg The message of the new <b>LineException</b>.
      * @return The new <b>TraceException</b>.
      */
-    public TraceException push(Positioned d, String msg) {
+    public TraceException push(CharPosition d, String msg) {
         return new TraceException(trace.prepend(lineEx(d, msg)));
     }
 

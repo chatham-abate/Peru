@@ -1,18 +1,14 @@
 package org.perudevteam.misc;
 
 import io.vavr.Function1;
-import io.vavr.collection.List;
-import io.vavr.collection.Seq;
 import io.vavr.control.Try;
-import org.perudevteam.lexer.charlexer.CharData;
 
-import javax.sound.sampled.Line;
 import java.util.Objects;
 
 /**
  * Class representing an exception which occurred on some line at some some position on that line.
  */
-public class LineException extends Exception implements Positioned {
+public class LineException extends Exception implements CharPosition {
 
     /**
      * Given a <b>Try</b>.
@@ -64,7 +60,7 @@ public class LineException extends Exception implements Positioned {
      * @param msg The message.
      * @return The created <b>LineException</b>.
      */
-    public static LineException lineEx(Positioned d, String msg) {
+    public static LineException lineEx(CharPosition d, String msg) {
         Objects.requireNonNull(d);
         return new LineException(d.getLine(), d.getLinePosition(), msg);
     }
@@ -125,7 +121,7 @@ public class LineException extends Exception implements Positioned {
     }
 
     @Override
-    public LineException withPosition(Positioned d) {
+    public LineException withPosition(CharPosition d) {
         Objects.requireNonNull(d);
         return new LineException(d.getLine(), d.getLinePosition(), getMessage());
     }
@@ -143,7 +139,7 @@ public class LineException extends Exception implements Positioned {
     }
 
     @Override
-    public LineException mapPosition(Function1<? super Positioned, ? extends Positioned> f) {
+    public LineException mapPosition(Function1<? super CharPosition, ? extends CharPosition> f) {
         Objects.requireNonNull(f);
         return withPosition(f.apply(this));
     }
@@ -161,5 +157,19 @@ public class LineException extends Exception implements Positioned {
      */
     public LineException withMessage(String msg) {
         return new LineException(line, linePosition, getMessage());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LineException that = (LineException) o;
+        return line == that.line &&
+                linePosition == that.linePosition && getMessage().equals(that.getMessage());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(line, linePosition, getMessage());
     }
 }
