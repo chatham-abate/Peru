@@ -40,7 +40,7 @@ public class CharLinearDLexer<T extends Enum<T>>
         // If we read a new line, the current line should be incremented, current line position should be set to 1.
         // Otherwise, just increment line position.
         return input == '\n'
-                ? context.map(l -> l.withCurrent(l.getCurrent() + 1), lp -> lp.withCurrent(1))
+                ? context.map(l -> l.withCurrent(l.getCurrent() + 1), lp -> lp.withCurrent(0))
                 : context.mapLinePosition(lp -> lp.withCurrent(lp.getCurrent() + 1));
     }
 

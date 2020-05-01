@@ -31,7 +31,7 @@ public class CharSimpleDLexer<T extends Enum<T>> extends
         // New Line Character means current line increments and current line pos goes to one..
         // Otherwise line stays the same, line position increments.
         return input == '\n'
-                ? context.map(l -> l.withCurrent(l.getCurrent() + 1), lp -> lp.withCurrent(1))
+                ? context.map(l -> l.withCurrent(l.getCurrent() + 1), lp -> lp.withCurrent(0))
                 : context.mapLinePosition(lp -> lp.withCurrent(lp.getCurrent() + 1));
     }
 

@@ -6,7 +6,6 @@ package org.perudevteam.misc;
  * Specifically, The line number of the Object and the position of the Object on that line.
  */
 public interface Positioned {
-
     /**
      * Get the line number of the Object.
      *

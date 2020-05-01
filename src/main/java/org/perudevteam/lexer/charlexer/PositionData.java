@@ -6,9 +6,9 @@ package org.perudevteam.lexer.charlexer;
 public class PositionData {
 
     /**
-     * A preset initial Position Data instance. (All positions with value 1)
+     * A preset initial Position Data instance. (All positions with value 0)
      */
-    public static final PositionData INIT_POSITION = new PositionData(1, 1, 1);
+    public static final PositionData INIT_POSITION = new PositionData(0, 0, 0);
 
     /**
      * The starting position.

@@ -133,12 +133,12 @@ public class TestCharLexer {
     private static final Seq<Character> INPUT1 = List.ofAll("123 \n 456 12.34\n".toCharArray());
 
     private static final Seq<Tuple2<String, CharData<TokenType1>>> EXPECTED1 = List.of(
-            Tuple.of("123", new CharData<>(TokenType1.INT, 1, 1)),
-            Tuple.of(" \n ", new CharData<>(TokenType1.WHITESPACE, 1, 4)),
-            Tuple.of("456", new CharData<>(TokenType1.INT, 2, 2)),
-            Tuple.of(" ", new CharData<>(TokenType1.WHITESPACE, 2, 5)),
-            Tuple.of("12.34", new CharData<>(TokenType1.DOUBLE, 2, 6)),
-            Tuple.of("\n", new CharData<>(TokenType1.WHITESPACE, 2, 11))
+            Tuple.of("123", new CharData<>(TokenType1.INT, 0, 0)),
+            Tuple.of(" \n ", new CharData<>(TokenType1.WHITESPACE, 0, 3)),
+            Tuple.of("456", new CharData<>(TokenType1.INT, 1, 1)),
+            Tuple.of(" ", new CharData<>(TokenType1.WHITESPACE, 1, 4)),
+            Tuple.of("12.34", new CharData<>(TokenType1.DOUBLE, 1, 5)),
+            Tuple.of("\n", new CharData<>(TokenType1.WHITESPACE, 1, 10))
     );
 
     @Test
@@ -151,11 +151,11 @@ public class TestCharLexer {
 
 
     private static final Seq<Tuple2<String, CharData<TokenType2>>> EXPECTED2 = List.of(
-            Tuple.of("ababc", new CharData<>(TokenType2.LONG, 1, 1)),
-            Tuple.of("ab", new CharData<>(TokenType2.SHORT, 1, 6)),
-            Tuple.of("ab", new CharData<>(TokenType2.SHORT, 1, 8)),
-            Tuple.of("ab", new CharData<>(TokenType2.SHORT, 1, 10)),
-            Tuple.of("ab", new CharData<>(TokenType2.SHORT, 1, 12))
+            Tuple.of("ababc", new CharData<>(TokenType2.LONG, 0, 0)),
+            Tuple.of("ab", new CharData<>(TokenType2.SHORT, 0, 5)),
+            Tuple.of("ab", new CharData<>(TokenType2.SHORT, 0, 7)),
+            Tuple.of("ab", new CharData<>(TokenType2.SHORT, 0, 9)),
+            Tuple.of("ab", new CharData<>(TokenType2.SHORT, 0, 11))
     );
 
     @Test
