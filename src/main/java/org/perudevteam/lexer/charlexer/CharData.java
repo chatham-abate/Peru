@@ -53,7 +53,33 @@ public class CharData<T extends Enum<T>> implements Tokenized<T>, Positioned {
      * @param context The current context.
      */
     public CharData(T t, CharSimpleContext context) {
-        this(t, context.getLine().getStarting(), context.getLinePosition().getStarting());
+        this(t, context, true);
+    }
+
+    protected CharData(T t, CharSimpleContext context, boolean withCheck) {
+        if (withCheck) {
+            Objects.requireNonNull(t);
+            Objects.requireNonNull(context);
+        }
+
+        type = t;
+        line = context.getLine().getStarting();
+        linePosition = context.getLinePosition().getStarting();
+    }
+
+    public CharData(T t, Positioned d) {
+        this(t, d, true);
+    }
+
+    protected CharData(T t, Positioned d, boolean withCheck) {
+        if (withCheck) {
+            Objects.requireNonNull(t);
+            Objects.requireNonNull(d);
+        }
+
+        type = t;
+        line = d.getLine();
+        linePosition = d.getLinePosition();
     }
 
     /**
@@ -64,34 +90,62 @@ public class CharData<T extends Enum<T>> implements Tokenized<T>, Positioned {
      * @param lp The lexeme's line position.
      */
     public CharData(T t, int l, int lp) {
-        Objects.requireNonNull(t);
+        this(t, l, lp, true);
+    }
+
+    protected CharData(T t, int l, int lp, boolean withCheck) {
+        if (withCheck) {
+            Objects.requireNonNull(t);
+        }
 
         type = t;
         line = l;
         linePosition = lp;
     }
 
-    @Override
-    public T getTokenType() {
-        return type;
-    }
 
-    /**
-     * Get the line number of this <b>CharData</b>'s successful lexeme.
-     *
-     * @return The line number.
-     */
+    @Override
     public int getLine() {
         return line;
     }
 
-    /**
-     * Get the line position of this <b>CharData</b>'s successful lexeme.
-     *
-     * @return The line position.
-     */
+    @Override
     public int getLinePosition() {
         return linePosition;
+    }
+
+    @Override
+    public CharData<T> withPosition(Positioned d) {
+        Objects.requireNonNull(d);
+        return new CharData<>(type, d, false);
+    }
+
+    @Override
+    public CharData<T> mapLine(Function1<? super Integer, ? extends Integer> f) {
+        Objects.requireNonNull(f);
+        return new CharData<>(type, f.apply(line), linePosition, false);
+    }
+
+    @Override
+    public CharData<T> mapLinePosition(Function1<? super Integer, ? extends Integer> f) {
+        Objects.requireNonNull(f);
+        return new CharData<>(type, line, f.apply(linePosition), false);
+    }
+
+    @Override
+    public CharData<T> mapPosition(Function1<? super Positioned, ? extends Positioned> f) {
+        Objects.requireNonNull(f);
+        return withPosition(f.apply(this));
+    }
+
+    @Override
+    public CharData<T> withLine(int l) {
+        return new CharData<>(type, l, linePosition);
+    }
+
+    @Override
+    public CharData<T> withLinePosition(int lp) {
+        return new CharData<>(type, line, linePosition);
     }
 
     /**
@@ -105,24 +159,9 @@ public class CharData<T extends Enum<T>> implements Tokenized<T>, Positioned {
         return new CharData<>(t, line, linePosition);
     }
 
-    /**
-     * Set the line number of this <b>CharData</b>.
-     *
-     * @param l The line number.
-     * @return The new <b>CharData</b>.
-     */
-    public CharData<T> withLine(int l) {
-        return new CharData<>(type, l, linePosition);
-    }
-
-    /**
-     * Set the line position of this <b>CharData</b>.
-     *
-     * @param lp The line position.
-     * @return The new <b>CharData</b>.
-     */
-    public CharData<T> withLinePosition(int lp) {
-        return new CharData<>(type, line, linePosition);
+    @Override
+    public T getTokenType() {
+        return type;
     }
 
     @Override

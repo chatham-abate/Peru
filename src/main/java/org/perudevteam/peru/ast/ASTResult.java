@@ -1,5 +1,6 @@
 package org.perudevteam.peru.ast;
 
+import io.vavr.Function1;
 import org.perudevteam.misc.Positioned;
 import org.perudevteam.peru.base.BaseValue;
 
@@ -16,7 +17,7 @@ public interface ASTResult extends Positioned {
     }
 
     static ASTResult positioned(Positioned d) {
-        return EMPTY.withPosition(d.getLine(), d.getLinePosition());
+        return EMPTY.withPosition(d);
     }
 
     static ASTResult valued(BaseValue val) {
@@ -100,20 +101,6 @@ public interface ASTResult extends Positioned {
         return true;
     }
 
-    @Override
-    default int getLine() {
-        throw new NullPointerException("AST Result holds no line.");
-    }
-
-    @Override
-    default int getLinePosition() {
-        throw new NullPointerException("AST Result holds no line position.");
-    }
-
-    default boolean isPositioned() {
-        return false;
-    }
-
     default ASTResult withValue(BaseValue val) {
         Objects.requireNonNull(val);
         final ASTResult This = this;
@@ -166,7 +153,33 @@ public interface ASTResult extends Positioned {
         };
     }
 
+    default boolean isPositioned() {
+        return false;
+    }
+
+    @Override
+    default int getLine() {
+        throw new NullPointerException("AST Result holds no line.");
+    }
+
+    @Override
+    default int getLinePosition() {
+        throw new NullPointerException("AST Result holds no line position.");
+    }
+
+    @Override
+    default ASTResult withLine(int l) {
+        return withPosition(l, 0);
+    }
+
+    @Override
+    default ASTResult withLinePosition(int lp) {
+        return withPosition(0, lp);
+    }
+
+    @Override
     default ASTResult withPosition(Positioned d) {
+        Objects.requireNonNull(d);
         return withPosition(d.getLine(), d.getLinePosition());
     }
 
@@ -192,6 +205,34 @@ public interface ASTResult extends Positioned {
             @Override
             public int getLinePosition() {
                 return lp;
+            }
+
+            @Override
+            public ASTResult withLine(int l) {
+                return withPosition(l, lp);
+            }
+
+            @Override
+            public ASTResult withLinePosition(int lp) {
+                return withPosition(l, lp);
+            }
+
+            @Override
+            public ASTResult mapLine(Function1<? super Integer, ? extends Integer> f) {
+                Objects.requireNonNull(f);
+                return withLine(f.apply(l));
+            }
+
+            @Override
+            public ASTResult mapLinePosition(Function1<? super Integer, ? extends Integer> f) {
+                Objects.requireNonNull(f);
+                return withLinePosition(f.apply(lp));
+            }
+
+            @Override
+            public ASTResult mapPosition(Function1<? super Positioned, ? extends Positioned> f) {
+                Objects.requireNonNull(f);
+                return withPosition(f.apply(this));
             }
 
             @Override
@@ -221,4 +262,18 @@ public interface ASTResult extends Positioned {
         };
     }
 
+    @Override
+    default ASTResult mapLine(Function1<? super Integer, ? extends Integer> f) {
+        throw new NullPointerException("AST Result holds no line.");
+    }
+
+    @Override
+    default ASTResult mapLinePosition(Function1<? super Integer, ? extends Integer> f) {
+        throw new NullPointerException("AST Result holds no line position.");
+    }
+
+    @Override
+    default ASTResult mapPosition(Function1<? super Positioned, ? extends Positioned> f) {
+        throw new NullPointerException("AST Result holds no position");
+    }
 }

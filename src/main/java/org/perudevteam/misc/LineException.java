@@ -115,38 +115,42 @@ public class LineException extends Exception implements Positioned {
     }
 
     @Override
-    public String toString() {
-        return "[" + line + " : " + linePosition + "] " + getMessage();
-    }
-
-    /**
-     * Set the line number of this <b>LineException</b>.
-     *
-     * @param l The line number.
-     * @return The new <b>LineException</b>.
-     */
     public LineException withLine(int l) {
         return new LineException(l, linePosition, getMessage());
     }
 
-    /**
-     * Set the line position of this <b>LineException</b>.
-     *
-     * @param lp The line position.
-     * @return The new <b>LineException</b>.
-     */
+    @Override
     public LineException withLinePosition(int lp) {
         return new LineException(line, lp, getMessage());
     }
 
-    /**
-     * Set the position data of this <b>LineException</b>.
-     *
-     * @param d The position data.
-     * @return The new <b>LineException</b>.
-     */
+    @Override
     public LineException withPosition(Positioned d) {
+        Objects.requireNonNull(d);
         return new LineException(d.getLine(), d.getLinePosition(), getMessage());
+    }
+
+    @Override
+    public LineException mapLine(Function1<? super Integer, ? extends Integer> f) {
+        Objects.requireNonNull(f);
+        return new LineException(f.apply(line), linePosition, getMessage());
+    }
+
+    @Override
+    public LineException mapLinePosition(Function1<? super Integer, ? extends Integer> f) {
+        Objects.requireNonNull(f);
+        return new LineException(line, f.apply(linePosition), getMessage());
+    }
+
+    @Override
+    public LineException mapPosition(Function1<? super Positioned, ? extends Positioned> f) {
+        Objects.requireNonNull(f);
+        return withPosition(f.apply(this));
+    }
+
+    @Override
+    public String toString() {
+        return "[" + line + " : " + linePosition + "] " + getMessage();
     }
 
     /**

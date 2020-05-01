@@ -14,7 +14,7 @@ import static org.perudevteam.misc.LineException.*;
  * Think a stack of function calls. When an error occurs at some level in the stack, this class allows us to
  * store all calls in a single <b>Exception</b>.
  */
-public class TraceException extends Exception implements Positioned {
+public class TraceException extends Exception {
 
     /**
      * Match some <b>Try</b>.
@@ -107,16 +107,6 @@ public class TraceException extends Exception implements Positioned {
     @Override
     public String getMessage() {
         return headException().getMessage();
-    }
-
-    @Override
-    public int getLine() {
-        return headException().getLine();
-    }
-
-    @Override
-    public int getLinePosition() {
-        return headException().getLinePosition();
     }
 
     @Override
