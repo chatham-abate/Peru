@@ -5,7 +5,7 @@ import org.perudevteam.misc.CharPosition;
 
 import java.util.Objects;
 
-public class TokenStyleData implements CharPosition {
+public class CharStyleData implements CharPosition {
 
     // Position.
     private final int line;
@@ -21,7 +21,7 @@ public class TokenStyleData implements CharPosition {
     private final FColor underline;
 
 
-    protected TokenStyleData(int l, int lp, boolean i, boolean b, FColor fg, FColor bg, FColor un, boolean withCheck) {
+    protected CharStyleData(int l, int lp, boolean i, boolean b, FColor fg, FColor bg, FColor un, boolean withCheck) {
         if (withCheck) {
             Objects.requireNonNull(fg);
             Objects.requireNonNull(bg);
@@ -50,36 +50,36 @@ public class TokenStyleData implements CharPosition {
     }
 
     @Override
-    public TokenStyleData withLine(int l) {
-        return new TokenStyleData(l, linePosition, italicize, bold, foreground, background, underline, false);
+    public CharStyleData withLine(int l) {
+        return new CharStyleData(l, linePosition, italicize, bold, foreground, background, underline, false);
     }
 
     @Override
-    public TokenStyleData withLinePosition(int lp) {
-        return new TokenStyleData(line, lp, italicize, bold, foreground, background, underline, false);
+    public CharStyleData withLinePosition(int lp) {
+        return new CharStyleData(line, lp, italicize, bold, foreground, background, underline, false);
     }
 
     @Override
-    public TokenStyleData withPosition(CharPosition d) {
+    public CharStyleData withPosition(CharPosition d) {
         Objects.requireNonNull(d);
-        return new TokenStyleData(d.getLine(), d.getLinePosition(), italicize,
+        return new CharStyleData(d.getLine(), d.getLinePosition(), italicize,
                 bold, foreground, background, underline, false);
     }
 
     @Override
-    public TokenStyleData mapLine(Function1<? super Integer, ? extends Integer> f) {
+    public CharStyleData mapLine(Function1<? super Integer, ? extends Integer> f) {
         Objects.requireNonNull(f);
         return withLine(f.apply(line));
     }
 
     @Override
-    public TokenStyleData mapLinePosition(Function1<? super Integer, ? extends Integer> f) {
+    public CharStyleData mapLinePosition(Function1<? super Integer, ? extends Integer> f) {
         Objects.requireNonNull(f);
         return withLinePosition(f.apply(linePosition));
     }
 
     @Override
-    public TokenStyleData mapPosition(Function1<? super CharPosition, ? extends CharPosition> f) {
+    public CharStyleData mapPosition(Function1<? super CharPosition, ? extends CharPosition> f) {
         Objects.requireNonNull(f);
         return withPosition(f.apply(this));
     }
@@ -90,50 +90,50 @@ public class TokenStyleData implements CharPosition {
         return italicize;
     }
 
-    public TokenStyleData withItalicsFlag(boolean i) {
-        return new TokenStyleData(line, linePosition, i, bold, foreground, background, underline, false);
+    public CharStyleData withItalicsFlag(boolean i) {
+        return new CharStyleData(line, linePosition, i, bold, foreground, background, underline, false);
     }
 
     public boolean bold() {
         return bold;
     }
 
-    public TokenStyleData withBoldFlag(boolean b) {
-        return new TokenStyleData(line, linePosition, italicize, b, foreground, background, underline, false);
+    public CharStyleData withBoldFlag(boolean b) {
+        return new CharStyleData(line, linePosition, italicize, b, foreground, background, underline, false);
     }
 
     public FColor getForeground() {
         return foreground;
     }
 
-    public TokenStyleData withForeground(FColor fg) {
+    public CharStyleData withForeground(FColor fg) {
         Objects.requireNonNull(fg);
-        return new TokenStyleData(line, linePosition, italicize, bold, fg, background, underline, false);
+        return new CharStyleData(line, linePosition, italicize, bold, fg, background, underline, false);
     }
 
     public FColor getBackground() {
         return background;
     }
 
-    public TokenStyleData withBackground(FColor bg) {
+    public CharStyleData withBackground(FColor bg) {
         Objects.requireNonNull(bg);
-        return new TokenStyleData(line, linePosition, italicize, bold, foreground, bg, underline, false);
+        return new CharStyleData(line, linePosition, italicize, bold, foreground, bg, underline, false);
     }
 
     public FColor getUnderline() {
         return underline;
     }
 
-    public TokenStyleData withUnderLine(FColor un) {
+    public CharStyleData withUnderLine(FColor un) {
         Objects.requireNonNull(un);
-        return new TokenStyleData(line, linePosition, italicize, bold, foreground, background, un, false);
+        return new CharStyleData(line, linePosition, italicize, bold, foreground, background, un, false);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        TokenStyleData that = (TokenStyleData) o;
+        CharStyleData that = (CharStyleData) o;
         return line == that.line &&
                 linePosition == that.linePosition &&
                 italicize == that.italicize &&

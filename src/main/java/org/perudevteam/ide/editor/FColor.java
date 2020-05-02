@@ -8,6 +8,8 @@ import java.util.Objects;
 // Functional Color Class...
 public class FColor {
 
+    public static final FColor CLEAR = color(0, 0, 0, 0);
+
     public static FColor color(int r, int g, int b) {
         return new FColor(r, g, b, 255, true);
     }

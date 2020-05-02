@@ -94,7 +94,7 @@ public class LineException extends Exception implements CharPosition {
      * @param lp The line position of the <b>LineException</b>.
      * @param msg The message of the <b>LineException</b>.
      */
-    private LineException(int l, int lp, String msg) {
+    protected LineException(int l, int lp, String msg) {
         super(msg);
         line = l;
         linePosition = lp;

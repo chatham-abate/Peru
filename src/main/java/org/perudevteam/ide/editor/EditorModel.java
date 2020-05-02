@@ -12,7 +12,7 @@ public abstract class EditorModel {
     public abstract EditorModel moveCursorDown();
 
     // Editor Text functions...
-    public abstract Seq<Tuple2<String, TokenStyleData>> getTokens();
+    public abstract Seq<Tuple2<String, CharStyleData>> getTokens();
     public abstract String getText();
     public abstract EditorModel insertChar(char c);
     public abstract EditorModel deleteChar();

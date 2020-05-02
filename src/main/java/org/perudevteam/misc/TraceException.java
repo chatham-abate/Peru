@@ -80,7 +80,7 @@ public class TraceException extends Exception {
      *
      * @param t The sequence of <b>LineException</b>s.
      */
-    private TraceException(Seq<? extends LineException> t) {
+    protected TraceException(Seq<? extends LineException> t) {
         super();
         Objects.requireNonNull(t);
         t.forEach(Objects::requireNonNull);
