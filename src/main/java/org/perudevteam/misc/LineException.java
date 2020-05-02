@@ -2,13 +2,14 @@ package org.perudevteam.misc;
 
 import io.vavr.Function1;
 import io.vavr.control.Try;
+import org.perudevteam.charpos.CharPos;
 
 import java.util.Objects;
 
 /**
  * Class representing an exception which occurred on some line at some some position on that line.
  */
-public class LineException extends Exception implements CharPosition {
+public class LineException extends Exception implements CharPos {
 
     /**
      * Given a <b>Try</b>.
@@ -60,7 +61,7 @@ public class LineException extends Exception implements CharPosition {
      * @param msg The message.
      * @return The created <b>LineException</b>.
      */
-    public static LineException lineEx(CharPosition d, String msg) {
+    public static LineException lineEx(CharPos d, String msg) {
         Objects.requireNonNull(d);
         return new LineException(d.getLine(), d.getLinePosition(), msg);
     }
@@ -121,7 +122,7 @@ public class LineException extends Exception implements CharPosition {
     }
 
     @Override
-    public LineException withPosition(CharPosition d) {
+    public LineException withPosition(CharPos d) {
         Objects.requireNonNull(d);
         return new LineException(d.getLine(), d.getLinePosition(), getMessage());
     }
@@ -139,7 +140,7 @@ public class LineException extends Exception implements CharPosition {
     }
 
     @Override
-    public LineException mapPosition(Function1<? super CharPosition, ? extends CharPosition> f) {
+    public LineException mapPosition(Function1<? super CharPos, ? extends CharPos> f) {
         Objects.requireNonNull(f);
         return withPosition(f.apply(this));
     }

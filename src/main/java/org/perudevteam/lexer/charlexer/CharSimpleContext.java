@@ -1,12 +1,15 @@
 package org.perudevteam.lexer.charlexer;
 
 import io.vavr.Function1;
+import org.perudevteam.charpos.CharPos;
+
+import static org.perudevteam.charpos.CharPos.*;
 
 /**
  * The context of a simple character lexer.
  * @see org.perudevteam.lexer.charlexer.CharSimpleDLexer
  */
-public class CharSimpleContext {
+public class CharSimpleContext implements CharPos {
 
     /**
      * Preset initial context for any simple character lexer.
@@ -19,12 +22,12 @@ public class CharSimpleContext {
     /**
      * Data on the lexer's line number.
      */
-    private final PositionData line;
+    private final PositionData lineData;
 
     /**
      * Data on the lexer's position within its current line.
      */
-    private final PositionData linePosition;
+    private final PositionData linePositionData;
 
     /**
      * Constructor.
@@ -33,8 +36,8 @@ public class CharSimpleContext {
      * @param lp The Context's line position data.
      */
     public CharSimpleContext(PositionData l, PositionData lp) {
-       line = l;
-       linePosition = lp;
+       lineData = l;
+       linePositionData = lp;
     }
 
     /**
@@ -42,8 +45,8 @@ public class CharSimpleContext {
      *
      * @return The line data.
      */
-    public PositionData getLine() {
-        return line;
+    public PositionData getLineData() {
+        return lineData;
     }
 
     /**
@@ -51,8 +54,8 @@ public class CharSimpleContext {
      *
      * @return The line position data.
      */
-    public PositionData getLinePosition() {
-        return linePosition;
+    public PositionData getLinePositionData() {
+        return linePositionData;
     }
 
     /**
@@ -61,8 +64,8 @@ public class CharSimpleContext {
      * @param l The new line data.
      * @return The new context.
      */
-    public CharSimpleContext withLine(PositionData l) {
-       return new CharSimpleContext(l, linePosition);
+    public CharSimpleContext withLineData(PositionData l) {
+       return new CharSimpleContext(l, linePositionData);
     }
 
     /**
@@ -71,8 +74,8 @@ public class CharSimpleContext {
      * @param m The mapping function.
      * @return The new context.
      */
-    public CharSimpleContext mapLine(Function1<? super PositionData, ? extends  PositionData> m) {
-       return new CharSimpleContext(m.apply(line), linePosition);
+    public CharSimpleContext mapLineData(Function1<? super PositionData, ? extends  PositionData> m) {
+       return new CharSimpleContext(m.apply(lineData), linePositionData);
     }
 
     /**
@@ -81,8 +84,8 @@ public class CharSimpleContext {
      * @param lp The line position data.
      * @return The new context.
      */
-    public CharSimpleContext withLinePosition(PositionData lp) {
-       return new CharSimpleContext(line, lp);
+    public CharSimpleContext withLinePositionData(PositionData lp) {
+       return new CharSimpleContext(lineData, lp);
     }
 
     /**
@@ -91,8 +94,8 @@ public class CharSimpleContext {
      * @param m The mapping function.
      * @return The new context.
      */
-    public CharSimpleContext mapLinePosition(Function1<? super PositionData, ? extends PositionData> m) {
-       return new CharSimpleContext(line, m.apply(linePosition));
+    public CharSimpleContext mapLinePositionData(Function1<? super PositionData, ? extends PositionData> m) {
+       return new CharSimpleContext(lineData, m.apply(linePositionData));
     }
 
     /**
@@ -104,6 +107,26 @@ public class CharSimpleContext {
      */
     public CharSimpleContext map(Function1<? super PositionData, ? extends  PositionData> lm,
                                  Function1<? super PositionData, ? extends  PositionData> lpm) {
-       return new CharSimpleContext(lm.apply(line), lpm.apply(linePosition));
+       return new CharSimpleContext(lm.apply(lineData), lpm.apply(linePositionData));
+    }
+
+    @Override
+    public int getLine() {
+        return lineData.getStarting();
+    }
+
+    @Override
+    public int getLinePosition() {
+        return linePositionData.getStarting();
+    }
+
+    @Override
+    public CharPos withLine(int l) {
+        return charPos(l, linePositionData.getStarting());
+    }
+
+    @Override
+    public CharPos withLinePosition(int lp) {
+        return charPos(lineData.getStarting(), lp);
     }
 }

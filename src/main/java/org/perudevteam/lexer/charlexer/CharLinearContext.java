@@ -5,8 +5,6 @@ import io.vavr.Tuple;
 import io.vavr.collection.*;
 import org.perudevteam.lexer.LinearContext;
 
-import java.util.Objects;
-
 /**
  * The context used for a {@link org.perudevteam.lexer.charlexer.CharLinearDLexer}.
  */
@@ -62,7 +60,7 @@ public class CharLinearContext extends CharSimpleContext implements LinearContex
     @Override
     public CharLinearContext withAbsolutePosition(int absPosition) {
         return new CharLinearContext(failMap, absPosition,
-                getLine(), getLinePosition());
+                getLineData(), getLinePositionData());
     }
 
     @Override
@@ -76,7 +74,7 @@ public class CharLinearContext extends CharSimpleContext implements LinearContex
         }
 
         return new CharLinearContext(cleanMap, absolutePosition,
-                getLine(), getLinePosition());
+                getLineData(), getLinePositionData());
     }
 
     @Override
@@ -92,32 +90,32 @@ public class CharLinearContext extends CharSimpleContext implements LinearContex
                 Set::addAll);
 
         return new CharLinearContext(newFailMap, absolutePosition,
-                getLine(), getLinePosition());
+                getLineData(), getLinePositionData());
     }
 
     @Override
-    public CharLinearContext withLine(PositionData l) {
-        return new CharLinearContext(failMap, absolutePosition, l, getLinePosition());
+    public CharLinearContext withLineData(PositionData l) {
+        return new CharLinearContext(failMap, absolutePosition, l, getLinePositionData());
     }
 
     @Override
-    public CharLinearContext mapLine(Function1<? super PositionData, ? extends  PositionData> m) {
-        return new CharLinearContext(failMap, absolutePosition, m.apply(getLine()), getLinePosition());
+    public CharLinearContext mapLineData(Function1<? super PositionData, ? extends  PositionData> m) {
+        return new CharLinearContext(failMap, absolutePosition, m.apply(getLineData()), getLinePositionData());
     }
 
     @Override
-    public CharLinearContext withLinePosition(PositionData lp) {
-        return new CharLinearContext(failMap, absolutePosition, getLine(), lp);
+    public CharLinearContext withLinePositionData(PositionData lp) {
+        return new CharLinearContext(failMap, absolutePosition, getLineData(), lp);
     }
 
     @Override
-    public CharLinearContext mapLinePosition(Function1<? super PositionData, ? extends PositionData> m) {
-        return new CharLinearContext(failMap, absolutePosition, getLine(), m.apply(getLinePosition()));
+    public CharLinearContext mapLinePositionData(Function1<? super PositionData, ? extends PositionData> m) {
+        return new CharLinearContext(failMap, absolutePosition, getLineData(), m.apply(getLinePositionData()));
     }
 
     @Override
     public CharLinearContext map(Function1<? super PositionData, ? extends  PositionData> lm,
                                  Function1<? super PositionData, ? extends  PositionData> lpm) {
-        return new CharLinearContext(failMap, absolutePosition, lm.apply(getLine()), lpm.apply(getLinePosition()));
+        return new CharLinearContext(failMap, absolutePosition, lm.apply(getLineData()), lpm.apply(getLinePositionData()));
     }
 }

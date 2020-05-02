@@ -6,12 +6,15 @@ import io.vavr.Tuple2;
 import io.vavr.collection.*;
 import io.vavr.control.Try;
 import org.junit.jupiter.api.Test;
+import org.perudevteam.charpos.CharPos;
+import org.perudevteam.charpos.CharPosEnum;
 import org.perudevteam.fa.DFAutomaton;
 import org.perudevteam.lexer.DLexer;
 
 import org.perudevteam.misc.MiscHelpers;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.perudevteam.charpos.CharPosEnum.*;
 
 public class TestCharLexer {
 
@@ -40,8 +43,8 @@ public class TestCharLexer {
      * Simple DFA for language 1.
      */
 
-    private static final DFAutomaton<Character, CharType1, Function1<CharSimpleContext, CharData<TokenType1>>>
-            DFA_SIMPLE1 = new DFAutomaton<Character, CharType1, Function1<CharSimpleContext, CharData<TokenType1>>>
+    private static final DFAutomaton<Character, CharType1, Function1<CharSimpleContext, CharPosEnum<TokenType1>>>
+            DFA_SIMPLE1 = new DFAutomaton<Character, CharType1, Function1<CharSimpleContext, CharPosEnum<TokenType1>>>
             (5, HashSet.of(CharType1.values()), (input) -> {
         if ('0' <= input && input <= '9') {
             return CharType1.NUMBER;
@@ -64,9 +67,9 @@ public class TestCharLexer {
             .withSingleTransition(2, 3, CharType1.DOT)
             .withSingleTransition(3, 4, CharType1.NUMBER)
             .withSingleTransition(4, 4, CharType1.NUMBER)
-            .withAcceptingState(1, c -> new CharData<>(TokenType1.WHITESPACE, c))
-            .withAcceptingState(2, c -> new CharData<>(TokenType1.INT, c))
-            .withAcceptingState(4, c -> new CharData<>(TokenType1.DOUBLE, c));
+            .withAcceptingState(1, c -> charPosEnum(c, TokenType1.WHITESPACE))
+            .withAcceptingState(2, c -> charPosEnum(c, TokenType1.INT))
+            .withAcceptingState(4, c -> charPosEnum(c, TokenType1.DOUBLE));
 
 
     /*
@@ -102,8 +105,8 @@ public class TestCharLexer {
      * Language 2 DFA.
      */
 
-    private static final DFAutomaton<Character, CharType2, Function1<CharSimpleContext, CharData<TokenType2>>>
-            DFA_SIMPLE2 = new DFAutomaton<Character, CharType2, Function1<CharSimpleContext, CharData<TokenType2>>>
+    private static final DFAutomaton<Character, CharType2, Function1<CharSimpleContext, CharPosEnum<TokenType2>>>
+            DFA_SIMPLE2 = new DFAutomaton<Character, CharType2, Function1<CharSimpleContext, CharPosEnum<TokenType2>>>
             (6, HashSet.of(CharType2.values()), (input) -> CHAR_MAP2.get(input).get())
             .withSingleTransition(0, 1, CharType2.A)
             .withSingleTransition(1, 2, CharType2.B)
@@ -112,8 +115,8 @@ public class TestCharLexer {
             .withSingleTransition(4, 5, CharType2.C)
             .withSingleTransition(2, 5, CharType2.C)
             .withSingleTransition(4, 3, CharType2.A)
-            .withAcceptingState(2, c -> new CharData<>(TokenType2.SHORT, c))
-            .withAcceptingState(5, c -> new CharData<>(TokenType2.LONG, c));
+            .withAcceptingState(2, c -> charPosEnum(c, TokenType2.SHORT))
+            .withAcceptingState(5, c -> charPosEnum(c, TokenType2.LONG));
 
     /*
      * Language 2 Lexers.
@@ -132,13 +135,13 @@ public class TestCharLexer {
 
     private static final Seq<Character> INPUT1 = List.ofAll("123 \n 456 12.34\n".toCharArray());
 
-    private static final Seq<Tuple2<String, CharData<TokenType1>>> EXPECTED1 = List.of(
-            Tuple.of("123", new CharData<>(TokenType1.INT, 0, 0)),
-            Tuple.of(" \n ", new CharData<>(TokenType1.WHITESPACE, 0, 3)),
-            Tuple.of("456", new CharData<>(TokenType1.INT, 1, 1)),
-            Tuple.of(" ", new CharData<>(TokenType1.WHITESPACE, 1, 4)),
-            Tuple.of("12.34", new CharData<>(TokenType1.DOUBLE, 1, 5)),
-            Tuple.of("\n", new CharData<>(TokenType1.WHITESPACE, 1, 10))
+    private static final Seq<Tuple2<String, CharPosEnum<TokenType1>>> EXPECTED1 = List.of(
+            Tuple.of("123", charPosEnum(0, 0, TokenType1.INT)),
+            Tuple.of(" \n ", charPosEnum(0, 3, TokenType1.WHITESPACE)),
+            Tuple.of("456", charPosEnum(1, 1, TokenType1.INT)),
+            Tuple.of(" ", charPosEnum(1, 4, TokenType1.WHITESPACE)),
+            Tuple.of("12.34", charPosEnum(1, 5, TokenType1.DOUBLE)),
+            Tuple.of("\n", charPosEnum(1, 10, TokenType1.WHITESPACE))
     );
 
     @Test
@@ -150,17 +153,17 @@ public class TestCharLexer {
     private static final Seq<Character> INPUT2 = List.ofAll("ababcabababab".toCharArray());
 
 
-    private static final Seq<Tuple2<String, CharData<TokenType2>>> EXPECTED2 = List.of(
-            Tuple.of("ababc", new CharData<>(TokenType2.LONG, 0, 0)),
-            Tuple.of("ab", new CharData<>(TokenType2.SHORT, 0, 5)),
-            Tuple.of("ab", new CharData<>(TokenType2.SHORT, 0, 7)),
-            Tuple.of("ab", new CharData<>(TokenType2.SHORT, 0, 9)),
-            Tuple.of("ab", new CharData<>(TokenType2.SHORT, 0, 11))
+    private static final Seq<Tuple2<String, CharPosEnum<TokenType2>>> EXPECTED2 = List.of(
+            Tuple.of("ababc", charPosEnum(0, 0, TokenType2.LONG)),
+            Tuple.of("ab", charPosEnum(0, 5, TokenType2.SHORT)),
+            Tuple.of("ab", charPosEnum(0, 7, TokenType2.SHORT)),
+            Tuple.of("ab", charPosEnum(0, 9, TokenType2.SHORT)),
+            Tuple.of("ab", charPosEnum(0, 11, TokenType2.SHORT))
     );
 
     @Test
     void testLinearLexer() {
-        Stream<Tuple2<String, CharData<TokenType2>>> stream =
+        Stream<Tuple2<String, CharPosEnum<TokenType2>>> stream =
                 LEXER_LINEAR2.buildSuccessfulTokenStream(INPUT2, CharLinearContext.INIT_LINEAR_CONTEXT);
 
         assertEquals(EXPECTED2, stream);

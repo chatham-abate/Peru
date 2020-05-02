@@ -228,5 +228,4 @@ public final class FAutomatonUtil {
 
         return reachableSets;
     }
-
 }

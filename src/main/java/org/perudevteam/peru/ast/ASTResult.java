@@ -1,12 +1,12 @@
 package org.perudevteam.peru.ast;
 
 import io.vavr.Function1;
-import org.perudevteam.misc.CharPosition;
+import org.perudevteam.charpos.CharPos;
 import org.perudevteam.peru.base.BaseValue;
 
 import java.util.Objects;
 
-public interface ASTResult extends CharPosition {
+public interface ASTResult extends CharPos {
 
     static ASTResult empty() {
         return EMPTY;
@@ -16,7 +16,7 @@ public interface ASTResult extends CharPosition {
         return EMPTY.withPosition(l, lp);
     }
 
-    static ASTResult position(CharPosition d) {
+    static ASTResult position(CharPos d) {
         return EMPTY.withPosition(d);
     }
 
@@ -28,7 +28,7 @@ public interface ASTResult extends CharPosition {
         return value(val).withPosition(l, lp);
     }
 
-    static ASTResult fullResult(CharPosition d, BaseValue val) {
+    static ASTResult fullResult(CharPos d, BaseValue val) {
         return value(val).withPosition(d.getLine(), d.getLinePosition());
     }
 
@@ -178,7 +178,7 @@ public interface ASTResult extends CharPosition {
     }
 
     @Override
-    default ASTResult withPosition(CharPosition d) {
+    default ASTResult withPosition(CharPos d) {
         Objects.requireNonNull(d);
         return withPosition(d.getLine(), d.getLinePosition());
     }
@@ -230,7 +230,7 @@ public interface ASTResult extends CharPosition {
             }
 
             @Override
-            public ASTResult mapPosition(Function1<? super CharPosition, ? extends CharPosition> f) {
+            public ASTResult mapPosition(Function1<? super CharPos, ? extends CharPos> f) {
                 Objects.requireNonNull(f);
                 return withPosition(f.apply(this));
             }
@@ -273,7 +273,7 @@ public interface ASTResult extends CharPosition {
     }
 
     @Override
-    default ASTResult mapPosition(Function1<? super CharPosition, ? extends CharPosition> f) {
+    default ASTResult mapPosition(Function1<? super CharPos, ? extends CharPos> f) {
         throw new NullPointerException("AST Result holds no position");
     }
 }

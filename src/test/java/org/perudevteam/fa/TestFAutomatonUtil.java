@@ -7,12 +7,13 @@ import io.vavr.collection.*;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
-import org.perudevteam.lexer.charlexer.CharData;
+import org.perudevteam.charpos.CharPosEnum;
 import org.perudevteam.lexer.charlexer.CharSimpleContext;
 import org.perudevteam.lexer.charlexer.CharSimpleDLexer;
 
 import static org.perudevteam.fa.FAutomatonUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.perudevteam.charpos.CharPosEnum.*;
 
 public class TestFAutomatonUtil {
 
@@ -62,9 +63,9 @@ public class TestFAutomatonUtil {
         THING2
     }
 
-    private static final Function1<CharSimpleContext, CharData<OutputClass>>
-        OUTPUT_1 = c -> new CharData<>(OutputClass.THING1, c),
-        OUTPUT_2 = c -> new CharData<>(OutputClass.THING2, c);
+    private static final Function1<CharSimpleContext, CharPosEnum<OutputClass>>
+        OUTPUT_1 = c -> charPosEnum(c, OutputClass.THING1),
+        OUTPUT_2 = c -> charPosEnum(c, OutputClass.THING2);
 
     private static final NFAutomaton<Character, InputClass, OutputClass> AMBIGUOUS_NFA =
             new NFAutomaton<Character, InputClass, OutputClass>(
@@ -82,8 +83,8 @@ public class TestFAutomatonUtil {
         assertThrows(Exception.class, AMBIGUOUS_NFA::toDFA);
     }
 
-    private static final NFAutomaton<Character, InputClass, Function1<CharSimpleContext, CharData<OutputClass>>> NFA1 =
-            new NFAutomaton<Character, InputClass, Function1<CharSimpleContext, CharData<OutputClass>>>(
+    private static final NFAutomaton<Character, InputClass, Function1<CharSimpleContext, CharPosEnum<OutputClass>>> NFA1 =
+            new NFAutomaton<Character, InputClass, Function1<CharSimpleContext, CharPosEnum<OutputClass>>>(
                     9, HashSet.of(InputClass.values()), TestFAutomatonUtil::getInputClass
     )
                     .withEpsilonTransition(0, 1)
@@ -100,7 +101,7 @@ public class TestFAutomatonUtil {
                     .withEpsilonTransition(8, 6)
                     .withAcceptingState(8, OUTPUT_2);
 
-    private static final DFAutomaton<Character, InputClass, Function1<CharSimpleContext, CharData<OutputClass>>>
+    private static final DFAutomaton<Character, InputClass, Function1<CharSimpleContext, CharPosEnum<OutputClass>>>
             DFA1 = NFA1.tryToDFA().get();
 
     private static final CharSimpleDLexer<OutputClass> LEXER1 = new CharSimpleDLexer<>(DFA1);
@@ -118,11 +119,11 @@ public class TestFAutomatonUtil {
         return EXPECTED1.map(tuple -> DynamicTest.dynamicTest("String : " + tuple._1, () -> {
             Seq<Character> inputSequence = List.ofAll(tuple._1.toCharArray());
 
-            Seq<Tuple2<String, CharData<OutputClass>>> outputs =
+            Seq<Tuple2<String, CharPosEnum<OutputClass>>> outputs =
                     LEXER1.buildOnlySuccessfulTokenStream(inputSequence, CharSimpleContext.INIT_SIMPLE_CONTEXT);
 
             assertEquals(1, outputs.length());
-            Tuple2<String, CharData<OutputClass>> result = outputs.head();
+            Tuple2<String, CharPosEnum<OutputClass>> result = outputs.head();
 
             assertEquals(tuple._1, result._1);
             assertEquals(tuple._2, result._2.getTokenType());

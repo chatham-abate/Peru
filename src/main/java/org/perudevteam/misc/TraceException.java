@@ -4,6 +4,8 @@ import io.vavr.Function1;
 import io.vavr.collection.List;
 import io.vavr.collection.Seq;
 import io.vavr.control.Try;
+import org.perudevteam.charpos.CharPos;
+
 import java.util.Objects;
 import static org.perudevteam.misc.LineException.*;
 
@@ -141,7 +143,7 @@ public class TraceException extends Exception {
      * @param msg The message of the new <b>LineException</b>.
      * @return The new <b>TraceException</b>.
      */
-    public TraceException push(CharPosition d, String msg) {
+    public TraceException push(CharPos d, String msg) {
         return new TraceException(trace.prepend(lineEx(d, msg)));
     }
 

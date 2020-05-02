@@ -1,4 +1,4 @@
-package org.perudevteam.misc;
+package org.perudevteam.charpos;
 
 import io.vavr.Function1;
 
@@ -9,10 +9,9 @@ import java.util.Objects;
  * <br>
  * Specifically, The line number of the Object and the position of the Object on that line.
  */
-public interface CharPosition {
-
-    static CharPosition position(int l, int lp) {
-        return new CharPosition() {
+public interface CharPos {
+    static CharPos charPos(int l, int lp) {
+        return new CharPos() {
             @Override
             public int getLine() {
                 return l;
@@ -24,13 +23,13 @@ public interface CharPosition {
             }
 
             @Override
-            public CharPosition withLine(int l) {
-                return CharPosition.position(l, lp);
+            public CharPos withLine(int l) {
+                return CharPos.charPos(l, lp);
             }
 
             @Override
-            public CharPosition withLinePosition(int lp) {
-                return CharPosition.position(l, lp);
+            public CharPos withLinePosition(int lp) {
+                return CharPos.charPos(l, lp);
             }
 
             @Override
@@ -42,7 +41,7 @@ public interface CharPosition {
             public boolean equals(Object obj) {
                 if (obj == null) return false;
                 if (obj.getClass() != this.getClass()) return false;
-                CharPosition that = (CharPosition) obj;
+                CharPos that = (CharPos) obj;
                 return that.getLine() == getLine() && that.getLinePosition() == getLinePosition();
             }
         };
@@ -62,26 +61,26 @@ public interface CharPosition {
      */
     int getLinePosition();
 
-    CharPosition withLine(int l);
+    CharPos withLine(int l);
 
-    CharPosition withLinePosition(int lp);
+    CharPos withLinePosition(int lp);
 
-    default CharPosition withPosition(CharPosition d) {
+    default CharPos withPosition(CharPos d) {
         Objects.requireNonNull(d);
         return d;
     }
 
-    default CharPosition mapLine(Function1<? super Integer, ? extends Integer> f) {
+    default CharPos mapLine(Function1<? super Integer, ? extends Integer> f) {
         Objects.requireNonNull(f);
         return withLine(f.apply(getLine()));
     }
 
-    default CharPosition mapLinePosition(Function1<? super Integer, ? extends Integer> f) {
+    default CharPos mapLinePosition(Function1<? super Integer, ? extends Integer> f) {
         Objects.requireNonNull(f);
         return withLinePosition(f.apply(getLinePosition()));
     }
 
-    default CharPosition mapPosition(Function1<? super CharPosition, ? extends CharPosition> f) {
+    default CharPos mapPosition(Function1<? super CharPos, ? extends CharPos> f) {
         Objects.requireNonNull(f);
         return withPosition(f.apply(this));
     }

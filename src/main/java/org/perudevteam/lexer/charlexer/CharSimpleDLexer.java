@@ -1,6 +1,7 @@
 package org.perudevteam.lexer.charlexer;
 
 import io.vavr.Function1;
+import org.perudevteam.charpos.CharPosEnum;
 import org.perudevteam.fa.DFAutomaton;
 import org.perudevteam.lexer.SimpleDLexer;
 import org.perudevteam.misc.LineException;
@@ -14,7 +15,7 @@ import org.perudevteam.misc.LineException;
  * @param <T> The category type.
  */
 public class CharSimpleDLexer<T extends Enum<T>> extends
-        SimpleDLexer<Character, String, CharData<T>, CharSimpleContext> {
+        SimpleDLexer<Character, String, CharPosEnum<T>, CharSimpleContext> {
 
     /**
      * Constructor.
@@ -22,7 +23,7 @@ public class CharSimpleDLexer<T extends Enum<T>> extends
      * @param d The lexer's deterministic finite automaton.
      */
     public CharSimpleDLexer(DFAutomaton<? super Character, ?,
-                    ? extends Function1<? super CharSimpleContext, ? extends CharData<T>>> d) {
+                    ? extends Function1<? super CharSimpleContext, ? extends CharPosEnum<T>>> d) {
         super("", d);
     }
 
@@ -32,7 +33,7 @@ public class CharSimpleDLexer<T extends Enum<T>> extends
         // Otherwise line stays the same, line position increments.
         return input == '\n'
                 ? context.map(l -> l.withCurrent(l.getCurrent() + 1), lp -> lp.withCurrent(0))
-                : context.mapLinePosition(lp -> lp.withCurrent(lp.getCurrent() + 1));
+                : context.mapLinePositionData(lp -> lp.withCurrent(lp.getCurrent() + 1));
     }
 
     @Override
@@ -41,14 +42,14 @@ public class CharSimpleDLexer<T extends Enum<T>> extends
     }
 
     @Override
-    protected CharSimpleContext onToken(String lexeme, CharData<T> data, CharSimpleContext context) {
+    protected CharSimpleContext onToken(String lexeme, CharPosEnum<T> data, CharSimpleContext context) {
         // Here current line becomes ending line, and current position becomes ending position.
         return context.map(l -> l.withEnding(l.getCurrent()), lp -> lp.withEnding(lp.getCurrent()));
     }
 
     @Override
     protected LineException makeError(String lexeme, CharSimpleContext context) {
-        return LineException.lineEx(context.getLine().getStarting(), context.getLinePosition().getStarting(),
+        return LineException.lineEx(context.getLineData().getStarting(), context.getLinePositionData().getStarting(),
                 "Lexeme cannot be lexed.");
     }
 
@@ -59,7 +60,7 @@ public class CharSimpleDLexer<T extends Enum<T>> extends
     }
 
     @Override
-    protected CharSimpleContext onSuccess(String lexeme, CharData<T> data, CharSimpleContext context) {
+    protected CharSimpleContext onSuccess(String lexeme, CharPosEnum<T> data, CharSimpleContext context) {
         // Here we restart the context to whatever comes directly after the successful token.
         return context.map(l -> l.withCurrent(l.getEnding()).withStarting(l.getEnding()),
                 lp -> lp.withCurrent(lp.getEnding()).withStarting(lp.getEnding()));

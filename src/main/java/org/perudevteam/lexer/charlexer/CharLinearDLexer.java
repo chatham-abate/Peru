@@ -1,6 +1,7 @@
 package org.perudevteam.lexer.charlexer;
 
 import io.vavr.Function1;
+import org.perudevteam.charpos.CharPosEnum;
 import org.perudevteam.fa.DFAutomaton;
 import org.perudevteam.lexer.LinearDLexer;
 import org.perudevteam.misc.LineException;
@@ -12,7 +13,7 @@ import org.perudevteam.misc.LineException;
  * @param <T> The <b>Enum</b> category type.
  */
 public class CharLinearDLexer<T extends Enum<T>>
-        extends LinearDLexer<Character, String, CharData<T>, CharLinearContext> {
+        extends LinearDLexer<Character, String, CharPosEnum<T>, CharLinearContext> {
 
     /**
      * Build a linear character lexer with a max rollback amount.
@@ -20,8 +21,8 @@ public class CharLinearDLexer<T extends Enum<T>>
      * @param mra The max rollback amount.
      * @param d The automaton of the lexer.
      */
-    protected CharLinearDLexer(int mra,
-            DFAutomaton<? super Character,?, ? extends Function1<? super CharLinearContext, ? extends CharData<T>>> d) {
+    protected CharLinearDLexer(int mra, DFAutomaton<? super Character, ?,
+            ? extends Function1<? super CharLinearContext, ? extends CharPosEnum<T>>> d) {
         super(mra, "", d);
     }
 
@@ -30,8 +31,8 @@ public class CharLinearDLexer<T extends Enum<T>>
      *
      * @param d The automaton of the lexer.
      */
-    protected CharLinearDLexer(
-            DFAutomaton<? super Character, ?, ? extends Function1<? super CharLinearContext, ? extends CharData<T>>> d) {
+    protected CharLinearDLexer(DFAutomaton<? super Character, ?,
+            ? extends Function1<? super CharLinearContext, ? extends CharPosEnum<T>>> d) {
         super("", d);
     }
 
@@ -41,7 +42,7 @@ public class CharLinearDLexer<T extends Enum<T>>
         // Otherwise, just increment line position.
         return input == '\n'
                 ? context.map(l -> l.withCurrent(l.getCurrent() + 1), lp -> lp.withCurrent(0))
-                : context.mapLinePosition(lp -> lp.withCurrent(lp.getCurrent() + 1));
+                : context.mapLinePositionData(lp -> lp.withCurrent(lp.getCurrent() + 1));
     }
 
     @Override
@@ -50,15 +51,15 @@ public class CharLinearDLexer<T extends Enum<T>>
     }
 
     @Override
-    protected CharLinearContext onToken(String lexeme, CharData<T> data, CharLinearContext context) {
+    protected CharLinearContext onToken(String lexeme, CharPosEnum<T> data, CharLinearContext context) {
         // On token shift ending line and line position to current line and line position.
         return context.map(l -> l.withEnding(l.getCurrent()), lp -> lp.withEnding(lp.getCurrent()));
     }
 
     @Override
     protected Throwable makeError(String lexeme, CharLinearContext context) {
-        return LineException.lineEx(context.getLine().getStarting(),
-                context.getLinePosition().getStarting(), "Lexeme cannot be lexed." + lexeme);
+        return LineException.lineEx(context.getLineData().getStarting(),
+                context.getLinePositionData().getStarting(), "Lexeme cannot be lexed." + lexeme);
     }
 
     @Override
@@ -68,7 +69,7 @@ public class CharLinearDLexer<T extends Enum<T>>
     }
 
     @Override
-    protected CharLinearContext onSuccess(String lexeme, CharData<T> data, CharLinearContext context) {
+    protected CharLinearContext onSuccess(String lexeme, CharPosEnum<T> data, CharLinearContext context) {
         // Shift current back to ending, and starting up to ending.
 
         return context.map(l -> l.withStarting(l.getEnding()).withCurrent(l.getEnding()),
