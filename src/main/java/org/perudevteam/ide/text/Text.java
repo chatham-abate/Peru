@@ -5,7 +5,7 @@ import org.perudevteam.charpos.CharPos;
 import java.util.Objects;
 
 // Texted is positioned with line and linePosition...
-public interface Text {
+public interface Text<T extends Text<T>> {
 
     // Get Line Methods...
     int numberOfLines();
@@ -39,60 +39,62 @@ public interface Text {
     }
 
     // Insert Char Methods...
-    default Text insertChar(CharPos d, char c) {
+    default T insertChar(CharPos d, char c) {
         Objects.requireNonNull(d);
         return insertChar(d.getLine(), d.getLinePosition(), c);
     }
 
-    default Text insertChar(int l, int lp, char c) {
+    default T insertChar(int l, int lp, char c) {
         requireValidInsertionLinePosition(l, lp);
         return insertCharUnchecked(l, lp, c);
     }
 
-    Text insertCharUnchecked(int l, int lp, char c);
+    T insertCharUnchecked(int l, int lp, char c);
 
     // Insert String Methods...
-    default Text insertString(CharPos d, String s) {
+    default T insertString(CharPos d, String s) {
         Objects.requireNonNull(d);
         return insertString(d.getLine(), d.getLinePosition(), s);
     }
 
-    default Text insertString(int l, int lp, String s) {
+    default T insertString(int l, int lp, String s) {
         requireValidInsertionLinePosition(l, lp);
         return insertStringUnchecked(l, lp, s);
     }
 
-    Text insertStringUnchecked(int l, int lp, String s);
+    T insertStringUnchecked(int l, int lp, String s);
 
-    // Delete Line Methods...
-    default Text deleteLine(int l) {
-        requireValidLine(l);
-        return deleteLineUnchecked(l);
+    default T breakLine(int l) {
+        if (l <= 0 || l >= numberOfLines()) {
+            throw new IndexOutOfBoundsException("Invalid break line index");
+        }
+
+        return breakLineUnchecked(l);
     }
 
-    Text deleteLineUnchecked(int l);
+    T breakLineUnchecked(int l);
 
     // Delete Char Methods...
-    default Text deleteChar(CharPos d) {
+    default T deleteChar(CharPos d) {
         Objects.requireNonNull(d);
         return deleteChar(d.getLine(), d.getLinePosition());
     }
 
-    default Text deleteChar(int l, int lp) {
+    default T deleteChar(int l, int lp) {
         requireValidLinePosition(l, lp);
         return deleteCharUnchecked(l, lp);
     }
 
-    Text deleteCharUnchecked(int l, int lp);
+    T deleteCharUnchecked(int l, int lp);
 
     // Delete Range Methods...
-    default Text deleteRangeInclusive(CharPos s, CharPos e) {
+    default T deleteRangeInclusive(CharPos s, CharPos e) {
         Objects.requireNonNull(s);
         Objects.requireNonNull(e);
         return deleteRangeInclusiveUnchecked(s.getLine(), s.getLinePosition(), e.getLine(), e.getLinePosition());
     }
 
-    default Text deleteRangeInclusive(int sl, int slp, int el, int elp) {
+    default T deleteRangeInclusive(int sl, int slp, int el, int elp) {
         requireValidLinePosition(sl, slp);
         requireValidLinePosition(el, elp);
 
@@ -103,5 +105,5 @@ public interface Text {
         return deleteRangeInclusiveUnchecked(sl, slp, el, elp);
     }
 
-    Text deleteRangeInclusiveUnchecked(int sl, int slp, int el, int elp);
+    T deleteRangeInclusiveUnchecked(int sl, int slp, int el, int elp);
 }

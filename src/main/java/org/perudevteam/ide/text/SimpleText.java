@@ -1,11 +1,46 @@
 package org.perudevteam.ide.text;
 
-import io.vavr.collection.Seq;
+import io.vavr.collection.*;
 
 import java.util.Objects;
 
 // Simple Text will hold a sequence of strings... That's it...
-public class SimpleText implements Text {
+public class SimpleText implements Text<SimpleText> {
+
+    private static final SimpleText SINGLE_LINE = new SimpleText(Vector.of(""));
+
+    public static SimpleText singleLine() {
+        return SINGLE_LINE;
+    }
+
+    public static SimpleText of(String text) {
+        Objects.requireNonNull(text);
+        return new SimpleText(sliceLines(text));
+    }
+
+    public static SimpleText of(Seq<String> lines) {
+        Objects.requireNonNull(lines);
+        lines.forEach(Objects::requireNonNull);
+
+        return new SimpleText(lines);
+    }
+
+    static Vector<String> sliceLines(String text) {
+        Queue<String> lines = Queue.empty();
+        StringBuilder currLine = new StringBuilder();
+
+        for (char c: text.toCharArray()) {
+            if (c == '\n') {
+                lines = lines.append(currLine.toString());
+                currLine = new StringBuilder();
+            } else {
+                currLine.append(c);
+            }
+        }
+
+        lines = lines.append(currLine.toString());
+        return Vector.ofAll(lines);
+    }
 
     private final Seq<String> lines;
 
@@ -23,8 +58,6 @@ public class SimpleText implements Text {
         return lines.get(l);
     }
 
-
-    // MUST DEAL WITH NEWLINE CHARACTERS!!!!
     @Override
     public SimpleText insertCharUnchecked(int l, int lp, char c) {
         if (c == '\n') {
@@ -39,24 +72,31 @@ public class SimpleText implements Text {
 
     @Override
     public SimpleText insertStringUnchecked(int l, int lp, String s) {
-        String[] lineInsertions = s.split("\n");
+        Seq<String> lineInsertions = sliceLines(s);
 
-        if (lineInsertions.length > 1) {
+        if (lineInsertions.length() > 1) {
             String suffix = lines.get(l).substring(lp);
-            Seq<String> newLines = lines;
 
             // Take out suffix.
-            newLines = lines.update(l, r -> r.substring(0, lp));
+            Seq<String> newLines = lines.update(l, r -> r.substring(0, lp) + lineInsertions.get(0));
 
-            // TODO Finish This ALGO....
+            for (int i = 1; i < lineInsertions.length(); i++) {
+                newLines = newLines.insert(l + i, lineInsertions.get(i));
+            }
+
+            newLines = newLines.update(l + lineInsertions .length() - 1, r -> r + suffix);
+
+            return new SimpleText(newLines);
         }
 
         return new SimpleText(lines.update(l, r -> r.substring(0, lp) + s + r.substring(lp)));
     }
 
     @Override
-    public SimpleText deleteLineUnchecked(int l) {
-        return new SimpleText(lines.removeAt(l));
+    public SimpleText breakLineUnchecked(int l) {
+        Seq<String> newLines = lines.update(l - 1, s -> s + lines.get(l))
+                .removeAt(l);
+        return new SimpleText(newLines);
     }
 
     @Override
@@ -72,24 +112,35 @@ public class SimpleText implements Text {
                     lines.update(sl, s -> s.substring(0, slp) + s.substring(elp + 1)));
         }
 
+        String suffix = lines.get(el).substring(elp + 1);
         Seq<String> newLines = lines;
 
-        // First remove excess characters on the starting line...
-        newLines = newLines.update(sl, s -> s.substring(0, slp));
+        // First remove excess characters on the starting line... add suffix from ending line...
+        newLines = newLines.update(sl, s -> s.substring(0, slp) + suffix);
 
-        // Now for the middle lines (If they exist.)
-        for (int midLine = sl + 1; midLine < el; midLine++) {
+        // Remove all deleted lines.
+        for (int delLine = sl + 1; delLine <= el; delLine++) {
             newLines = newLines.removeAt(sl + 1);
-        }
-
-        if (elp == newLines.get(sl + 1).length() - 1) {
-            // Delete the ending line.
-            newLines = newLines.removeAt(sl + 1);
-        } else {
-            // Trim the ending line.
-            newLines = newLines.update(sl + 1, s -> s.substring(elp + 1));
         }
 
         return new SimpleText(newLines);
+    }
+
+    @Override
+    public String toString() {
+        return lines.foldLeft("", (x, y) -> x + "\n" + y);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SimpleText that = (SimpleText) o;
+        return lines.equals(that.lines);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(lines);
     }
 }

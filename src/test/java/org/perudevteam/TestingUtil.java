@@ -8,15 +8,18 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.function.Executable;
 
+import java.util.function.BiConsumer;
+
 public final class TestingUtil {
     private TestingUtil() {
         // Static Final Class should never be initialized.
     }
 
-    public static <T> Seq<DynamicTest> testEqualities(Seq<Tuple2<T, T>> tuples) {
+    public static <T> Seq<DynamicTest> testTuples(Seq<? extends Tuple2<? extends T, ? extends T>> tuples,
+                                                  BiConsumer<? super T, ? super T> f) {
         return tuples.map(tup -> DynamicTest.dynamicTest(
                 tup._1 + " = " + tup._2,
-                () -> assertEquals(tup._1, tup._2)
+                () -> f.accept(tup._1, tup._2)
         ));
     }
 

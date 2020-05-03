@@ -4,6 +4,7 @@ import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import io.vavr.collection.Array;
 import io.vavr.collection.Seq;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import org.perudevteam.TestingUtil;
@@ -22,7 +23,7 @@ public class TestCharPos {
 
     @TestFactory
     Seq<DynamicTest> testSimpleEqualities() {
-        return TestingUtil.testEqualities(SIMPLE_EQUALITIES);
+        return TestingUtil.testTuples(SIMPLE_EQUALITIES, Assertions::assertEquals);
     }
 
     private static final Seq<Tuple2<ValueCharPos<Integer>, ValueCharPos<Integer>>> VALUE_EQUALITIES = Array.of(
@@ -35,7 +36,7 @@ public class TestCharPos {
 
     @TestFactory
     Seq<DynamicTest> testValueEqualities() {
-        return TestingUtil.testEqualities(VALUE_EQUALITIES);
+        return TestingUtil.testTuples(VALUE_EQUALITIES, Assertions::assertEquals);
     }
 
     enum TestEnum {
@@ -53,6 +54,6 @@ public class TestCharPos {
 
     @TestFactory
     Seq<DynamicTest> testEnumEqualities() {
-        return TestingUtil.testEqualities(ENUM_EQUALITIES);
+        return TestingUtil.testTuples(ENUM_EQUALITIES, Assertions::assertEquals);
     }
 }

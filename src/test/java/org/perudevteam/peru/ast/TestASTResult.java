@@ -4,6 +4,7 @@ import io.vavr.Tuple;
 import io.vavr.Tuple2;
 import io.vavr.collection.Array;
 import io.vavr.collection.Seq;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -38,6 +39,6 @@ public class TestASTResult {
 
     @TestFactory
     Seq<DynamicTest> testEqualASTs() {
-        return TestingUtil.testEqualities(EQUALITIES);
+        return TestingUtil.testTuples(EQUALITIES, Assertions::assertEquals);
     }
 }
