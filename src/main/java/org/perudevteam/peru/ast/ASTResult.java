@@ -1,12 +1,15 @@
 package org.perudevteam.peru.ast;
 
 import io.vavr.Function1;
+import io.vavr.control.Option;
 import org.perudevteam.charpos.CharPos;
+import org.perudevteam.charpos.MappableCharPos;
+import org.perudevteam.charpos.SimpleCharPos;
 import org.perudevteam.peru.base.BaseValue;
 
 import java.util.Objects;
 
-public interface ASTResult extends CharPos {
+public class ASTResult implements MappableCharPos<ASTResult> {
 
     static ASTResult empty() {
         return EMPTY;
@@ -25,255 +28,102 @@ public interface ASTResult extends CharPos {
     }
 
     static ASTResult fullResult(int l, int lp, BaseValue val) {
-        return value(val).withPosition(l, lp);
+        Objects.requireNonNull(val);
+        return new ASTResult(Option.of(SimpleCharPos.simpleCharPos(l, lp)), Option.of(val));
     }
 
     static ASTResult fullResult(CharPos d, BaseValue val) {
-        return value(val).withPosition(d.getLine(), d.getLinePosition());
-    }
+        Objects.requireNonNull(d);
+        Objects.requireNonNull(val);
 
-    static boolean samePositions(ASTResult r1, ASTResult r2) {
-        if (!r1.isPositioned() && !r2.isPositioned()) {
-            return true;
-        }
-
-        if (r1.isPositioned() && r2.isPositioned()) {
-            return r1.getLine() == r2.getLine() && r1.getLinePosition() == r2.getLinePosition();
-        }
-
-        return false;
-    }
-
-    static boolean sameValues(ASTResult r1, ASTResult r2) {
-        if (r1.isEmpty() && r2.isEmpty()) {
-            return true;
-        }
-
-        if (!r1.isEmpty() && !r2.isEmpty()) {
-            return r1.getValue().equals(r2.getValue());
-        }
-
-        return false;
-    }
-
-    static boolean sameASTResults(ASTResult r1, ASTResult r2) {
-        return samePositions(r1, r2) && sameValues(r1, r2);
-    }
-
-    static boolean equalsASTResult(ASTResult r, Object o) {
-        Objects.requireNonNull(r);
-
-        if (o == null) return false;
-        if (o.getClass() != r.getClass()) return false;
-
-        ASTResult that = (ASTResult) o;
-
-        return sameASTResults(r, that);
+        return new ASTResult(Option.of(d), Option.of(val));
     }
 
     static String buildASTResultString(ASTResult r) {
         String internal = "";
 
         if (r.isPositioned()) internal += "[" + r.getLine() + " : " + r.getLinePosition() + "]";
-        if (!r.isEmpty()) internal += " " + r.getValue().toString();
+        if (!r.isEmpty()) internal += " (" + r.getValue().toString() + ")";
 
-        return "(" + internal + ")";
+        return internal;
     }
 
-    ASTResult EMPTY = new ASTResult() {
-        @Override
-        @SuppressWarnings("all")
-        public boolean equals(Object obj) {
-            return ASTResult.equalsASTResult(this, obj);
-        }
+    private static final ASTResult EMPTY = new ASTResult(Option.none(), Option.none());
 
-        @Override
-        public String toString() {
-            return ASTResult.buildASTResultString(this);
-        }
-    };
+    private final Option<CharPos> positionOption;
+    private final Option<BaseValue> valueOption;
 
-    default BaseValue getValue() {
-        throw new NullPointerException("AST Result holds no value.");
+    protected ASTResult(Option<CharPos> p, Option<BaseValue> v) {
+        positionOption = p;
+        valueOption = v;
     }
 
-    default boolean isEmpty() {
-        return true;
+    public boolean isEmpty() {
+        return valueOption.isEmpty();
     }
 
-    default ASTResult withValue(BaseValue val) {
-        Objects.requireNonNull(val);
-        final ASTResult This = this;
-
-        return new ASTResult() {
-            @Override
-            public BaseValue getValue() {
-                return val;
-            }
-
-            @Override
-            public boolean isEmpty() {
-                return false;
-            }
-
-            @Override
-            public int getLine() {
-                return This.getLine();
-            }
-
-            @Override
-            public int getLinePosition() {
-                return This.getLinePosition();
-            }
-
-            @Override
-            public boolean isPositioned() {
-                return This.isPositioned();
-            }
-
-            @Override
-            public int hashCode() {
-                if (this.isPositioned()) {
-                    return Objects.hash(val, this.getLine(), this.getLinePosition());
-                }
-
-                return Objects.hashCode(val);
-            }
-
-            @Override
-            @SuppressWarnings("all")
-            public boolean equals(Object obj) {
-                return ASTResult.equalsASTResult(this, obj);
-            }
-
-            @Override
-            public String toString() {
-                return ASTResult.buildASTResultString(this);
-            }
-        };
+    public BaseValue getValue() {
+        return valueOption.get();
     }
 
-    default boolean isPositioned() {
-        return false;
+    public ASTResult withValue(BaseValue v) {
+        Objects.requireNonNull(v);
+        return new ASTResult(positionOption, Option.of(v));
+    }
+
+    public boolean isPositioned() {
+        return !positionOption.isEmpty();
     }
 
     @Override
-    default int getLine() {
-        throw new NullPointerException("AST Result holds no line.");
+    public int getLine() {
+        return positionOption.get().getLine();
     }
 
     @Override
-    default int getLinePosition() {
-        throw new NullPointerException("AST Result holds no line position.");
+    public int getLinePosition() {
+        return positionOption.get().getLinePosition();
     }
 
     @Override
-    default ASTResult withLine(int l) {
-        return withPosition(l, 0);
+    public ASTResult withLine(int l) {
+        SimpleCharPos newPos = positionOption.isEmpty()
+                ? SimpleCharPos.simpleCharPos(l, 0)
+                : SimpleCharPos.simpleCharPos(l, positionOption.get().getLinePosition());
+
+        return new ASTResult(Option.of(newPos), valueOption);
     }
 
     @Override
-    default ASTResult withLinePosition(int lp) {
-        return withPosition(0, lp);
+    public ASTResult withLinePosition(int lp) {
+        SimpleCharPos newPos = positionOption.isEmpty()
+                ? SimpleCharPos.simpleCharPos(0, lp)
+                : SimpleCharPos.simpleCharPos(positionOption.get().getLine(), lp);
+
+        return new ASTResult(Option.of(newPos), valueOption);
     }
 
     @Override
-    default ASTResult withPosition(CharPos d) {
-        Objects.requireNonNull(d);
-        return withPosition(d.getLine(), d.getLinePosition());
-    }
-
-    default ASTResult withPosition(int l, int lp) {
-        final ASTResult This = this;
-
-        return new ASTResult() {
-            @Override
-            public BaseValue getValue() {
-                return This.getValue();
-            }
-
-            @Override
-            public boolean isEmpty() {
-                return This.isEmpty();
-            }
-
-            @Override
-            public int getLine() {
-                return l;
-            }
-
-            @Override
-            public int getLinePosition() {
-                return lp;
-            }
-
-            @Override
-            public ASTResult withLine(int l) {
-                return withPosition(l, lp);
-            }
-
-            @Override
-            public ASTResult withLinePosition(int lp) {
-                return withPosition(l, lp);
-            }
-
-            @Override
-            public ASTResult mapLine(Function1<? super Integer, ? extends Integer> f) {
-                Objects.requireNonNull(f);
-                return withLine(f.apply(l));
-            }
-
-            @Override
-            public ASTResult mapLinePosition(Function1<? super Integer, ? extends Integer> f) {
-                Objects.requireNonNull(f);
-                return withLinePosition(f.apply(lp));
-            }
-
-            @Override
-            public ASTResult mapPosition(Function1<? super CharPos, ? extends CharPos> f) {
-                Objects.requireNonNull(f);
-                return withPosition(f.apply(this));
-            }
-
-            @Override
-            public boolean isPositioned() {
-                return true;
-            }
-
-            @Override
-            public int hashCode() {
-                if (!this.isEmpty()) {
-                    return Objects.hash(this.getValue(), l, lp);
-                }
-
-                return Objects.hash(l, lp);
-            }
-
-            @Override
-            @SuppressWarnings("all")
-            public boolean equals(Object obj) {
-                return ASTResult.equalsASTResult(this, obj);
-            }
-
-            @Override
-            public String toString() {
-                return ASTResult.buildASTResultString(this);
-            }
-        };
+    public ASTResult withPosition(int l, int lp) {
+        return new ASTResult(Option.of(SimpleCharPos.simpleCharPos(l, lp)), valueOption);
     }
 
     @Override
-    default ASTResult mapLine(Function1<? super Integer, ? extends Integer> f) {
-        throw new NullPointerException("AST Result holds no line.");
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ASTResult astResult = (ASTResult) o;
+        return positionOption.equals(astResult.positionOption) &&
+                valueOption.equals(astResult.valueOption);
     }
 
     @Override
-    default ASTResult mapLinePosition(Function1<? super Integer, ? extends Integer> f) {
-        throw new NullPointerException("AST Result holds no line position.");
+    public int hashCode() {
+        return Objects.hash(positionOption, valueOption);
     }
 
     @Override
-    default ASTResult mapPosition(Function1<? super CharPos, ? extends CharPos> f) {
-        throw new NullPointerException("AST Result holds no position");
+    public String toString() {
+        return buildASTResultString(this);
     }
 }

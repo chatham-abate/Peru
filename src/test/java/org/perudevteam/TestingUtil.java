@@ -13,6 +13,13 @@ public final class TestingUtil {
         // Static Final Class should never be initialized.
     }
 
+    public static <T> Seq<DynamicTest> testEqualities(Seq<Tuple2<T, T>> tuples) {
+        return tuples.map(tup -> DynamicTest.dynamicTest(
+                tup._1 + " = " + tup._2,
+                () -> assertEquals(tup._1, tup._2)
+        ));
+    }
+
     public static <T extends Throwable>  Seq<DynamicTest> buildThrowTests(Class<T> expectedThrow,
             Seq<? extends Tuple2<? extends String, ? extends Executable>> errorTests) {
         return errorTests.map(tuple -> DynamicTest.dynamicTest(tuple._1,

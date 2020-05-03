@@ -3,8 +3,6 @@ package org.perudevteam.lexer.charlexer;
 import io.vavr.Function1;
 import org.perudevteam.charpos.CharPos;
 
-import static org.perudevteam.charpos.CharPos.*;
-
 /**
  * The context of a simple character lexer.
  * @see org.perudevteam.lexer.charlexer.CharSimpleDLexer
@@ -118,15 +116,5 @@ public class CharSimpleContext implements CharPos {
     @Override
     public int getLinePosition() {
         return linePositionData.getStarting();
-    }
-
-    @Override
-    public CharPos withLine(int l) {
-        return charPos(l, linePositionData.getStarting());
-    }
-
-    @Override
-    public CharPos withLinePosition(int lp) {
-        return charPos(lineData.getStarting(), lp);
     }
 }

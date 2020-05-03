@@ -6,7 +6,6 @@ import org.perudevteam.parser.Tokenized;
 import java.util.Objects;
 
 public class CharPosEnum<T extends Enum<T>> extends CharPosValue<T> implements Tokenized<T> {
-
     public static <T extends Enum<T>> CharPosEnum<T> charPosEnum(CharPos d, T v) {
         Objects.requireNonNull(d);
         return new CharPosEnum<>(d.getLine(), d.getLinePosition(), v);
@@ -23,47 +22,19 @@ public class CharPosEnum<T extends Enum<T>> extends CharPosValue<T> implements T
     protected CharPosEnum(int l, int lp, T v) {
         super(l, lp, v);
     }
-    
+
     @Override
-    public CharPosEnum<T> withLine(int l) {
-        return new CharPosEnum<>(l, getLinePosition(), getValue());
+    public CharPosEnum<T> withPosition(int l, int lp) {
+        return new CharPosEnum<>(l, lp, getValue());
     }
 
     @Override
-    public CharPosEnum<T> withLinePosition(int lp) {
-        return new CharPosEnum<>(getLine(), lp, getValue());
-    }
-
-    @Override
-    public CharPosEnum<T> withPosition(CharPos d) {
-        Objects.requireNonNull(d);
-        return new CharPosEnum<>(d.getLine(), d.getLinePosition(), getValue());
-    }
-
     public CharPosEnum<T> withValue(T v) {
         return new CharPosEnum<>(getLine(), getLinePosition(), v);
     }
 
     @Override
-    public CharPosEnum<T> mapLine(Function1<? super Integer, ? extends Integer> f) {
-        Objects.requireNonNull(f);
-        return withLine(f.apply(getLine()));
-    }
-
-    @Override
-    public CharPosEnum<T> mapLinePosition(Function1<? super Integer, ? extends Integer> f) {
-        Objects.requireNonNull(f);
-        return withLinePosition(f.apply(getLinePosition()));
-    }
-
-    @Override
-    public CharPosEnum<T> mapPosition(Function1<? super CharPos, ? extends CharPos> f) {
-        Objects.requireNonNull(f);
-        return withPosition(f.apply(this));
-    }
-
     public CharPosEnum<T> mapValue(Function1<? super T, ? extends T> f) {
-        Objects.requireNonNull(f);
         return withValue(f.apply(getValue()));
     }
 

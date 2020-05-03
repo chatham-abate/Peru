@@ -1,10 +1,11 @@
 package org.perudevteam.charpos;
 
 import io.vavr.Function1;
+import org.perudevteam.lexer.charlexer.CharSimpleContext;
 
 import java.util.Objects;
 
-public class CharPosValue<T> implements CharPos {
+public class CharPosValue<T> implements MappableCharPos<CharPosValue<T>>  {
 
     public static <T> CharPosValue<T> charPosValue(CharPos d, T v) {
         Objects.requireNonNull(d);
@@ -26,9 +27,9 @@ public class CharPosValue<T> implements CharPos {
     protected CharPosValue(int l, int lp, T v) {
         Objects.requireNonNull(v);
 
+        value = v;
         line = l;
         linePosition = lp;
-        value = v;
     }
 
     @Override
@@ -41,46 +42,17 @@ public class CharPosValue<T> implements CharPos {
         return linePosition;
     }
 
+    @Override
+    public CharPosValue<T> withPosition(int l, int lp) {
+        return new CharPosValue<>(line, linePosition, value);
+    }
+
     public T getValue() {
         return value;
     }
 
-    @Override
-    public CharPosValue<T> withLine(int l) {
-        return new CharPosValue<>(l, linePosition, value);
-    }
-
-    @Override
-    public CharPosValue<T> withLinePosition(int lp) {
-        return new CharPosValue<>(line, lp, value);
-    }
-
-    @Override
-    public CharPosValue<T> withPosition(CharPos d) {
-        Objects.requireNonNull(d);
-        return new CharPosValue<>(d.getLine(), d.getLinePosition(), value);
-    }
-
     public CharPosValue<T> withValue(T v) {
-        return new CharPosValue<>(line, linePosition, v);
-    }
-
-    @Override
-    public CharPosValue<T> mapLine(Function1<? super Integer, ? extends Integer> f) {
-        Objects.requireNonNull(f);
-        return withLine(f.apply(line));
-    }
-
-    @Override
-    public CharPosValue<T> mapLinePosition(Function1<? super Integer, ? extends Integer> f) {
-        Objects.requireNonNull(f);
-        return withLinePosition(f.apply(linePosition));
-    }
-
-    @Override
-    public CharPosValue<T> mapPosition(Function1<? super CharPos, ? extends CharPos> f) {
-        Objects.requireNonNull(f);
-        return withPosition(f.apply(this));
+        return new CharPosValue<T>(getLine(), getLinePosition(), v);
     }
 
     public CharPosValue<T> mapValue(Function1<? super T, ? extends T> f) {
@@ -101,5 +73,10 @@ public class CharPosValue<T> implements CharPos {
     @Override
     public int hashCode() {
         return Objects.hash(line, linePosition, value);
+    }
+
+    @Override
+    public String toString() {
+        return "[ " + line + " : " + linePosition + "]" + " (" + value + ")";
     }
 }

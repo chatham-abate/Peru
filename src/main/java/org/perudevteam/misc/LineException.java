@@ -3,13 +3,14 @@ package org.perudevteam.misc;
 import io.vavr.Function1;
 import io.vavr.control.Try;
 import org.perudevteam.charpos.CharPos;
+import org.perudevteam.charpos.MappableCharPos;
 
 import java.util.Objects;
 
 /**
  * Class representing an exception which occurred on some line at some some position on that line.
  */
-public class LineException extends Exception implements CharPos {
+public class LineException extends Exception implements MappableCharPos<LineException> {
 
     /**
      * Given a <b>Try</b>.
@@ -112,37 +113,8 @@ public class LineException extends Exception implements CharPos {
     }
 
     @Override
-    public LineException withLine(int l) {
-        return new LineException(l, linePosition, getMessage());
-    }
-
-    @Override
-    public LineException withLinePosition(int lp) {
-        return new LineException(line, lp, getMessage());
-    }
-
-    @Override
-    public LineException withPosition(CharPos d) {
-        Objects.requireNonNull(d);
-        return new LineException(d.getLine(), d.getLinePosition(), getMessage());
-    }
-
-    @Override
-    public LineException mapLine(Function1<? super Integer, ? extends Integer> f) {
-        Objects.requireNonNull(f);
-        return new LineException(f.apply(line), linePosition, getMessage());
-    }
-
-    @Override
-    public LineException mapLinePosition(Function1<? super Integer, ? extends Integer> f) {
-        Objects.requireNonNull(f);
-        return new LineException(line, f.apply(linePosition), getMessage());
-    }
-
-    @Override
-    public LineException mapPosition(Function1<? super CharPos, ? extends CharPos> f) {
-        Objects.requireNonNull(f);
-        return withPosition(f.apply(this));
+    public LineException withPosition(int l, int lp) {
+        return new LineException(l, lp, getMessage());
     }
 
     @Override
