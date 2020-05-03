@@ -7,13 +7,13 @@ import io.vavr.collection.*;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
-import org.perudevteam.charpos.CharPosEnum;
+import org.perudevteam.charpos.EnumCharPos;
 import org.perudevteam.lexer.charlexer.CharSimpleContext;
 import org.perudevteam.lexer.charlexer.CharSimpleDLexer;
 
 import static org.perudevteam.fa.FAutomatonUtil.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.perudevteam.charpos.CharPosEnum.*;
+import static org.perudevteam.charpos.EnumCharPos.*;
 
 public class TestFAutomatonUtil {
 
@@ -63,7 +63,7 @@ public class TestFAutomatonUtil {
         THING2
     }
 
-    private static final Function1<CharSimpleContext, CharPosEnum<OutputClass>>
+    private static final Function1<CharSimpleContext, EnumCharPos<OutputClass>>
         OUTPUT_1 = c -> charPosEnum(c, OutputClass.THING1),
         OUTPUT_2 = c -> charPosEnum(c, OutputClass.THING2);
 
@@ -83,8 +83,8 @@ public class TestFAutomatonUtil {
         assertThrows(Exception.class, AMBIGUOUS_NFA::toDFA);
     }
 
-    private static final NFAutomaton<Character, InputClass, Function1<CharSimpleContext, CharPosEnum<OutputClass>>> NFA1 =
-            new NFAutomaton<Character, InputClass, Function1<CharSimpleContext, CharPosEnum<OutputClass>>>(
+    private static final NFAutomaton<Character, InputClass, Function1<CharSimpleContext, EnumCharPos<OutputClass>>> NFA1 =
+            new NFAutomaton<Character, InputClass, Function1<CharSimpleContext, EnumCharPos<OutputClass>>>(
                     9, HashSet.of(InputClass.values()), TestFAutomatonUtil::getInputClass
     )
                     .withEpsilonTransition(0, 1)
@@ -101,7 +101,7 @@ public class TestFAutomatonUtil {
                     .withEpsilonTransition(8, 6)
                     .withAcceptingState(8, OUTPUT_2);
 
-    private static final DFAutomaton<Character, InputClass, Function1<CharSimpleContext, CharPosEnum<OutputClass>>>
+    private static final DFAutomaton<Character, InputClass, Function1<CharSimpleContext, EnumCharPos<OutputClass>>>
             DFA1 = NFA1.tryToDFA().get();
 
     private static final CharSimpleDLexer<OutputClass> LEXER1 = new CharSimpleDLexer<>(DFA1);
@@ -119,11 +119,11 @@ public class TestFAutomatonUtil {
         return EXPECTED1.map(tuple -> DynamicTest.dynamicTest("String : " + tuple._1, () -> {
             Seq<Character> inputSequence = List.ofAll(tuple._1.toCharArray());
 
-            Seq<Tuple2<String, CharPosEnum<OutputClass>>> outputs =
+            Seq<Tuple2<String, EnumCharPos<OutputClass>>> outputs =
                     LEXER1.buildOnlySuccessfulTokenStream(inputSequence, CharSimpleContext.INIT_SIMPLE_CONTEXT);
 
             assertEquals(1, outputs.length());
-            Tuple2<String, CharPosEnum<OutputClass>> result = outputs.head();
+            Tuple2<String, EnumCharPos<OutputClass>> result = outputs.head();
 
             assertEquals(tuple._1, result._1);
             assertEquals(tuple._2, result._2.getTokenType());

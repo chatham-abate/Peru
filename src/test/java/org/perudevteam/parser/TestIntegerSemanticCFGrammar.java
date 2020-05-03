@@ -7,7 +7,7 @@ import io.vavr.collection.*;
 import io.vavr.control.Try;
 import org.junit.jupiter.api.Test;
 import org.perudevteam.fa.DFAutomaton;
-import org.perudevteam.charpos.CharPosEnum;
+import org.perudevteam.charpos.EnumCharPos;
 import org.perudevteam.lexer.charlexer.CharSimpleContext;
 import org.perudevteam.lexer.charlexer.CharSimpleDLexer;
 import org.perudevteam.misc.LineException;
@@ -16,7 +16,7 @@ import org.perudevteam.parser.grammar.SemanticProduction;
 import org.perudevteam.parser.lrone.LROneParser;
 import static org.junit.jupiter.api.Assertions.*;
 import static io.vavr.control.Either.*;
-import static org.perudevteam.charpos.CharPosEnum.*;
+import static org.perudevteam.charpos.EnumCharPos.*;
 
 /**
  * Tests for parsing a simple language.
@@ -36,8 +36,8 @@ public class TestIntegerSemanticCFGrammar {
     }
 
 
-    private static final DFAutomaton<Character, CL, Function1<CharSimpleContext, CharPosEnum<T>>>
-            DFA_1 = new DFAutomaton<Character, CL, Function1<CharSimpleContext, CharPosEnum<T>>>(
+    private static final DFAutomaton<Character, CL, Function1<CharSimpleContext, EnumCharPos<T>>>
+            DFA_1 = new DFAutomaton<Character, CL, Function1<CharSimpleContext, EnumCharPos<T>>>(
                     3, HashSet.of(CL.values()), (input) -> {
         if ('0' <= input && input <= '9') {
             return CL.DIGIT;
@@ -93,18 +93,18 @@ public class TestIntegerSemanticCFGrammar {
         }
     };
 
-    private static final Map<T, CheckedFunction2<String, CharPosEnum<T>, Integer>> TERM_GENERATORS = HashMap.of(
+    private static final Map<T, CheckedFunction2<String, EnumCharPos<T>, Integer>> TERM_GENERATORS = HashMap.of(
             T.NUMBER, (l, d) -> Integer.parseInt(l),
             T.ADDOP, (l, d) -> l.equals("+") ? 1 : -1
     );
 
-    private static final SemanticCFGrammar<NT, T, SemanticProduction<NT, T, Integer>, String, CharPosEnum<T>, Integer>
+    private static final SemanticCFGrammar<NT, T, SemanticProduction<NT, T, Integer>, String, EnumCharPos<T>, Integer>
             G = new SemanticCFGrammar<>(NT.GOAL, TERM_GENERATORS, List.of(GOAL_PROD, SUM_PROD1, SUM_PROD2));
 
-    private static final LROneParser<NT, T, String, CharPosEnum<T>, Integer>
-            PARSER = new LROneParser<NT, T, String, CharPosEnum<T>, Integer>(G) {
+    private static final LROneParser<NT, T, String, EnumCharPos<T>, Integer>
+            PARSER = new LROneParser<NT, T, String, EnumCharPos<T>, Integer>(G) {
         @Override
-        protected Exception onError(Tuple2<String, CharPosEnum<T>> lookAhead) {
+        protected Exception onError(Tuple2<String, EnumCharPos<T>> lookAhead) {
             return LineException.lineEx(lookAhead._2, "Unexpected Token : " + lookAhead._2.getTokenType().name());
         }
 
@@ -132,7 +132,7 @@ public class TestIntegerSemanticCFGrammar {
     void testSuccessfulResults() {
         for (int i = 0; i < INPUTS.length(); i++) {
             Seq<Character> input = List.ofAll(INPUTS.get(i).toCharArray());
-            Seq<Tuple2<String, CharPosEnum<T>>> tokens =
+            Seq<Tuple2<String, EnumCharPos<T>>> tokens =
                     LEXER.buildSuccessfulTokenStream(input, CharSimpleContext.INIT_SIMPLE_CONTEXT);
 
             Try<Integer> result = PARSER.tryParse(tokens);
@@ -154,7 +154,7 @@ public class TestIntegerSemanticCFGrammar {
     void testErrors() {
         for (String errorStr: ERRORS) {
             Seq<Character> errorInput = List.ofAll(errorStr.toCharArray());
-            Seq<Tuple2<String, CharPosEnum<T>>> errorTokens =
+            Seq<Tuple2<String, EnumCharPos<T>>> errorTokens =
                     LEXER.buildSuccessfulTokenStream(errorInput, CharSimpleContext.INIT_SIMPLE_CONTEXT);
 
             assertTrue(PARSER.tryParse(errorTokens).isFailure());

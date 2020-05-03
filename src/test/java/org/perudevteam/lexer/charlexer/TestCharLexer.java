@@ -6,15 +6,14 @@ import io.vavr.Tuple2;
 import io.vavr.collection.*;
 import io.vavr.control.Try;
 import org.junit.jupiter.api.Test;
-import org.perudevteam.charpos.CharPos;
-import org.perudevteam.charpos.CharPosEnum;
+import org.perudevteam.charpos.EnumCharPos;
 import org.perudevteam.fa.DFAutomaton;
 import org.perudevteam.lexer.DLexer;
 
 import org.perudevteam.misc.MiscHelpers;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.perudevteam.charpos.CharPosEnum.*;
+import static org.perudevteam.charpos.EnumCharPos.*;
 
 public class TestCharLexer {
 
@@ -43,8 +42,8 @@ public class TestCharLexer {
      * Simple DFA for language 1.
      */
 
-    private static final DFAutomaton<Character, CharType1, Function1<CharSimpleContext, CharPosEnum<TokenType1>>>
-            DFA_SIMPLE1 = new DFAutomaton<Character, CharType1, Function1<CharSimpleContext, CharPosEnum<TokenType1>>>
+    private static final DFAutomaton<Character, CharType1, Function1<CharSimpleContext, EnumCharPos<TokenType1>>>
+            DFA_SIMPLE1 = new DFAutomaton<Character, CharType1, Function1<CharSimpleContext, EnumCharPos<TokenType1>>>
             (5, HashSet.of(CharType1.values()), (input) -> {
         if ('0' <= input && input <= '9') {
             return CharType1.NUMBER;
@@ -105,8 +104,8 @@ public class TestCharLexer {
      * Language 2 DFA.
      */
 
-    private static final DFAutomaton<Character, CharType2, Function1<CharSimpleContext, CharPosEnum<TokenType2>>>
-            DFA_SIMPLE2 = new DFAutomaton<Character, CharType2, Function1<CharSimpleContext, CharPosEnum<TokenType2>>>
+    private static final DFAutomaton<Character, CharType2, Function1<CharSimpleContext, EnumCharPos<TokenType2>>>
+            DFA_SIMPLE2 = new DFAutomaton<Character, CharType2, Function1<CharSimpleContext, EnumCharPos<TokenType2>>>
             (6, HashSet.of(CharType2.values()), (input) -> CHAR_MAP2.get(input).get())
             .withSingleTransition(0, 1, CharType2.A)
             .withSingleTransition(1, 2, CharType2.B)
@@ -135,7 +134,7 @@ public class TestCharLexer {
 
     private static final Seq<Character> INPUT1 = List.ofAll("123 \n 456 12.34\n".toCharArray());
 
-    private static final Seq<Tuple2<String, CharPosEnum<TokenType1>>> EXPECTED1 = List.of(
+    private static final Seq<Tuple2<String, EnumCharPos<TokenType1>>> EXPECTED1 = List.of(
             Tuple.of("123", charPosEnum(0, 0, TokenType1.INT)),
             Tuple.of(" \n ", charPosEnum(0, 3, TokenType1.WHITESPACE)),
             Tuple.of("456", charPosEnum(1, 1, TokenType1.INT)),
@@ -153,7 +152,7 @@ public class TestCharLexer {
     private static final Seq<Character> INPUT2 = List.ofAll("ababcabababab".toCharArray());
 
 
-    private static final Seq<Tuple2<String, CharPosEnum<TokenType2>>> EXPECTED2 = List.of(
+    private static final Seq<Tuple2<String, EnumCharPos<TokenType2>>> EXPECTED2 = List.of(
             Tuple.of("ababc", charPosEnum(0, 0, TokenType2.LONG)),
             Tuple.of("ab", charPosEnum(0, 5, TokenType2.SHORT)),
             Tuple.of("ab", charPosEnum(0, 7, TokenType2.SHORT)),
@@ -163,7 +162,7 @@ public class TestCharLexer {
 
     @Test
     void testLinearLexer() {
-        Stream<Tuple2<String, CharPosEnum<TokenType2>>> stream =
+        Stream<Tuple2<String, EnumCharPos<TokenType2>>> stream =
                 LEXER_LINEAR2.buildSuccessfulTokenStream(INPUT2, CharLinearContext.INIT_LINEAR_CONTEXT);
 
         assertEquals(EXPECTED2, stream);

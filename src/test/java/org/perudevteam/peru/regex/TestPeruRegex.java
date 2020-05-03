@@ -7,17 +7,14 @@ import io.vavr.Tuple3;
 import io.vavr.collection.*;
 import io.vavr.control.Try;
 import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
-import org.junit.jupiter.api.function.Executable;
-import org.perudevteam.charpos.CharPos;
 import org.perudevteam.fa.DFAutomaton;
 import org.perudevteam.lexer.DLexer;
-import org.perudevteam.charpos.CharPosEnum;
+import org.perudevteam.charpos.EnumCharPos;
 import org.perudevteam.lexer.charlexer.CharSimpleContext;
 import org.perudevteam.lexer.charlexer.CharSimpleDLexer;
 
-import static org.perudevteam.charpos.CharPosEnum.*;
+import static org.perudevteam.charpos.EnumCharPos.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.perudevteam.peru.regex.PeruRegex.*;
 
@@ -56,7 +53,7 @@ public class TestPeruRegex {
         WHITESPACE
     }
 
-    private static final Seq<Tuple3<String, Boolean, Function1<CharSimpleContext, CharPosEnum<Terminal1>>>>
+    private static final Seq<Tuple3<String, Boolean, Function1<CharSimpleContext, EnumCharPos<Terminal1>>>>
             PATTERNS1 = Array.of(
             Tuple.of("\\d+", false, enumBuilder(Terminal1.INTEGER)),
             Tuple.of("[0-9]+\\.[0-9]+", false, enumBuilder(Terminal1.DOUBLE)),
@@ -70,7 +67,7 @@ public class TestPeruRegex {
             Tuple.of("\\s+", false, enumBuilder(Terminal1.WHITESPACE))
     ).map(tuple -> tuple.map3(Function1::narrow));
 
-    private static final DFAutomaton<Character, Character, Function1<CharSimpleContext, CharPosEnum<Terminal1>>>
+    private static final DFAutomaton<Character, Character, Function1<CharSimpleContext, EnumCharPos<Terminal1>>>
             DFA1 = tryBuildMultiResultDFA(PATTERNS1).get();
 
     private static final CharSimpleDLexer<Terminal1> LEXER1 = new CharSimpleDLexer<>(DFA1);
@@ -116,10 +113,10 @@ public class TestPeruRegex {
     }
 
     static <T extends Enum<T>, C> Seq<DynamicTest> charLexerFailureTests(
-            DLexer<Character, String, CharPosEnum<T>, C> lexer,
+            DLexer<Character, String, EnumCharPos<T>, C> lexer,
             C context, Seq<? extends String> cases) {
         return cases.map(failure -> DynamicTest.dynamicTest("Can't Lex " + failure, () -> {
-            Tuple3<Tuple2<String, Try<CharPosEnum<T>>>, C, Seq<Character>> result =
+            Tuple3<Tuple2<String, Try<EnumCharPos<T>>>, C, Seq<Character>> result =
                     lexer.build(List.ofAll(failure.toCharArray()), context);
 
             assertTrue(result._1._2.isFailure());
@@ -128,10 +125,10 @@ public class TestPeruRegex {
 
 
     static <T extends Enum<T>, C> Seq<DynamicTest> charLexerSuccessTests(
-            DLexer<Character, String, CharPosEnum<T>, C> lexer,
+            DLexer<Character, String, EnumCharPos<T>, C> lexer,
             C context, Seq<? extends Tuple2<? extends String, T>> cases) {
         return cases.map(tuple -> DynamicTest.dynamicTest("Can Lex " + tuple._1, () -> {
-            Tuple3<Tuple2<String, Try<CharPosEnum<T>>>, C, Seq<Character>> result =
+            Tuple3<Tuple2<String, Try<EnumCharPos<T>>>, C, Seq<Character>> result =
                     lexer.build(List.ofAll(tuple._1.toCharArray()), context);
 
             assertEquals(result._1._1, tuple._1);
