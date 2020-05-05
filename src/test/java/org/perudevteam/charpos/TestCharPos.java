@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import org.perudevteam.TestingUtil;
 
+import static org.perudevteam.charpos.ValueCharPos.*;
 import static org.perudevteam.charpos.EnumCharPos.*;
 import static org.perudevteam.charpos.SimpleCharPos.*;
 

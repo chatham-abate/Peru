@@ -12,6 +12,7 @@ public class SimpleCursor implements Cursor<SimpleCursor> {
 
     private final int line;
     private final int linePosition;
+
     private final int tokenIndex;
     private final int tokenPosition;
 
