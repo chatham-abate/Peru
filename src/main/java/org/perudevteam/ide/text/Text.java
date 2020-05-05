@@ -64,15 +64,15 @@ public interface Text<T extends Text<T>> {
 
     T insertStringUnchecked(int l, int lp, String s);
 
-    default T breakLine(int l) {
+    default T joinLine(int l) {
         if (l <= 0 || l >= numberOfLines()) {
             throw new IndexOutOfBoundsException("Invalid break line index");
         }
 
-        return breakLineUnchecked(l);
+        return joinLineUnchecked(l);
     }
 
-    T breakLineUnchecked(int l);
+    T joinLineUnchecked(int l);
 
     // Delete Char Methods...
     default T deleteChar(CharPos d) {

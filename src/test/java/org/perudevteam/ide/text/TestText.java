@@ -34,6 +34,10 @@ public class TestText {
                     of("ab\nc").deleteRangeInclusiveUnchecked(0, 1, 1, 0).deleteChar(0, 0)
             ),
             Tuple.of(
+                    of("Hello\nWorld"),
+                    of("HelloWorld").insertChar(0, 5, '\n')
+            ),
+            Tuple.of(
                     of(Vector.of("Hello", "World")),
                     singleLine().insertString(0, 0, "Hello\nW").insertString(1, 1, "orld")
             ),
@@ -67,19 +71,19 @@ public class TestText {
             ),
             Tuple.of(
                     of("b"),
-                    of("\nb").breakLine(1)
+                    of("\nb").joinLine(1)
             ),
             Tuple.of(
                     of("abc\nabc\nabc"),
-                    of("abc\na\nbc\nabc").breakLine(2)
+                    of("abc\na\nbc\nabc").joinLine(2)
             ),
             Tuple.of(
                     singleLine(),
-                    of("\n").breakLine(1)
+                    of("\n").joinLine(1)
             ),
             Tuple.of(
                     of("\n\n\n"),
-                    of("\n\n\n\n").breakLine(2)
+                    of("\n\n\n\n").joinLine(2)
             )
     );
 
@@ -106,12 +110,12 @@ public class TestText {
                     () -> of("abc").deleteChar(0, 3)
             ),
             Tuple.of(
-                    "Bad Line Break 1",
-                    () -> of("").breakLine(0)
+                    "Bad Line Join 1",
+                    () -> of("").joinLine(0)
             ),
             Tuple.of(
-                    "Bad Line Break 2",
-                    () -> of("abc\nas").breakLine(2)
+                    "Bad Line Join 2",
+                    () -> of("abc\nas").joinLine(2)
             )
     );
 

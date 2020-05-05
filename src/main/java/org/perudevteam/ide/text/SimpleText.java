@@ -93,7 +93,7 @@ public class SimpleText implements Text<SimpleText> {
     }
 
     @Override
-    public SimpleText breakLineUnchecked(int l) {
+    public SimpleText joinLineUnchecked(int l) {
         Seq<String> newLines = lines.update(l - 1, s -> s + lines.get(l))
                 .removeAt(l);
         return new SimpleText(newLines);
