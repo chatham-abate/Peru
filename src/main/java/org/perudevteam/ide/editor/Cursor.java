@@ -1,44 +1,46 @@
 package org.perudevteam.ide.editor;
 
 import io.vavr.Function1;
-import org.perudevteam.charpos.CharPos;
-import org.perudevteam.charpos.MappableCharPos;
 
 import java.util.Objects;
 
-public interface Cursor<C extends Cursor<C>> extends MappableCharPos<C> {
+public class Cursor {
 
-    int getTokenIndex();
-
-    int getTokenPosition();
-
-    C withTokenIndexAndPosition(int ti, int tp);
-
-    default C withTokenIndexAndPosition(Cursor<?> d) {
-        Objects.requireNonNull(d);
-        return withTokenIndexAndPosition(d.getTokenIndex(), d.getTokenPosition());
+    public static Cursor cursor(int ti, int tp) {
+        return new Cursor(ti, tp);
     }
 
-    default C withTokenIndex(int ti) {
-        return withTokenIndexAndPosition(ti, getTokenPosition());
+    private final int tokenIndex;
+    private final int tokenPosition;
+
+    protected Cursor(int ti, int tp) {
+        tokenIndex = ti;
+        tokenPosition = tp;
     }
 
-    default C withTokenPosition(int tp) {
-        return withTokenIndexAndPosition(getTokenIndex(), tp);
+    public int getTokenIndex() {
+        return tokenIndex;
     }
 
-    default C mapTokenIndex(Function1<? super Integer, ? extends Integer> f) {
+    public int getTokenPosition() {
+        return tokenPosition;
+    }
+
+    public Cursor withTokenIndex(int ti) {
+        return new Cursor(ti, tokenPosition);
+    }
+
+    public Cursor mapTokenIndex(Function1<? super Integer, ? extends Integer> f) {
         Objects.requireNonNull(f);
-        return withTokenIndexAndPosition(f.apply(getTokenIndex()), getTokenPosition());
+        return new Cursor(f.apply(tokenIndex), tokenPosition);
     }
 
-    default C mapTokenPosition(Function1<? super Integer, ? extends Integer> f) {
-        Objects.requireNonNull(f);
-        return withTokenIndexAndPosition(getTokenIndex(), f.apply(getTokenPosition()));
+    public Cursor withTokenPosition(int tp) {
+        return new Cursor(tokenIndex, tp);
     }
 
-    default C mapTokenIndexAndPosition(Function1<? super Cursor<?>, ? extends Cursor<?>> f) {
+    public Cursor mapTokenPosition(Function1<? super Integer, ? extends Integer> f) {
         Objects.requireNonNull(f);
-        return withTokenIndexAndPosition(f.apply(this));
+        return new Cursor(tokenIndex, f.apply(tokenPosition));
     }
 }
