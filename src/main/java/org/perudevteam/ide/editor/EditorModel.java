@@ -10,10 +10,10 @@ public class EditorModel {
     private final Option<Cursor> selectionStart;
 
     private final Seq<Tuple2<String, TokenStyle>> tokens;
-    private final Stylist stylist;
+    private final Function1<String, Seq<TokenSprite>> stylist;
 
     protected EditorModel(Cursor c, Option<Cursor> ss, Seq<Tuple2<String, TokenStyle>> ts,
-                          Stylist st) {
+                          Function1<String, Seq<TokenSprite>> st) {
         cursor = c;
         selectionStart = ss;
 
@@ -43,5 +43,21 @@ public class EditorModel {
         return new EditorModel(requireValidCursor(c), selectionStart, tokens, stylist);
     }
 
-    
+//    public EditorModel moveLeft() {
+//
+//    }
+//
+//    public EditorModel moveRight() {
+//
+//    }
+//
+//    public EditorModel moveUp() {
+//
+//    }
+//
+//    public EditorModel moveDown() {
+//
+//    }
+//
+//
 }

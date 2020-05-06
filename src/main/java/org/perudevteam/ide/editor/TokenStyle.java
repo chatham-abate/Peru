@@ -3,61 +3,51 @@ package org.perudevteam.ide.editor;
 import io.vavr.Function1;
 import org.perudevteam.parser.Tokenized;
 
+import java.awt.*;
 import java.util.Objects;
 
 public class TokenStyle {
-    public static TokenStyle style(FColor fg) {
-        return style(false, false, fg, FColor.CLEAR, FColor.CLEAR, "");
+
+    public static TokenStyle style(Font f, FColor fg) {
+        return style(f, fg, FColor.CLEAR, FColor.CLEAR);
     }
 
-    public static TokenStyle style(boolean i, boolean b, FColor fg) {
-        return style(i, b, fg, FColor.CLEAR, FColor.CLEAR, "");
-    }
-
-    public static TokenStyle style(boolean i, boolean b, FColor fg, FColor bg, FColor un, String tt) {
+    public static TokenStyle style(Font f, FColor fg, FColor bg, FColor un) {
+        Objects.requireNonNull(f);
         Objects.requireNonNull(fg);
         Objects.requireNonNull(bg);
         Objects.requireNonNull(un);
-        Objects.requireNonNull(tt);
 
-        return new TokenStyle(i, b, fg, bg, un, tt);
+        return new TokenStyle(f, fg, bg, un);
     }
 
-    // Style.
-    private final boolean italicize;
-    private final boolean bold;
+    // Font.
+    private final Font font;
 
     // Colors.
     private final FColor foreground;
     private final FColor background;
     private final FColor underline;
 
-    // Tool Tip.
-    private final String toolTip;
-
-    protected TokenStyle(boolean i, boolean b, FColor fg, FColor bg, FColor un, String tt) {
-        italicize = i;
-        bold = b;
+    protected TokenStyle(Font f, FColor fg, FColor bg, FColor un) {
+        font = f;
         foreground = fg;
         background = bg;
         underline = un;
-        toolTip = tt;
     }
 
-    public boolean italicize() {
-        return italicize;
+    public Font getFont() {
+        return font;
     }
 
-    public TokenStyle withItalicsFlag(boolean i) {
-        return new TokenStyle(i, bold, foreground, background, underline, toolTip);
+    public TokenStyle withFont(Font f) {
+        Objects.requireNonNull(f);
+        return new TokenStyle(f, foreground, background, underline);
     }
 
-    public boolean bold() {
-        return bold;
-    }
-
-    public TokenStyle withBoldFlag(boolean b) {
-        return new TokenStyle(italicize, b, foreground, background, underline, toolTip);
+    public TokenStyle mapFont(Function1<? super Font, ? extends Font> f) {
+        Objects.requireNonNull(f);
+        return withFont(f.apply(font));
     }
 
     public FColor getForeground() {
@@ -66,7 +56,7 @@ public class TokenStyle {
 
     public TokenStyle withForeground(FColor fg) {
         Objects.requireNonNull(fg);
-        return new TokenStyle(italicize, bold, fg, background, underline, toolTip);
+        return new TokenStyle(font, fg, background, underline);
     }
 
     public TokenStyle mapForeground(Function1<? super FColor, ? extends FColor> f) {
@@ -80,7 +70,7 @@ public class TokenStyle {
 
     public TokenStyle withBackground(FColor bg) {
         Objects.requireNonNull(bg);
-        return new TokenStyle(italicize, bold, foreground, bg, underline, toolTip);
+        return new TokenStyle(font, foreground, bg, underline);
     }
 
     public TokenStyle mapBackground(Function1<? super FColor, ? extends FColor> f) {
@@ -94,7 +84,7 @@ public class TokenStyle {
 
     public TokenStyle withUnderline(FColor un) {
         Objects.requireNonNull(un);
-        return new TokenStyle(italicize, bold, foreground, background, un, toolTip);
+        return new TokenStyle(font, foreground, background, un);
     }
 
     public TokenStyle mapUnderline(Function1<? super FColor, ? extends FColor> f) {
@@ -102,34 +92,19 @@ public class TokenStyle {
         return withUnderline(f.apply(underline));
     }
 
-    public String getToolTip() {
-        return toolTip;
-    }
-
-    public TokenStyle withToolTip(String tt) {
-        Objects.requireNonNull(tt);
-        return new TokenStyle(italicize, bold, foreground, background, underline, tt);
-    }
-
-    public TokenStyle mapToolTip(Function1<? super String, ? extends String> f) {
-        Objects.requireNonNull(f);
-        return withToolTip(f.apply(toolTip));
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        TokenStyle tokenStyle = (TokenStyle) o;
-        return italicize == tokenStyle.italicize &&
-                bold == tokenStyle.bold &&
-                foreground.equals(tokenStyle.foreground) &&
-                background.equals(tokenStyle.background) &&
-                underline.equals(tokenStyle.underline);
+        TokenStyle that = (TokenStyle) o;
+        return font.equals(that.font) &&
+                foreground.equals(that.foreground) &&
+                background.equals(that.background) &&
+                underline.equals(that.underline);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(italicize, bold, foreground, background, underline);
+        return Objects.hash(font, foreground, background, underline);
     }
 }
