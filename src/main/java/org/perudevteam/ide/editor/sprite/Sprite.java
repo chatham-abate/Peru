@@ -5,7 +5,7 @@ import io.vavr.Function1;
 import java.awt.*;
 import java.util.Objects;
 
-// Test Comment.
+// Test 
 public abstract class Sprite<T extends Sprite<T>> {
 
     private final int xPosition;
