@@ -8,7 +8,6 @@ import io.vavr.control.Try;
 import java.util.Objects;
 
 /**
- * <h1>Builder</h1>
  * A <b>Builder</b> is a function which takes in a sequence of inputs of type <b>I</b>
  * and a context of type <b>C</b>. Using the inputs and the context, the function builds some output
  * of type <b>O</b> then returns a <b>Tuple3</b> containing the output, a new context, and

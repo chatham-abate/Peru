@@ -56,14 +56,8 @@ public abstract class LROneParser<NT extends Enum<NT>, T extends Enum<T>, L, D e
         table = new LROneTable<>(g);    // Build LR(1) table.
     }
 
-    /**
-     * Creates error to be thrown when an error state is encountered with the given lookahead.
-     */
     protected abstract Throwable onError(Tuple2<L, D> lookAhead);
 
-    /**
-     * Creates error to be thrown when an error state is encountered with a lookahead of EOF.
-     */
     protected abstract Throwable onError();
 
     @Override

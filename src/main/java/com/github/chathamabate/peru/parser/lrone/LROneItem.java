@@ -142,9 +142,6 @@ public class LROneItem <NT extends Enum<NT>, T extends Enum<T>, P extends Produc
         return Either.right(suffix.get());
     }
 
-    /**
-     * Whether or not the LR(1) item holds the empty rule.
-     */
     public boolean isEmpty() {
         return production.getRule().isEmpty();
     }
