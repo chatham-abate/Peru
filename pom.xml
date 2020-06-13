@@ -8,9 +8,9 @@
     <artifactId>peru</artifactId>
     <version>0.1.0-SNAPSHOT</version>
 
-    <name>Peru</name>
+    <name>peru</name>
     <description>A library for generating lexers, parsers, interpreters, and compilers.</description>
-    <url>https://github.com/chathamabate/Peru</url>
+    <url>https://github.com/chathamabate/peru</url>
 
     <licenses>
         <license>
@@ -29,14 +29,13 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git://github.com/chathamabate/Peru.git</connection>
-        <developerConnection>scm:git:ssh://github.com:chathamabate/Peru.git</developerConnection>
-        <url>http://github.com/chathamabate/Peru</url>
+        <connection>scm:git:git://github.com/chathamabate/peru.git</connection>
+        <developerConnection>scm:git:ssh://github.com:chathamabate/peru.git</developerConnection>
+        <url>http://github.com/chathamabate/peru</url>
     </scm>
 
     <properties>
         <!-- Java 8 -->
-
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
